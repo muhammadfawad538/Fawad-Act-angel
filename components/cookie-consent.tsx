@@ -82,7 +82,7 @@ export function CookieConsent() {
                 &ldquo;Accept All&rdquo; to agree to all cookies, or &ldquo;Customize&rdquo; to
                 choose which categories you allow. For more detail, see our{" "}
                 <a href="/privacy-policy" target="_blank" className="underline underline-offset-2 hover:text-[#111] transition-colors">
-                  Cookies Policy
+                  Cookies Policy1
                 </a>
                 .
               </p>
