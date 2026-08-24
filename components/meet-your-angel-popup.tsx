@@ -323,6 +323,7 @@ export function MeetYourAngelModal({
                     unsubscribe or HELP for help. See our{" "}
                     <a
                       href="/privacy-policy"
+                      target="_blank"
                       className="underline hover:text-black/60"
                     >
                       Privacy Policy

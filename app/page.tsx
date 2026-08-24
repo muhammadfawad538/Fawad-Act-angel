@@ -860,6 +860,7 @@ export default function AgenticPage() {
           <div className="flex items-center gap-6">
             <a
               href="/privacy-policy"
+              target="_blank"
               className="text-sm text-black/35 hover:text-black/70 transition-colors tracking-widest"
             >
               Cookies Policy
