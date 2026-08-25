@@ -870,9 +870,10 @@ export default function AgenticPage() {
             </a>
           </div>
 
-          {/* Row 2: the 3 policy links on their own line — right-aligned on desktop, centred
-              and wrapping (flex-wrap) on small screens so they never overflow. */}
-          <div className="flex flex-wrap items-center justify-center md:justify-end gap-x-6 gap-y-2">
+        </div>
+        <div className="max-w-6xl mx-auto mt-8 pt-6 border-t border-black/[0.04] flex flex-col-reverse md:flex-row md:items-center md:justify-between gap-4">
+          <span className="text-sm text-black/20">© 2026 Act Angel AI</span>
+          <div className="flex flex-wrap items-center justify-start md:justify-end gap-x-6 gap-y-2">
             <a
               href="/privacy"
               target="_blank"
@@ -895,9 +896,6 @@ export default function AgenticPage() {
               Cookies Policy
             </a>
           </div>
-        </div>
-        <div className="max-w-6xl mx-auto mt-8 pt-6 border-t border-black/[0.04]">
-          <span className="text-sm text-black/20">© 2026 Act Angel AI</span>
         </div>
       </footer>
     </div>

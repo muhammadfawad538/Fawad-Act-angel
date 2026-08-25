@@ -27,7 +27,7 @@ export default function BehindTheAngelsPage() {
       <div className="px-6 md:px-12 lg:px-20 py-24 md:py-32">
       <main className="max-w-6xl mx-auto">
         <h1 className="text-4xl md:text-5xl font-light tracking-tight leading-[1.1] max-w-3xl mx-auto text-center">
-          We Don&rsquo;t Build More Software. We Build AI Employees.
+          We Don&rsquo;t Build More Software.<br/>We Build AI Employees.
         </h1>
         <p className="mt-4 text-lg md:text-xl text-black/55 text-center">
           Scale your business — not your headcount.
