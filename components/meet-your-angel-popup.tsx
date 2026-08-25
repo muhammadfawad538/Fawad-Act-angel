@@ -322,7 +322,7 @@ export function MeetYourAngelModal({
                     purchase. Message and data rates may apply. Reply STOP to
                     unsubscribe or HELP for help. See our{" "}
                     <a
-                      href="/privacy-policy"
+                      href="/privacy"
                       target="_blank"
                       className="underline hover:text-black/60"
                     >

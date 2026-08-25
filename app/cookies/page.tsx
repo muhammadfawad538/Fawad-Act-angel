@@ -1,6 +1,8 @@
 import type { Metadata } from "next"
 import { COOKIE_CATEGORIES } from "@/lib/cookie-consent"
 import { CookiePreferencesButton } from "@/components/cookie-preferences-button"
+import { SiteHeader } from "@/components/site-header"
+import { SiteFooter } from "@/components/site-footer"
 
 export const metadata: Metadata = {
   title: "Cookies Policy — Act Angel AI",
@@ -19,32 +21,13 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   )
 }
 
-export default function PrivacyPolicyPage() {
+export default function CookiesPolicyPage() {
   return (
     <div className="bg-[#F5F4F0] text-[#111] min-h-screen font-sans antialiased">
-      {/* Logo-only nav — same surface, geometry and container as the site nav
-          (components/mobile-nav.tsx), minus the menu items. The logo links home. */}
-      <div className="fixed top-4 inset-x-0 z-50 flex justify-center px-6 md:px-12 lg:px-20 pointer-events-none">
-        <div className="pointer-events-auto w-full max-w-6xl mx-auto">
-          <nav
-            className="flex items-center px-5 py-3 rounded-2xl border border-black/[0.06]"
-            style={{
-              backdropFilter: "blur(16px)",
-              WebkitBackdropFilter: "blur(16px)",
-              background: "rgba(255,255,255,0.75)",
-              boxShadow: "0 10px 30px -12px rgba(0,0,0,0.12)",
-            }}
-          >
-            <a href="/" aria-label="Act Angel AI — back to home" className="flex items-center gap-2">
-              <img src="/images/logo.png" alt="Act Angel AI" className="h-10 w-auto" />
-            </a>
-          </nav>
-        </div>
-      </div>
+      {/* Same nav + modals as the homepage, matching /privacy, /terms, and
+          /behind-the-angels — not the stripped-down logo-only nav this used to have. */}
+      <SiteHeader />
 
-      {/* Two elements, mirroring the navbar exactly: padding on the outer one, max-w-6xl on
-          the inner. Putting both on a single element would subtract the padding from the
-          1152px cap and leave the content narrower than the nav. */}
       <div className="px-6 md:px-12 lg:px-20 py-24 md:py-32">
       <main className="max-w-6xl mx-auto">
         <h1 className="text-4xl md:text-5xl font-light tracking-tight leading-[1.05]">
@@ -171,11 +154,10 @@ export default function PrivacyPolicyPage() {
           </p>
         </Section>
 
-        <div className="mt-16 pt-6 border-t border-black/[0.08]">
-          <span className="text-sm text-black/20">© 2026 Act Angel AI</span>
-        </div>
       </main>
       </div>
+
+      <SiteFooter />
     </div>
   )
 }

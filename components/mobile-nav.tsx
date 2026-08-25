@@ -67,7 +67,8 @@ export function MobileNav({ onSelectPersona, onGetStarted }: MobileNavProps) {
           style={NAV_STYLE}
         >
           <a
-            href="#"
+            href="/"
+            aria-label="Act Angel AI — go to homepage"
             className="flex items-center gap-2 font-pixel text-xs tracking-[0.25em] text-black/70"
           >
             <img
@@ -107,7 +108,7 @@ export function MobileNav({ onSelectPersona, onGetStarted }: MobileNavProps) {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <a href="#behind-the-angels" className={NAV_ITEM}>
+            <a href="/behind-the-angels" className={NAV_ITEM}>
               Behind the Angels
             </a>
             <a href="#contact" className={NAV_ITEM}>
@@ -195,7 +196,7 @@ export function MobileNav({ onSelectPersona, onGetStarted }: MobileNavProps) {
             </div>
 
             <a
-              href="#behind-the-angels"
+              href="/behind-the-angels"
               onClick={close}
               className={`px-4 py-3 hover:bg-black/[0.03] rounded-xl ${NAV_ITEM}`}
             >

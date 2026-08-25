@@ -846,7 +846,8 @@ export default function AgenticPage() {
       >
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
           <a
-            href="#"
+            href="/"
+            aria-label="Act Angel AI — go to homepage"
             className="flex items-center gap-2 font-pixel text-xs tracking-[0.25em] text-black/50"
           >
             <img
@@ -857,14 +858,36 @@ export default function AgenticPage() {
             />
           </a>
 
-          <div className="flex items-center gap-6">  <a href="#m" className="text-sm text-black/35 hover:text-black/70 transition-colors tracking-widest"> One Boston Place, # 2600, Boston, MA, 02108           </a>
-            <a
-              href="/privacy-policy"
-              target="_blank"
-              className="text-sm text-black/35 hover:text-black/70 transition-colors tracking-widest"
-            >
-              Cookies Policy
+          {/* Small screens: address / menu links / email stack as three separate lines
+              (flex-col here), with the menu group itself wrapping if it's still too wide for
+              one line. From md up, everything returns to a single row like before. */}
+          <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-6 w-full md:w-auto">
+            <a href="#m" className="text-sm text-black/35 hover:text-black/70 transition-colors tracking-widest">
+              One Boston Place, # 2600, Boston, MA, 02108
             </a>
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+              <a
+                href="/privacy"
+                target="_blank"
+                className="text-sm text-black/35 hover:text-black/70 transition-colors tracking-widest"
+              >
+                Privacy Policy
+              </a>
+              <a
+                href="/terms"
+                target="_blank"
+                className="text-sm text-black/35 hover:text-black/70 transition-colors tracking-widest"
+              >
+                Terms
+              </a>
+              <a
+                href="/cookies"
+                target="_blank"
+                className="text-sm text-black/35 hover:text-black/70 transition-colors tracking-widest"
+              >
+                Cookies Policy
+              </a>
+            </div>
             <a
               href="mailto:hello@actangel.com"
               className="text-sm text-black/35 hover:text-black/70 transition-colors tracking-widest"
