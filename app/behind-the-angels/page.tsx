@@ -35,9 +35,8 @@ export default function BehindTheAngelsPage() {
 
         <p className="mt-8 text-[15px] leading-relaxed text-black/60 max-w-3xl">
           Act Angel AI is a <strong className="font-medium text-[#111]">Boston-headquartered AI
-          company</strong> combining three decades of enterprise technology, SaaS, and business
-          process expertise with a new generation of{" "}
-          <strong className="font-medium text-[#111]">AI-native talent — fresh, fast, and agile.</strong>{" "}
+          company</strong> bringing together industry veterans with three decades of enterprise technology, SaaS, and business process expertise and a new generation of{" "}
+          <strong className="font-medium text-[#111]">AI-native talent—fresh, fast, innovative, and agile.</strong>{" "}
           Backed by seasoned investors who know how to build, scale, and win.
         </p>
 
