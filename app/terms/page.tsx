@@ -3,7 +3,7 @@ import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 
 export const metadata: Metadata = {
-  title: "Terms of Service — Act Angel AI",
+  title: "Terms & Conditions — Act Angel AI",
   description:
     "The terms that apply when you submit an enquiry and Act Angel AI's AI assistant calls or messages you in response.",
 }
@@ -28,7 +28,7 @@ export default function TermsPage() {
       <div className="px-6 md:px-12 lg:px-20 py-24 md:py-32">
       <main className="max-w-6xl mx-auto">
         <h1 className="text-4xl md:text-5xl font-light tracking-tight leading-[1.05]">
-          Terms of Service
+          Terms &amp; Conditions
         </h1>
         <p className="mt-4 text-[13px] text-black/40">Last updated: {LAST_UPDATED}</p>
 
