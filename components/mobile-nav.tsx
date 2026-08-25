@@ -107,8 +107,8 @@ export function MobileNav({ onSelectPersona, onGetStarted }: MobileNavProps) {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <a href="#pilot" className={NAV_ITEM}>
-              Pilot
+            <a href="#behind-the-angels" className={NAV_ITEM}>
+              Behind the Angels
             </a>
             <a href="#contact" className={NAV_ITEM}>
               Contact
@@ -195,11 +195,11 @@ export function MobileNav({ onSelectPersona, onGetStarted }: MobileNavProps) {
             </div>
 
             <a
-              href="#pilot"
+              href="#behind-the-angels"
               onClick={close}
               className={`px-4 py-3 hover:bg-black/[0.03] rounded-xl ${NAV_ITEM}`}
             >
-              Pilot
+              Behind the Angels
             </a>
             <a
               href="#contact"
