@@ -8,6 +8,7 @@ type Step = "details" | "otp" | "success"
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const RESEND_COOLDOWN_SECONDS = 30
+const WHATSAPP_LINK = `https://wa.me/13236885001?text=${encodeURIComponent("Hi, I'd like to chat with Act Angel!")}`
 
 // Icon paths ported as-is from the interactive-ai-sales-agent form.
 const CHANNELS: { id: Channel; icon: React.ReactNode }[] = [
@@ -194,6 +195,12 @@ export function MeetYourAngelForm({ resetOn, onDone }: MeetYourAngelFormProps) {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error ?? "That code didn't work.")
       setStep("success")
+      if (channel === "WhatsApp") {
+        // Opened synchronously within this click handler (not in a useEffect)
+        // so browsers treat it as a direct result of the user's action rather
+        // than an unrequested popup - this is what keeps it from being blocked.
+        window.open(WHATSAPP_LINK, "_blank", "noopener,noreferrer")
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.")
     } finally {
@@ -287,6 +294,10 @@ export function MeetYourAngelForm({ resetOn, onDone }: MeetYourAngelFormProps) {
               our{" "}
               <a href="/privacy" target="_blank" className="underline hover:text-black/60">
                 Privacy Policy
+              </a>{" "}
+              and{" "}
+              <a href="/terms" target="_blank" className="underline hover:text-black/60">
+                Terms of Service
               </a>
               .
             </p>
@@ -371,10 +382,34 @@ export function MeetYourAngelForm({ resetOn, onDone }: MeetYourAngelFormProps) {
             ✓
           </div>
           <h3 className="text-lg font-medium">You&apos;re all set!</h3>
-          <p className="text-sm text-black/55">
-            Your mobile and email are verified. Act Angel is calling you now via {channel} — keep
-            an eye on your phone.
-          </p>
+          {channel === "Call" && (
+            <p className="text-sm text-black/55">
+              Your mobile and email are verified. Act Angel is calling you now — keep an eye on
+              your phone.
+            </p>
+          )}
+          {channel === "WhatsApp" && (
+            <>
+              <p className="text-sm text-black/55">
+                Your mobile and email are verified. WhatsApp should be opening now to start
+                chatting with your Angel.
+              </p>
+              <a
+                href={WHATSAPP_LINK}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${primaryButtonClass} inline-flex items-center justify-center gap-1`}
+              >
+                Didn&apos;t open? Continue on WhatsApp →
+              </a>
+            </>
+          )}
+          {channel === "Email" && (
+            <p className="text-sm text-black/55">
+              Your mobile and email are verified. Check your inbox — your Angel has just sent you
+              a note to get the conversation started.
+            </p>
+          )}
           <button onClick={() => onDone?.()} className={primaryButtonClass}>
             Done
           </button>
