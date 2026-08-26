@@ -146,10 +146,10 @@ export default function CookiesPolicyPage() {
           </p>
           <p>
             <a
-              href="mailto:hello@actangel.ai"
+              href="mailto:angel@actangel.com"
               className="text-[#111] underline underline-offset-2 hover:text-black/60 transition-colors"
             >
-              hello@actangel.ai
+              angel@actangel.com
             </a>
           </p>
         </Section>

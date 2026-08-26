@@ -96,10 +96,10 @@ export default function PrivacyPage() {
           <p>
             For any privacy question or request, contact us at{" "}
             <a
-              href="mailto:crm@cloudsteer.com"
+              href="mailto:angel@actangel.com"
               className="text-[#111] underline underline-offset-2 hover:text-black/60 transition-colors"
             >
-              crm@cloudsteer.com
+              angel@actangel.com
             </a>
             .
           </p>
