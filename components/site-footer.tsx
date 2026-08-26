@@ -1,3 +1,5 @@
+import Link from "next/link"
+
 // Copied from the homepage's footer (app/page.tsx) so secondary pages render an identical
 // footer instead of drifting from it. The "contact" id is kept as-is even though it only
 // makes sense in a homepage context; the logo's href is "/" rather than "#" precisely
@@ -10,7 +12,7 @@ export function SiteFooter() {
       className="py-10 px-6 md:px-12 lg:px-20 border-t border-black/[0.06]"
     >
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-8">
-        <a
+        <Link
           href="/"
           aria-label="Act Angel AI — go to homepage"
           className="flex items-center gap-2 font-pixel text-xs tracking-[0.25em] text-black/50"
@@ -21,7 +23,7 @@ export function SiteFooter() {
             aria-hidden="true"
             className="h-10 w-auto"
           />
-        </a>
+        </Link>
         <a href="#m" className="text-sm text-black/35 hover:text-black/70 transition-colors tracking-widest">
           One Boston Place, # 2600, Boston, MA, 02108
         </a>

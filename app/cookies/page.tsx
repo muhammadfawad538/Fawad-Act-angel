@@ -23,12 +23,14 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 export default function CookiesPolicyPage() {
   return (
-    <div className="bg-[#F5F4F0] text-[#111] min-h-screen font-sans antialiased">
+    <div className="bg-[#F5F4F0] text-[#111] min-h-screen flex flex-col font-sans antialiased">
       {/* Same nav + modals as the homepage, matching /privacy, /terms, and
           /behind-the-angels — not the stripped-down logo-only nav this used to have. */}
       <SiteHeader />
 
-      <div className="px-6 md:px-12 lg:px-20 py-24 md:py-32">
+      {/* flex-1: keeps the footer pinned to the bottom of the screen on short-content pages
+          instead of stranded right after the content. */}
+      <div className="flex-1 px-6 md:px-12 lg:px-20 py-24 md:py-32">
       <main className="max-w-6xl mx-auto">
         <h1 className="text-4xl md:text-5xl font-light tracking-tight leading-[1.05]">
           Cookies Policy

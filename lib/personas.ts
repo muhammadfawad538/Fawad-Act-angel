@@ -14,6 +14,7 @@ export type ScriptLine = ["in" | "out", string]
 export interface Persona {
   id: PersonaId
   label: string // nav dropdown / picker label
+  slug: string // URL segment under /hire-an-angel/, e.g. "sales-angel"
   contact: string // contact name shown on the call screen and chat header
   avatar: string // per-persona photo (public/images)
   role: string
@@ -24,6 +25,7 @@ export const PERSONAS: Persona[] = [
   {
     id: "sales",
     label: "Sales Angel",
+    slug: "sales-angel",
     contact: "Alex Morgan",
     avatar: "/images/alex_morgan.webp",
     role: "Sales",
@@ -37,6 +39,7 @@ export const PERSONAS: Persona[] = [
   {
     id: "service",
     label: "Service Angel",
+    slug: "service-angel",
     contact: "Nora Bennett",
     avatar: "/images/nora_bennett.png",
     role: "Service",
@@ -50,6 +53,7 @@ export const PERSONAS: Persona[] = [
   {
     id: "hr",
     label: "Recruitment Angel",
+    slug: "recruitment-angel",
     contact: "Mia Torres",
     avatar: "/images/mia_torres.png",
     role: "Human Resource",
@@ -63,6 +67,7 @@ export const PERSONAS: Persona[] = [
   {
     id: "assistance",
     label: "Executive Assistant Angel",
+    slug: "executive-assistant-angel",
     contact: "Sarah Thomson",
     avatar: "/images/sarah_thomson.png",
     role: "Assistance",
