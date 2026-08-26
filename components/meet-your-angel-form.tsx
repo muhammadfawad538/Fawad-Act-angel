@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { useRouter } from "next/navigation"
 import { normalizePhone } from "@/lib/phone"
 
 type Channel = "Call" | "WhatsApp" | "Email"
@@ -62,6 +63,7 @@ export interface MeetYourAngelFormProps {
  * content to this component now.
  */
 export function MeetYourAngelForm({ resetOn, onDone }: MeetYourAngelFormProps) {
+  const router = useRouter()
   const [step, setStep] = useState<Step>("details")
   const [channel, setChannel] = useState<Channel>("Call")
   const [name, setName] = useState("")
@@ -410,7 +412,19 @@ export function MeetYourAngelForm({ resetOn, onDone }: MeetYourAngelFormProps) {
               a note to get the conversation started.
             </p>
           )}
-          <button onClick={() => onDone?.()} className={primaryButtonClass}>
+          <button
+            onClick={() => {
+              // onDone is only provided by the modal (components/meet-your-angel-popup.tsx),
+              // which uses it to close the dialog. On the standalone /get-started page there is
+              // no modal to close and no onDone is passed, so the button did nothing at all -
+              // that's the bug report ("Done not closing the popup"): there never was a popup on
+              // that page, just a button silently no-op'ing. Falling back to navigating home
+              // gives it real, sensible behavior in that case instead of doing nothing.
+              if (onDone) onDone()
+              else router.push("/")
+            }}
+            className={primaryButtonClass}
+          >
             Done
           </button>
         </div>
