@@ -135,14 +135,21 @@ export function MeetYourAngelForm({ resetOn, onDone }: MeetYourAngelFormProps) {
     e.preventDefault()
     setError("")
 
-    if (!name.trim()) return setError("Please enter your name.")
+    if (!name.trim()) {
+      posthog.capture("form_validation_failed", { step: "details", field: "name" })
+      return setError("Please enter your name.")
+    }
     const cleanPhone = normalizePhone(phone)
     if (!cleanPhone) {
+      posthog.capture("form_validation_failed", { step: "details", field: "phone" })
       return setError(
         "Please enter your mobile number including country code, e.g. +14155551234 or +919876543210.",
       )
     }
-    if (!EMAIL_RE.test(email.trim())) return setError("Please enter a valid email address.")
+    if (!EMAIL_RE.test(email.trim())) {
+      posthog.capture("form_validation_failed", { step: "details", field: "email" })
+      return setError("Please enter a valid email address.")
+    }
 
     setLoading(true)
     try {
@@ -153,7 +160,9 @@ export function MeetYourAngelForm({ resetOn, onDone }: MeetYourAngelFormProps) {
       posthog.capture("form_step_completed", { step: "details", channel })
       posthog.capture("otp_sent", { channel })
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong.")
+      const message = err instanceof Error ? err.message : "Something went wrong."
+      setError(message)
+      posthog.capture("otp_send_failed", { error: message })
     } finally {
       setLoading(false)
     }
@@ -163,11 +172,14 @@ export function MeetYourAngelForm({ resetOn, onDone }: MeetYourAngelFormProps) {
     if (resendCooldown > 0 || loading) return
     setError("")
     setLoading(true)
+    posthog.capture("otp_resend_requested", { channel })
     try {
       await sendCodes(normalizedPhone, email.trim())
       startResendCooldown()
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Couldn't resend the code.")
+      const message = err instanceof Error ? err.message : "Couldn't resend the code."
+      setError(message)
+      posthog.capture("otp_resend_failed", { error: message })
     } finally {
       setLoading(false)
     }
@@ -177,8 +189,14 @@ export function MeetYourAngelForm({ resetOn, onDone }: MeetYourAngelFormProps) {
     e.preventDefault()
     setError("")
 
-    if (!/^\d{4,10}$/.test(phoneCode.trim())) return setError("Please enter the mobile code we sent you.")
-    if (!/^\d{4,10}$/.test(emailCode.trim())) return setError("Please enter the email code we sent you.")
+    if (!/^\d{4,10}$/.test(phoneCode.trim())) {
+      posthog.capture("form_validation_failed", { step: "otp", field: "phoneCode" })
+      return setError("Please enter the mobile code we sent you.")
+    }
+    if (!/^\d{4,10}$/.test(emailCode.trim())) {
+      posthog.capture("form_validation_failed", { step: "otp", field: "emailCode" })
+      return setError("Please enter the email code we sent you.")
+    }
 
     setLoading(true)
     try {
@@ -378,6 +396,7 @@ export function MeetYourAngelForm({ resetOn, onDone }: MeetYourAngelFormProps) {
           <button
             type="button"
             onClick={() => {
+              posthog.capture("form_step_back", { from: "otp", to: "details" })
               setStep("details")
               setError("")
               setPhoneCode("")
