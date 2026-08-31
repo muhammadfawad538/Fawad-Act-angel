@@ -1,6 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
+import { usePathname } from "next/navigation"
 import Script from "next/script"
 import { Analytics } from "@vercel/analytics/next"
 import posthog from "posthog-js"
@@ -31,6 +32,8 @@ const POSTHOG_HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST
  */
 export function AnalyticsGate() {
   const [allowed, setAllowed] = useState(false)
+  const pathname = usePathname()
+  const pageTimerRef = useRef<{ path: string; enteredAt: number } | null>(null)
 
   useEffect(() => {
     const sync = () => setAllowed(hasConsent("analytics"))
@@ -64,6 +67,41 @@ export function AnalyticsGate() {
       posthog.opt_out_capturing()
     }
   }, [allowed])
+
+  /**
+   * Time-on-page, per route. `visibilitychange` (not `beforeunload`, which is unreliable on
+   * mobile/Safari) is what actually catches a tab close/background - flushing there AND
+   * resetting the clock means a visitor who comes back to a still-open tab later doesn't get
+   * double-counted for the time it sat hidden. The pathname effect below catches in-app SPA
+   * navigation, which never fires a visibility change at all.
+   */
+  useEffect(() => {
+    if (!allowed) return
+
+    function flushAndReset() {
+      const cur = pageTimerRef.current
+      if (!cur) return
+      const seconds = Math.round((Date.now() - cur.enteredAt) / 1000)
+      if (seconds > 0) posthog.capture("page_time_spent", { path: cur.path, seconds })
+      pageTimerRef.current = { path: cur.path, enteredAt: Date.now() }
+    }
+
+    function handleVisibility() {
+      if (document.visibilityState === "hidden") flushAndReset()
+    }
+    document.addEventListener("visibilitychange", handleVisibility)
+    return () => document.removeEventListener("visibilitychange", handleVisibility)
+  }, [allowed])
+
+  useEffect(() => {
+    if (!allowed) return
+    const prev = pageTimerRef.current
+    if (prev && prev.path !== pathname) {
+      const seconds = Math.round((Date.now() - prev.enteredAt) / 1000)
+      if (seconds > 0) posthog.capture("page_time_spent", { path: prev.path, seconds })
+    }
+    pageTimerRef.current = { path: pathname, enteredAt: Date.now() }
+  }, [allowed, pathname])
 
   if (!allowed) return null
   return (

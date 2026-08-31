@@ -2,6 +2,7 @@
 
 import React, { useRef, useEffect, useState, useCallback } from "react";
 import Link from "next/link";
+import posthog from "posthog-js";
 import {
   IntroAnimation,
   INTRO_DURATION_MS,
@@ -793,6 +794,7 @@ export default function AgenticPage() {
           </h2>
           <Link
             href="/get-started"
+            onClick={() => posthog.capture("cta_get_started_clicked", { location: "hero" })}
             className="inline-block px-8 py-3 bg-[#111] text-white text-sm rounded-xl hover:bg-[#333] transition-colors tracking-wide font-medium"
           >
             Get Started

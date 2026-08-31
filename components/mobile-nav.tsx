@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import posthog from "posthog-js";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -112,6 +113,7 @@ export function MobileNav() {
           <div className="flex items-center gap-2">
             <Link
               href="/get-started"
+              onClick={() => posthog.capture("cta_get_started_clicked", { location: "nav_desktop" })}
               className={`hidden md:flex items-center justify-center px-[26px] h-[46px] rounded-full bg-white border border-[#DADADA] hover:border-[#b8b8b8] ${NAV_CTA}`}
             >
               Get Started
@@ -207,7 +209,10 @@ export function MobileNav() {
             <div className="mt-1 px-2 pb-1">
               <Link
                 href="/get-started"
-                onClick={close}
+                onClick={() => {
+                  posthog.capture("cta_get_started_clicked", { location: "nav_mobile" })
+                  close()
+                }}
                 className={`flex items-center justify-center w-full px-4 h-[46px] rounded-full bg-white border border-[#DADADA] hover:border-[#b8b8b8] ${NAV_CTA}`}
               >
                 Get Started
