@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
+import posthog from "posthog-js"
 import { normalizePhone } from "@/lib/phone"
 
 type Channel = "Call" | "WhatsApp" | "Email"
@@ -149,6 +150,8 @@ export function MeetYourAngelForm({ resetOn, onDone }: MeetYourAngelFormProps) {
       setNormalizedPhone(cleanPhone)
       setStep("otp")
       startResendCooldown()
+      posthog.capture("form_step_completed", { step: "details", channel })
+      posthog.capture("otp_sent", { channel })
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.")
     } finally {
@@ -197,6 +200,12 @@ export function MeetYourAngelForm({ resetOn, onDone }: MeetYourAngelFormProps) {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error ?? "That code didn't work.")
       setStep("success")
+      // Ties this browser's future activity to the actual lead once verified, so
+      // retention/return-visit cohorts in PostHog can be built off a real identity
+      // instead of only anonymous sessions.
+      posthog.identify(email.trim(), { phone: normalizedPhone, name: name.trim() })
+      posthog.capture("form_step_completed", { step: "otp", channel })
+      posthog.capture("form_submitted", { channel })
       if (channel === "WhatsApp") {
         // Opened synchronously within this click handler (not in a useEffect)
         // so browsers treat it as a direct result of the user's action rather
@@ -204,7 +213,9 @@ export function MeetYourAngelForm({ resetOn, onDone }: MeetYourAngelFormProps) {
         window.open(WHATSAPP_LINK, "_blank", "noopener,noreferrer")
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong.")
+      const message = err instanceof Error ? err.message : "Something went wrong."
+      setError(message)
+      posthog.capture("otp_verification_failed", { error: message })
     } finally {
       setLoading(false)
     }
@@ -228,7 +239,10 @@ export function MeetYourAngelForm({ resetOn, onDone }: MeetYourAngelFormProps) {
                 <button
                   key={c.id}
                   type="button"
-                  onClick={() => setChannel(c.id)}
+                  onClick={() => {
+                    setChannel(c.id)
+                    posthog.capture("channel_selected", { channel: c.id })
+                  }}
                   aria-label={c.id}
                   aria-pressed={active}
                   title={c.id}
