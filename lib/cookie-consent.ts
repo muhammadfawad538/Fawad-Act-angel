@@ -159,7 +159,11 @@ export function rejectAll() {
 // that authorises them. Rejecting has to actually remove what's already there — otherwise a
 // visitor who accepted and later changed their mind keeps being tracked by the old cookie.
 const COOKIES_BY_CATEGORY: Record<OptionalCategory, string[]> = {
-  analytics: ["_ga", "_gid", "_gat", "_vercel_insights", "va-session"],
+  analytics: [
+    "_ga", "_gid", "_gat", "_vercel_insights", "va-session", "_clck", "_clsk",
+    // PostHog's cookie name is ph_<project api key>_posthog - fixed for this project's key.
+    "ph_phc_zHKkDeNhQf8cPyqM7DxmaB2skkMg5gNepoJtajbc6KD8_posthog",
+  ],
   performance: ["_vercel_speed_insights"],
   functional: [],
   advertisement: ["_fbp", "_gcl_au"],

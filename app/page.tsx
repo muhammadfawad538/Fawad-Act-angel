@@ -1,6 +1,8 @@
 ﻿"use client";
 
 import React, { useRef, useEffect, useState, useCallback } from "react";
+import Link from "next/link";
+import posthog from "posthog-js";
 import {
   IntroAnimation,
   INTRO_DURATION_MS,
@@ -11,15 +13,8 @@ import { RevealText } from "@/components/reveal-text";
 import { StackingAgentCards } from "@/components/stacking-agent-cards";
 import { MobileNav } from "@/components/mobile-nav";
 import { DevExSection } from "@/components/devex-section";
-import { HireAnAngelModal } from "@/components/hire-an-angel-modal";
-import { MeetYourAngelModal } from "@/components/meet-your-angel-popup";
 import { PersonaPhoneDemo } from "@/components/persona-phone-demo";
-import {
-  HERO_CONTACT,
-  HERO_AVATAR,
-  HERO_MESSAGES,
-  type PersonaId,
-} from "@/lib/personas";
+import { HERO_CONTACT, HERO_AVATAR, HERO_MESSAGES } from "@/lib/personas";
 
 // ─── Intersection Observer hook ──────────────────────────────────────────────
 function useInView(threshold = 0.15) {
@@ -109,22 +104,6 @@ export default function AgenticPage() {
     setHeroReady(true);
   }, []);
 
-  // "Hire an Angel" persona-demo modal — opened from the nav dropdown (Step 3);
-  // the Hero's own trigger wires into this once Step 5 lands.
-  const [angelModalOpen, setAngelModalOpen] = useState(false);
-  const [angelPersonaId, setAngelPersonaId] = useState<PersonaId>("sales");
-  const openAngelModal = useCallback((id: PersonaId) => {
-    setAngelPersonaId(id);
-    setAngelModalOpen(true);
-  }, []);
-
-  // "Meet Your Angel" lead-capture modal — shared entry point for every "Get Started"
-  // button on the site (nav Step 3, hero Step 5, CTA Step 10, footer Step 11).
-  const [angelLeadModalOpen, setAngelLeadModalOpen] = useState(false);
-  const handleGetStarted = useCallback(() => {
-    setAngelLeadModalOpen(true);
-  }, []);
-
   // Start video zoom slightly before hero content reveals, for seamless overlap.
   // When the intro is skipped (already seen this session) there's nothing to overlap with,
   // so go straight to the zoomed state instead of holding it back for ~10s.
@@ -150,24 +129,7 @@ export default function AgenticPage() {
       <IntroAnimation onDone={handleIntroDone} />
 
       {/* ── STICKY NAV ────────────────────────────────────────────────────── */}
-      <MobileNav
-        onSelectPersona={openAngelModal}
-        onGetStarted={handleGetStarted}
-      />
-
-      {/* ── "HIRE AN ANGEL" PERSONA DEMO MODAL ──────────────────────────────── */}
-      <HireAnAngelModal
-        open={angelModalOpen}
-        onOpenChange={setAngelModalOpen}
-        personaId={angelPersonaId}
-        onPersonaChange={setAngelPersonaId}
-      />
-
-      {/* ── "MEET YOUR ANGEL" LEAD-CAPTURE MODAL ────────────────────────────── */}
-      <MeetYourAngelModal
-        open={angelLeadModalOpen}
-        onOpenChange={setAngelLeadModalOpen}
-      />
+      <MobileNav />
 
       {/* ── HERO ──────────────────────────────────────────────────────────── */}
       <section className="relative min-h-screen overflow-hidden flex flex-col">
@@ -294,14 +256,14 @@ export default function AgenticPage() {
                     "opacity 0.8s cubic-bezier(0.16,1,0.3,1) 200ms, filter 0.8s cubic-bezier(0.16,1,0.3,1) 200ms, transform 0.8s cubic-bezier(0.16,1,0.3,1) 200ms",
                 }}
               >
-                <button
-                  onClick={handleGetStarted}
+                <Link
+                  href="/get-started"
                   className="px-6 py-3 bg-[#111] text-white text-sm rounded-xl hover:bg-[#333] transition-colors tracking-wide font-medium"
                 >
                   GET STARTED
-                </button>
-                <button
-                  onClick={() => openAngelModal("sales")}
+                </Link>
+                <Link
+                  href="/hire-an-angel/sales-angel"
                   className="px-6 py-3 border border-black/15 bg-white/40 text-[#111] text-sm rounded-xl hover:border-black/30 hover:bg-white/70 transition-colors tracking-wide font-medium"
                   style={{
                     backdropFilter: "blur(8px)",
@@ -309,7 +271,7 @@ export default function AgenticPage() {
                   }}
                 >
                   HIRE AN ANGEL
-                </button>
+                </Link>
               </div>
 
               {/* 3 metrics — values/labels from the reference theme's hero, styling restored
@@ -830,12 +792,13 @@ export default function AgenticPage() {
             <br />
             AI employee
           </h2>
-          <button
-            onClick={handleGetStarted}
-            className="px-8 py-3 bg-[#111] text-white text-sm rounded-xl hover:bg-[#333] transition-colors tracking-wide font-medium"
+          <Link
+            href="/get-started"
+            onClick={() => posthog.capture("cta_get_started_clicked", { location: "hero" })}
+            className="inline-block px-8 py-3 bg-[#111] text-white text-sm rounded-xl hover:bg-[#333] transition-colors tracking-wide font-medium"
           >
             Get Started
-          </button>
+          </Link>
         </div>
       </section>
 
@@ -844,25 +807,23 @@ export default function AgenticPage() {
         id="contact"
         className="py-10 px-6 md:px-12 lg:px-20 border-t border-black/[0.06]"
       >
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
-          <a
-            href="#"
-            className="flex items-center gap-2 font-pixel text-xs tracking-[0.25em] text-black/50"
-          >
-            <img
-              src="/images/logo.png"
-              alt=""
-              aria-hidden="true"
-              className="h-10 w-auto"
-            />
-          </a>
-
-          <div className="flex items-center gap-6">
-            <a
-              href="/privacy-policy"
-              className="text-sm text-black/35 hover:text-black/70 transition-colors tracking-widest"
+        <div className="max-w-6xl mx-auto flex flex-col gap-6">
+          {/* Row 1: logo, address, email. Stacks on small screens, one row from md up. */}
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-8">
+            <Link
+              href="/"
+              aria-label="Act Angel AI — go to homepage"
+              className="flex items-center gap-2 font-pixel text-xs tracking-[0.25em] text-black/50"
             >
-              Cookies Policy
+              <img
+                src="/images/logo.png"
+                alt=""
+                aria-hidden="true"
+                className="h-10 w-auto"
+              />
+            </Link>
+            <a href="#m" className="text-sm text-black/35 hover:text-black/70 transition-colors tracking-widest">
+              One Boston Place, # 2600, Boston, MA, 02108
             </a>
             <a
               href="mailto:hello@actangel.com"
@@ -871,9 +832,33 @@ export default function AgenticPage() {
               hello@actangel.com
             </a>
           </div>
+
         </div>
-        <div className="max-w-6xl mx-auto mt-8 pt-6 border-t border-black/[0.04]">
+        <div className="max-w-6xl mx-auto mt-8 pt-6 border-t border-black/[0.04] flex flex-col-reverse md:flex-row md:items-center md:justify-between gap-4">
           <span className="text-sm text-black/20">© 2026 Act Angel AI</span>
+          <div className="flex flex-wrap items-center justify-start md:justify-end gap-x-6 gap-y-2">
+            <a
+              href="/privacy"
+              target="_blank"
+              className="text-sm text-black/35 hover:text-black/70 transition-colors tracking-widest"
+            >
+              Privacy Policy
+            </a>
+            <a
+              href="/terms"
+              target="_blank"
+              className="text-sm text-black/35 hover:text-black/70 transition-colors tracking-widest"
+            >
+              Terms &amp; Conditions
+            </a>
+            <a
+              href="/cookies"
+              target="_blank"
+              className="text-sm text-black/35 hover:text-black/70 transition-colors tracking-widest"
+            >
+              Cookies Policy
+            </a>
+          </div>
         </div>
       </footer>
     </div>

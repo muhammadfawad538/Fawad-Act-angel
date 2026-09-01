@@ -12,12 +12,12 @@ const _courierPrime = Courier_Prime({ weight: ["400", "700"], subsets: ["latin"]
 const _ibmPlexSans = IBM_Plex_Sans({ weight: ["300", "400", "500", "600"], subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Act Angel AI — Your best sales & service employee',
+  title: 'Act Angel AI — Scale your business—not your headcount.',
   description: 'Sales and service, handled personally — every time, day or night.',
   keywords: ['AI sales agent', 'AI customer service', 'AI employee', 'sales automation', 'conversational AI'],
   authors: [{ name: 'Act Angel AI' }],
   openGraph: {
-    title: 'Act Angel AI — Your best sales & service employee',
+    title: 'Act Angel AI — Scale your business—not your headcount.',
     description: 'Sales and service, handled personally — every time, day or night.',
     type: 'website',
     url: 'https://actangel.ai',
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Act Angel AI — Your best sales & service employee',
+    title: 'Act Angel AI — Scale your business—not your headcount.',
     description: 'Sales and service, handled personally — every time, day or night.',
   },
   // All generated from public/icon.png (the Act Angel mark). The previous light/dark

@@ -140,19 +140,29 @@ export function IntroAnimation({ onDone }: { onDone: () => void }) {
       return
     }
 
+    // Marked "seen" as soon as this effect actually runs — via setTimeout(0), not
+    // synchronously — rather than waiting for the intro to finish at HERO_REVEAL_MS (~9.7s).
+    // That original timing meant clicking any nav/footer link during the ~10s the intro
+    // plays (very easy to do — nobody waits out a 10s animation before clicking around) tore
+    // the page down before the timer fired, so the flag never got saved; returning via the
+    // logo would then find "not seen" and replay the whole intro from scratch.
+    // setTimeout(0) still lands after the current synchronous effect-flush, so the parent's
+    // own mount-time effect (the hero's video-zoom timer) still reads "not seen" on this
+    // exact first render and schedules its own HERO_REVEAL_MS timer as before — only a
+    // reload racing this at sub-millisecond speed could still slip through, which isn't a
+    // real scenario.
+    const tSeen = setTimeout(markIntroSeen, 0)
+
     // Tiny delay so the browser has painted before we start transitioning
     const t0 = setTimeout(() => setPhase("in"), 80)
     const t1 = setTimeout(() => setPhase("out"), LETTERS_IN_TOTAL)
     const t2 = setTimeout(() => { setPhase("icons"); setShowIcons(true) }, ICONS_START)
     const t2b = setTimeout(() => setShowIcons(false), ICONS_START + ICONS_TOTAL)
     const t3 = setTimeout(() => setCurtainUp(true), CURTAIN_DELAY)
-    // Flagged here rather than on mount so the parent's own effect still reads "not seen"
-    // on a first visit — child effects run before parent ones, so marking it earlier would
-    // make the hero think the intro had already played and skip its reveal timing.
-    const t4 = setTimeout(() => { markIntroSeen(); onDone() }, HERO_REVEAL_MS)
+    const t4 = setTimeout(() => onDone(), HERO_REVEAL_MS)
     const t5 = setTimeout(() => setPhase("done"), ANIM_TOTAL)
 
-    return () => { clearTimeout(t0); clearTimeout(t1); clearTimeout(t2); clearTimeout(t2b); clearTimeout(t3); clearTimeout(t4); clearTimeout(t5) }
+    return () => { clearTimeout(tSeen); clearTimeout(t0); clearTimeout(t1); clearTimeout(t2); clearTimeout(t2b); clearTimeout(t3); clearTimeout(t4); clearTimeout(t5) }
   }, [onDone])
 
   if (phase === "done") return null
