@@ -323,7 +323,7 @@ export function IntroAnimation({ onDone }: { onDone: () => void }) {
             >
               <img src="/icon2.png" alt="" className="w-[80%] h-[80%] object-contain" />
             </div>
-          </div>1
+          </div>
 
           {/* Closing line — arrives as the orb collapses, and is the last thing on screen
               before the curtain lifts. Centered on the full viewport (both axes handled by the
