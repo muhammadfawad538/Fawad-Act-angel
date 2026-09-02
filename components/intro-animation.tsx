@@ -326,23 +326,43 @@ export function IntroAnimation({ onDone }: { onDone: () => void }) {
           </div>
 
           {/* Closing line — arrives as the orb collapses, and is the last thing on screen
-              before the curtain lifts. Sits above the cluster's centre, as in the reference. */}
+              before the curtain lifts. Centered on the full viewport (both axes handled by the
+              intro-text-in keyframes' translate(-50%,-50%)), independent of where the icon
+              cluster/orb above happen to sit.
+              Two independently-sized lines (not one heading with a uniform size) so the lead
+              line reads as the headline and the sub-line as supporting copy underneath it,
+              matching the client's reference: "AI That Acts." bigger and bolder, the longer
+              "Scale Your Business — Not Your Headcount." smaller beneath it. */}
           <h1
-            className="absolute left-1/2 font-sans text-[#111] text-center m-0"
+            className="absolute left-1/2 font-sans text-[#111] text-center m-0 flex flex-col items-center"
             style={{
-              top: "42%",
-              width: 600,
-              maxWidth: "88vw",
-              fontWeight: 500,
-              fontSize: "clamp(34px, 4.8vw, 52px)",
-              lineHeight: 1.08,
-              letterSpacing: "-0.02em",
+              top: "50%",
+              width: 780,
+              maxWidth: "92vw",
+              gap: "calc(0.35em + 12px)",
               animation: `intro-text-in ${TEXT_DUR}ms ease ${TEXT_DELAY}ms both`,
             }}
           >
-            Never Miss
-            <br />
-            Another Lead.
+            <span
+              style={{
+                fontWeight: 700,
+                fontSize: "clamp(38px, 6vw, 64px)",
+                lineHeight: 1.08,
+                letterSpacing: "-0.02em",
+              }}
+            >
+              AI That Acts.
+            </span>
+            <span
+              style={{
+                fontWeight: 600,
+                fontSize: "clamp(19px, 2.7vw, 30px)",
+                lineHeight: 1.2,
+                letterSpacing: "-0.01em",
+              }}
+            >
+              Scale Your Business — Not Your Headcount.
+            </span>
           </h1>
         </div>
       )}
