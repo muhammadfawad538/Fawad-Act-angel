@@ -58,11 +58,29 @@ export async function POST(request: NextRequest) {
   const accountSid = process.env.TWILIO_ACCOUNT_SID;
   const authToken = process.env.TWILIO_AUTH_TOKEN;
   const verifyServiceSid = process.env.TWILIO_VERIFY_SERVICE_SID;
+  if (!accountSid || !authToken || !verifyServiceSid) {
+    return NextResponse.json(
+      { error: "Server is misconfigured: missing Twilio Verify config" },
+      { status: 500 }
+    );
+  }
+
+  const isEmailChannel = channel?.toLowerCase() === "email";
+  // Call/WhatsApp still go through the n8n intake workflow (picks the right
+  // outbound number by country, fires the Retell call) - only Email is
+  // handled here. Checked up front so a misconfigured deployment fails fast
+  // with a clear error instead of after burning both Twilio Verify calls.
   const intakeUrl = process.env.N8N_INTAKE_WEBHOOK_URL;
   const intakeApiKey = process.env.N8N_INTAKE_WEBHOOK_API_KEY;
-  if (!accountSid || !authToken || !verifyServiceSid || !intakeUrl || !intakeApiKey) {
+  const webApiUrl = process.env.ACTANGEL_WEB_API_URL;
+  const emailAssistantId = process.env.ACTANGEL_EMAIL_ASSISTANT_ID;
+  if (isEmailChannel ? !webApiUrl || !emailAssistantId : !intakeUrl || !intakeApiKey) {
     return NextResponse.json(
-      { error: "Server is misconfigured: missing Twilio Verify or intake webhook config" },
+      {
+        error: isEmailChannel
+          ? "Server is misconfigured: missing ACTANGEL_WEB_API_URL or ACTANGEL_EMAIL_ASSISTANT_ID"
+          : "Server is misconfigured: missing intake webhook config",
+      },
       { status: 500 }
     );
   }
@@ -104,19 +122,37 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: `${which} didn't match or has expired` }, { status: 400 });
   }
 
-  // OTP verified: hand off to the n8n intake workflow, which pushes the lead
-  // to Postgres, picks the right outbound number by country, and fires the
-  // Retell call.
+  // OTP verified: hand off to the right backend for this channel.
   let intakeOk = true;
   let intakeData: unknown = null;
   try {
-    const intakeRes = await fetch(intakeUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "X-Intake-Api-Key": intakeApiKey },
-      body: JSON.stringify({ name, phone, email, otp_status: "verified", channel }),
-    });
-    intakeData = await intakeRes.json().catch(() => null);
-    intakeOk = intakeRes.ok;
+    if (isEmailChannel) {
+      // Email is handled natively by the main ACT Angel AI backend's email
+      // assistant pipeline (contact -> email conversation -> AI-handled
+      // reply) instead of the n8n intake workflow - see server/routes/
+      // emailEnquiry.ts in the WEB repo. assistantId tells that backend
+      // exactly which org/mailbox owns this conversation, so nothing here
+      // depends on a separately-configured "which org is the demo org"
+      // setting on the WEB side. Public, unauthenticated endpoint (rate
+      // limited there), same as this route's own Twilio-gated access.
+      const enquiryRes = await fetch(`${webApiUrl!.replace(/\/+$/, "")}/api/email-enquiry`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, phone, email, assistantId: emailAssistantId }),
+      });
+      intakeData = await enquiryRes.json().catch(() => null);
+      intakeOk = enquiryRes.ok;
+    } else {
+      // n8n intake workflow: pushes the lead to Postgres, picks the right
+      // outbound number by country, and fires the Retell call.
+      const intakeRes = await fetch(intakeUrl!, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Intake-Api-Key": intakeApiKey! },
+        body: JSON.stringify({ name, phone, email, otp_status: "verified", channel }),
+      });
+      intakeData = await intakeRes.json().catch(() => null);
+      intakeOk = intakeRes.ok;
+    }
   } catch {
     intakeOk = false;
   }
