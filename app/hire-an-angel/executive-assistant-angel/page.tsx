@@ -1,10 +1,12 @@
 import type { Metadata } from "next"
 import { HireAnAngelPageContent } from "@/components/hire-an-angel-page-content"
 
+// SEO copy is the client's exact wording for "Assistant Angel" (the on-page/display name — the
+// route itself intentionally stays /hire-an-angel/executive-assistant-angel).
 export const metadata: Metadata = {
-  title: "Executive Assistant Angel — Hire an Angel — Act Angel AI",
+  title: "Assistant Angel | AI Executive Assistant | Act Angel AI",
   description:
-    "See how the Executive Assistant Angel handles an incoming call and follows up by message.",
+    "Meet Assistant Angel, your virtual AI employee for everyday coordination. Manage schedules, prepare briefs, and move tasks forward across connected tools.",
 }
 
 export default function ExecutiveAssistantAngelPage() {

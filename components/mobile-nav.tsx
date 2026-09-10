@@ -30,10 +30,21 @@ const NAV_STYLE = {
 const NAV_ITEM =
   "text-[14px] font-medium text-[#4A4A4A] hover:text-[#111] transition-colors duration-200 [font-family:system-ui,-apple-system,sans-serif]";
 
-// The "Get Started" CTA is styled separately in the reference: smaller, uppercase and
-// letterspaced, in full black on a white pill rather than the muted grey of the links.
+// Nav pill buttons (requirements/Buttons_update_header.png): "Hire an Angel", "Behind the
+// Angels" and "Contact" are now outlined pills the same size as Get Started (46px tall, 12px
+// uppercase/letterspaced) instead of plain text links.
+// inline-flex (not flex) + shrink-0 + whitespace-nowrap: `flex` alone is block-level, so this
+// stretches to fill its parent's width wherever it isn't already a flex child sized by its
+// siblings (the mobile menu's standalone "Get Started" link, in particular) — inline-flex keeps
+// it sized to its own content in both contexts. shrink-0/whitespace-nowrap stop the label from
+// wrapping or the pill from getting squeezed when the desktop row is short on space.
+const NAV_PILL =
+  "inline-flex items-center justify-center gap-[6px] h-[46px] px-6 rounded-full border border-[#DADADA] hover:border-[#b8b8b8] text-[12px] font-medium uppercase tracking-[0.08em] text-[#111] whitespace-nowrap shrink-0 transition-colors duration-200";
+
+// Get Started is filled — #5D4387 is a mid-tone step sampled from the logo icon's own gradient,
+// lightening to #7168A0 on hover (both from the reference screenshot).
 const NAV_CTA =
-  "text-[12px] font-medium uppercase tracking-[0.08em] text-[#111] transition-colors duration-200";
+  "inline-flex items-center justify-center h-[46px] px-[26px] rounded-full bg-[#5D4387] hover:bg-[#7168A0] text-[12px] font-medium uppercase tracking-[0.08em] text-white whitespace-nowrap shrink-0 transition-colors duration-200";
 
 // No props: every item here is now a real link (persona pages, /get-started, /contact)
 // rather than something that opens a modal, so the nav no longer needs callbacks from its
@@ -69,17 +80,23 @@ export function MobileNav() {
             />
           </Link>
 
-          {/* Desktop links — gap-8 (32px) matches the reference's spacing between items */}
-          <div className="hidden md:flex items-center gap-8">
+          {/* Desktop group — all 4 buttons (3 outlined pills + filled Get Started) right-aligned
+              as one cluster next to the logo, per requirements/Buttons_update_header.png.
+              Switches in at lg (1024px), not md (768px): below that, the row doesn't have
+              enough room for all 4 pills and was squeezing/wrapping their labels — the burger
+              menu handles that whole range instead. */}
+          <div className="hidden lg:flex items-center gap-3">
             {/* modal={false}: Radix's default (modal) locks body scroll while the menu is
                 open, which hides the page scrollbar and shifts the layout sideways on every
                 open/close. A nav dropdown doesn't need to trap focus or block the page. */}
             <DropdownMenu modal={false}>
-              <DropdownMenuTrigger
-                className={`flex items-center gap-[5px] outline-none ${NAV_ITEM}`}
-              >
+              {/* Radix sets data-state="open"/"closed" on the trigger itself — `group` here
+                  lets the chevron span react to it directly, no extra state needed. */}
+              <DropdownMenuTrigger className={`group outline-none cursor-pointer ${NAV_PILL}`}>
                 Hire an Angel
-                <span className="text-[9px]">⌄</span>
+                <span className="text-[9px] transition-transform duration-200 group-data-[state=open]:rotate-180">
+                  ⌄
+                </span>
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="start"
@@ -102,58 +119,56 @@ export function MobileNav() {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <Link href="/behind-the-angels" className={NAV_ITEM}>
+            <Link href="/behind-the-angels" className={NAV_PILL}>
               Behind the Angels
             </Link>
-            <Link href="/contact" className={NAV_ITEM}>
+            <Link href="/contact" className={NAV_PILL}>
               Contact
             </Link>
-          </div>
 
-          <div className="flex items-center gap-2">
             <Link
               href="/get-started"
               onClick={() => posthog.capture("cta_get_started_clicked", { location: "nav_desktop" })}
-              className={`hidden md:flex items-center justify-center px-[26px] h-[46px] rounded-full bg-white border border-[#DADADA] hover:border-[#b8b8b8] ${NAV_CTA}`}
+              className={NAV_CTA}
             >
               Get Started
             </Link>
-
-            {/* Burger — mobile only */}
-            <button
-              onClick={() => setOpen((v) => !v)}
-              className="md:hidden flex flex-col justify-center items-center w-8 h-8 gap-[5px] rounded-lg hover:bg-black/[0.04] transition-colors"
-              aria-label={open ? "Close menu" : "Open menu"}
-            >
-              <span
-                className="block h-px bg-black/60 transition-all duration-300 origin-center"
-                style={{
-                  width: "18px",
-                  transform: open ? "translateY(6px) rotate(45deg)" : "none",
-                }}
-              />
-              <span
-                className="block h-px bg-black/60 transition-all duration-300"
-                style={{
-                  width: "18px",
-                  opacity: open ? 0 : 1,
-                  transform: open ? "scaleX(0)" : "none",
-                }}
-              />
-              <span
-                className="block h-px bg-black/60 transition-all duration-300 origin-center"
-                style={{
-                  width: "18px",
-                  transform: open ? "translateY(-6px) rotate(-45deg)" : "none",
-                }}
-              />
-            </button>
           </div>
+
+          {/* Burger — shown below lg (1024px), same threshold as the desktop group above */}
+          <button
+            onClick={() => setOpen((v) => !v)}
+            className="lg:hidden flex flex-col justify-center items-center w-8 h-8 gap-[5px] rounded-lg hover:bg-black/[0.04] transition-colors"
+            aria-label={open ? "Close menu" : "Open menu"}
+          >
+            <span
+              className="block h-px bg-black/60 transition-all duration-300 origin-center"
+              style={{
+                width: "18px",
+                transform: open ? "translateY(6px) rotate(45deg)" : "none",
+              }}
+            />
+            <span
+              className="block h-px bg-black/60 transition-all duration-300"
+              style={{
+                width: "18px",
+                opacity: open ? 0 : 1,
+                transform: open ? "scaleX(0)" : "none",
+              }}
+            />
+            <span
+              className="block h-px bg-black/60 transition-all duration-300 origin-center"
+              style={{
+                width: "18px",
+                transform: open ? "translateY(-6px) rotate(-45deg)" : "none",
+              }}
+            />
+          </button>
         </nav>
 
-        {/* Mobile dropdown */}
+        {/* Mobile dropdown — same lg threshold as the burger that opens it */}
         <div
-          className="md:hidden mt-2 overflow-hidden transition-all duration-300 ease-in-out"
+          className="lg:hidden mt-2 overflow-hidden transition-all duration-300 ease-in-out"
           style={{ maxHeight: open ? "480px" : "0px", opacity: open ? 1 : 0 }}
         >
           <div
@@ -206,14 +221,14 @@ export function MobileNav() {
               Contact
             </Link>
 
-            <div className="mt-1 px-2 pb-1">
+            <div className="mt-1 px-2 pb-1 flex justify-center">
               <Link
                 href="/get-started"
                 onClick={() => {
                   posthog.capture("cta_get_started_clicked", { location: "nav_mobile" })
                   close()
                 }}
-                className={`flex items-center justify-center w-full px-4 h-[46px] rounded-full bg-white border border-[#DADADA] hover:border-[#b8b8b8] ${NAV_CTA}`}
+                className={NAV_CTA}
               >
                 Get Started
               </Link>
