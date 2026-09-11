@@ -30,6 +30,7 @@ export interface Persona {
   // rolled out persona-by-persona: HireAnAngelPageContent only renders these sections once a
   // persona actually has this data, so the pages we haven't gotten to yet keep today's
   // minimal layout instead of showing broken/empty sections.
+  eyebrow?: string // small badge above the hero headline, e.g. "Virtual AI Sales Employee"
   heroHeadline?: string
   heroSubtext?: string
   capabilities?: Capability[]
@@ -53,7 +54,7 @@ export const PERSONAS: Persona[] = [
     label: "Sales Angel",
     slug: "sales-angel",
     contact: "Alex Morgan",
-    avatar: "/images/alex_morgan.webp",
+    avatar: "/images/sales_angel_avatar.png",
     role: "Sales",
     messages: [
       ["in", "Is the downtown listing still available?"],
@@ -61,6 +62,7 @@ export const PERSONAS: Persona[] = [
       ["in", "Saturday works"],
       ["out", "Booked — Sat, 11:00 AM"],
     ],
+    eyebrow: "Virtual AI Sales Employee",
     heroHeadline: "Turn Every Deal Into Action.",
     heroSubtext:
       "Your virtual AI sales employee engages deals, qualifies interest, books meetings, and moves opportunities forward across your connected sales systems.",
@@ -88,7 +90,7 @@ export const PERSONAS: Persona[] = [
     label: "Service Angel",
     slug: "service-angel",
     contact: "Nora Bennett",
-    avatar: "/images/nora_bennett.png",
+    avatar: "/images/service_angel_avatar.png",
     role: "Service",
     messages: [
       ["in", "My order hasn't arrived yet, can you check?"],
@@ -96,6 +98,7 @@ export const PERSONAS: Persona[] = [
       ["in", "Great, thank you!"],
       ["out", "You're welcome. I'll text you once it's delivered."],
     ],
+    eyebrow: "Virtual AI Customer Service Employee",
     heroHeadline: "From Customer Request to Resolution.",
     heroSubtext:
       "Your virtual AI service employee answers questions, acts on routine requests, and keeps customers informed across your connected support systems.",
@@ -123,7 +126,7 @@ export const PERSONAS: Persona[] = [
     label: "HR Angel",
     slug: "recruitment-angel",
     contact: "Mia Torres",
-    avatar: "/images/mia_torres.png",
+    avatar: "/images/hr_angel_avatar.png",
     role: "Human Resource",
     messages: [
       ["in", "I'd like to apply for the ops role."],
@@ -133,6 +136,7 @@ export const PERSONAS: Persona[] = [
     ],
     // Content doc's "HR Angel" section, used verbatim — displayed under the "HR Angel" label
     // above while the URL stays /hire-an-angel/recruitment-angel (route intentionally unchanged).
+    eyebrow: "Virtual AI HR Employee",
     heroHeadline: "Less HR Admin. More Human Impact.",
     heroSubtext:
       "Your virtual AI HR employee coordinates people processes, handles routine employee requests, and keeps work moving across your connected HR systems.",
@@ -160,7 +164,7 @@ export const PERSONAS: Persona[] = [
     label: "Assistant Angel",
     slug: "executive-assistant-angel",
     contact: "Sarah Thomson",
-    avatar: "/images/sarah_thomson.png",
+    avatar: "/images/assistant_angel_avatar.png",
     role: "Assistance",
     messages: [
       ["in", "Can you move my 3pm to tomorrow morning?"],
@@ -171,6 +175,7 @@ export const PERSONAS: Persona[] = [
     // Content doc's "Assistant Angel" section, used verbatim — displayed under the "Assistant
     // Angel" label above while the URL stays /hire-an-angel/executive-assistant-angel (route
     // intentionally unchanged).
+    eyebrow: "Virtual AI Assistant Employee",
     heroHeadline: "Give Your Priorities Room to Move.",
     heroSubtext:
       "Your virtual AI assistant coordinates schedules, prepares information, and follows through on everyday work across your connected tools and workflows.",
@@ -198,7 +203,7 @@ export const PERSONAS: Persona[] = [
 // The theme's hero phone runs its own thread — a longer 5-message pricing conversation —
 // rather than reusing the Sales persona's modal script, so it's kept separate here.
 export const HERO_CONTACT = "Alex Morgan"
-export const HERO_AVATAR = "/images/alex_morgan.webp"
+export const HERO_AVATAR = "/images/sales_angel_avatar.png"
 export const HERO_MESSAGES: ScriptLine[] = [
   ["in", "Hi, I saw your ad — do you have time to chat about pricing?"],
   ["out", "Of course! Could I get your name and what you're looking for?"],
