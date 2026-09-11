@@ -1,14 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import posthog from "posthog-js";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { PERSONAS } from "@/lib/personas";
 
 // Matches the reference theme's nav surface: a 75%-opaque white pill rather than the
@@ -53,6 +47,31 @@ const NAV_CTA =
 export function MobileNav() {
   const [open, setOpen] = useState(false);
   const [personasOpen, setPersonasOpen] = useState(false);
+  // Desktop "Hire an Angel" mega-menu: hand-rolled instead of Radix's DropdownMenu, because
+  // DropdownMenuContent anchors/aligns itself to the trigger button — fine for a small popover,
+  // but this panel needs to sit centered under the whole nav bar regardless of where the
+  // trigger pill happens to sit in it (it's off to the right, not centered, since the
+  // Buttons_update_header.png redesign right-aligned the nav group).
+  const [hireOpen, setHireOpen] = useState(false);
+  const hireRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!hireOpen) return;
+    function onPointerDown(e: MouseEvent) {
+      if (hireRef.current && !hireRef.current.contains(e.target as Node)) {
+        setHireOpen(false);
+      }
+    }
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") setHireOpen(false);
+    }
+    document.addEventListener("mousedown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [hireOpen]);
 
   const close = () => {
     setOpen(false);
@@ -61,7 +80,7 @@ export function MobileNav() {
 
   return (
     <div className="fixed top-4 inset-x-0 z-50 flex justify-center px-6 md:px-12 lg:px-20 pointer-events-none">
-      <div className="pointer-events-auto w-full max-w-6xl mx-auto">
+      <div ref={hireRef} className="pointer-events-auto w-full max-w-6xl mx-auto relative">
         {/* Main bar */}
         <nav
           className="flex items-center justify-between px-5 py-3 rounded-2xl border border-black/[0.06]"
@@ -86,38 +105,16 @@ export function MobileNav() {
               enough room for all 4 pills and was squeezing/wrapping their labels — the burger
               menu handles that whole range instead. */}
           <div className="hidden lg:flex items-center gap-3">
-            {/* modal={false}: Radix's default (modal) locks body scroll while the menu is
-                open, which hides the page scrollbar and shifts the layout sideways on every
-                open/close. A nav dropdown doesn't need to trap focus or block the page. */}
-            <DropdownMenu modal={false}>
-              {/* Radix sets data-state="open"/"closed" on the trigger itself — `group` here
-                  lets the chevron span react to it directly, no extra state needed. */}
-              <DropdownMenuTrigger className={`group outline-none cursor-pointer ${NAV_PILL}`}>
-                Hire an Angel
-                <span className="text-[9px] transition-transform duration-200 group-data-[state=open]:rotate-180">
-                  ⌄
-                </span>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="start"
-                className="rounded-2xl border border-black/[0.06] p-1.5 min-w-[220px]"
-                style={NAV_STYLE}
-              >
-                {PERSONAS.map((p) => (
-                  // asChild: renders the <a> itself as the menu item (real navigation, works
-                  // with right-click/open-in-new-tab) while Radix still handles focus and
-                  // closes the dropdown on click, same as the onSelect it replaces.
-                  <DropdownMenuItem key={p.id} asChild>
-                    <Link
-                      href={`/hire-an-angel/${p.slug}`}
-                      className={`rounded-xl px-3 py-2.5 cursor-pointer focus:bg-black/[0.05] focus:text-[#111] ${NAV_ITEM}`}
-                    >
-                      {p.label}
-                    </Link>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <button
+              onClick={() => setHireOpen((v) => !v)}
+              aria-expanded={hireOpen}
+              className={`group outline-none cursor-pointer ${NAV_PILL}`}
+            >
+              Hire an Angel
+              <span className={`text-[9px] transition-transform duration-200 ${hireOpen ? "rotate-180" : ""}`}>
+                ⌄
+              </span>
+            </button>
 
             <Link href="/behind-the-angels" className={NAV_PILL}>
               Behind the Angels
@@ -166,10 +163,78 @@ export function MobileNav() {
           </button>
         </nav>
 
+        {/* Mega-menu panel (requirements/Hire_an_angel_dropdown.png) — a sibling of <nav>,
+            absolutely positioned and centered under the whole nav bar via the outer wrapper's
+            `relative` + this panel's `inset-x-0 flex justify-center`, rather than anchored to
+            the trigger pill's own position (which sits off to the right, not centered). Hidden
+            below lg as a defensive guard: hireOpen can only be set true by the desktop trigger
+            above, which is itself only reachable at lg+, but this covers resizing the window
+            down while the menu is still open. */}
+        {hireOpen && (
+          <div className="hidden lg:flex absolute inset-x-0 top-full mt-2 justify-center z-50">
+            <div
+              className="w-[min(94vw,980px)] rounded-2xl border border-black/[0.06] overflow-hidden"
+              style={NAV_STYLE}
+            >
+              <div className="grid grid-cols-4 divide-x divide-black/[0.06] px-2">
+                {PERSONAS.map((p) => (
+                  <Link
+                    key={p.id}
+                    href={`/hire-an-angel/${p.slug}`}
+                    onClick={() => setHireOpen(false)}
+                    className="flex flex-col px-4 py-5 cursor-pointer hover:bg-black/[0.02] transition-colors [font-family:system-ui,-apple-system,sans-serif]"
+                  >
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={p.avatar}
+                        alt=""
+                        aria-hidden="true"
+                        className="w-11 h-11 rounded-full object-cover shrink-0"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[15px] font-semibold text-[#111] truncate">{p.label}</p>
+                        <p className="text-[12.5px] text-black/50 truncate">{p.dropdownRole}</p>
+                      </div>
+                      <span className="text-black/30 text-sm shrink-0">›</span>
+                    </div>
+
+                    <div className="mt-4 pt-4 border-t border-black/[0.06]">
+                      <p className="text-[10.5px] font-medium uppercase tracking-widest text-black/40">
+                        Use Cases
+                      </p>
+                      <ul className="mt-2.5 flex flex-col gap-1.5">
+                        {p.useCases?.map((uc) => (
+                          <li key={uc} className="flex items-center gap-2 text-[13px] font-medium text-[#333]">
+                            <span className="w-1 h-1 rounded-full bg-[#5D4387] shrink-0" />
+                            {uc}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+
+              <div className="flex items-center justify-between px-5 py-4 border-t border-black/[0.06] text-[13px]">
+                <span className="text-black/50">
+                  Not sure which Angel fits? <span className="font-semibold text-[#111]">We&apos;ll help you pick.</span>
+                </span>
+                <Link
+                  href="/contact"
+                  onClick={() => setHireOpen(false)}
+                  className="font-medium text-[#5D4387] hover:text-[#7168A0] cursor-pointer transition-colors"
+                >
+                  Talk to us ›
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Mobile dropdown — same lg threshold as the burger that opens it */}
         <div
-          className="lg:hidden mt-2 overflow-hidden transition-all duration-300 ease-in-out"
-          style={{ maxHeight: open ? "480px" : "0px", opacity: open ? 1 : 0 }}
+          className="lg:hidden mt-2 max-h-[80vh] overflow-y-auto transition-all duration-300 ease-in-out"
+          style={{ maxHeight: open ? "min(2000px, 80vh)" : "0px", opacity: open ? 1 : 0 }}
         >
           <div
             className="rounded-2xl border border-black/[0.06] px-2 py-2 flex flex-col"
@@ -190,19 +255,61 @@ export function MobileNav() {
             </button>
             <div
               className="overflow-hidden transition-all duration-200 ease-in-out"
-              style={{ maxHeight: personasOpen ? "220px" : "0px" }}
+              style={{ maxHeight: personasOpen ? "1400px" : "0px" }}
             >
-              <div className="flex flex-col pl-4">
-                {PERSONAS.map((p) => (
-                  <Link
-                    key={p.id}
-                    href={`/hire-an-angel/${p.slug}`}
-                    onClick={close}
-                    className={`text-left px-4 py-2.5 hover:bg-black/[0.03] rounded-xl ${NAV_ITEM}`}
-                  >
-                    {p.label}
-                  </Link>
-                ))}
+              {/* Same card content as the desktop mega-menu (photo, name, role, use cases): 1 per
+                  row on very small screens, 2-up from sm (640px) up to the lg breakpoint where
+                  this whole mobile panel gives way to the desktop mega-menu. border-r/border-b
+                  on index give the same flush line separation as the desktop grid's
+                  divide-x/divide-y, since Tailwind's `divide` utilities don't line up correctly
+                  once flex-wrap puts items on more than one row — and the divider pattern itself
+                  has to change between the 1-col and 2-col layouts (a bottom border on every
+                  item but the last vs. only on the first row). */}
+              <div className="flex flex-wrap border-t border-black/[0.06]">
+                {PERSONAS.map((p, i) => {
+                  const bottomAtBase = i < PERSONAS.length - 1; // 1-col: every item but the last
+                  const bottomAtSm = i < PERSONAS.length - 2; // 2-col: only the first row
+                  const rightAtSm = i % 2 === 0; // 2-col: left column only
+                  return (
+                    <Link
+                      key={p.id}
+                      href={`/hire-an-angel/${p.slug}`}
+                      onClick={close}
+                      className={`w-full sm:w-1/2 flex flex-col px-4 py-3 hover:bg-black/[0.03] transition-colors [font-family:system-ui,-apple-system,sans-serif] border-black/[0.06] ${
+                        bottomAtBase ? "border-b" : ""
+                      } ${bottomAtBase && !bottomAtSm ? "sm:border-b-0" : ""} ${
+                        rightAtSm ? "sm:border-r" : ""
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <img
+                          src={p.avatar}
+                          alt=""
+                          aria-hidden="true"
+                          className="w-9 h-9 rounded-full object-cover shrink-0"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[13.5px] font-semibold text-[#111] truncate">{p.label}</p>
+                          <p className="text-[11px] text-black/50 truncate">{p.dropdownRole}</p>
+                        </div>
+                      </div>
+
+                      <div className="mt-2.5">
+                        <p className="text-[9.5px] font-medium uppercase tracking-widest text-black/40">
+                          Use Cases
+                        </p>
+                        <ul className="mt-1.5 flex flex-col gap-1">
+                          {p.useCases?.map((uc) => (
+                            <li key={uc} className="flex items-center gap-2 text-[12px] font-medium text-[#333]">
+                              <span className="w-1 h-1 rounded-full bg-[#5D4387] shrink-0" />
+                              {uc}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </Link>
+                  );
+                })}
               </div>
             </div>
 

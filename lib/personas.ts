@@ -39,6 +39,12 @@ export interface Persona {
   whatIsDescription?: string
   ctaLine?: string
   ctaHireLabel?: string // e.g. "Hire a Sales Angel"
+
+  // "Hire an Angel" nav mega-menu card (requirements/Hire_an_angel_dropdown.png) — a short role
+  // subtitle under the name, and 4 use-case bullets. Reuses the `avatar` photo above rather than
+  // the mockup's separate halo/wings portrait set, which hasn't been provided yet.
+  dropdownRole?: string
+  useCases?: [string, string, string, string]
 }
 
 export const PERSONAS: Persona[] = [
@@ -74,6 +80,8 @@ export const PERSONAS: Persona[] = [
       "A Sales Angel is a virtual AI sales employee from Act Angel AI that autonomously qualifies deals, follows up, schedules meetings, and updates connected sales systems within your defined rules and permissions.",
     ctaLine: "Put your next opportunity in motion.",
     ctaHireLabel: "Hire a Sales Angel",
+    dropdownRole: "Outbound & inbound sales rep",
+    useCases: ["Lead Qualification", "Discovery Calls", "Meeting Scheduling", "Pipeline Follow-Up"],
   },
   {
     id: "service",
@@ -107,6 +115,8 @@ export const PERSONAS: Persona[] = [
       "A Service Angel is a virtual AI customer service employee from Act Angel AI that answers questions and autonomously completes routine service workflows across connected systems, with escalation when human judgement is needed.",
     ctaLine: "Make every service interaction count.",
     ctaHireLabel: "Hire a Service Angel",
+    dropdownRole: "Customer support & success",
+    useCases: ["Ticket Triage & Resolution", "Order & Account Support", "Renewals & Upsell", "After-Hours Coverage"],
   },
   {
     id: "hr",
@@ -142,6 +152,8 @@ export const PERSONAS: Persona[] = [
       "An HR Angel is a virtual AI employee from Act Angel AI that autonomously coordinates routine HR workflows across connected systems and approved data. Sensitive cases and employment decisions remain with authorised people.",
     ctaLine: "Give your people team more capacity.",
     ctaHireLabel: "Hire an HR Angel",
+    dropdownRole: "Talent sourcing & screening",
+    useCases: ["Candidate Sourcing", "Resume Screening", "Interview Scheduling", "Candidate Follow-Up"],
   },
   {
     id: "assistance",
@@ -178,6 +190,8 @@ export const PERSONAS: Persona[] = [
       "An Assistant Angel is a virtual AI assistant employee from Act Angel AI that autonomously coordinates administrative work across connected calendars, communication tools, data, and processes, following your permissions and approval rules.",
     ctaLine: "Make space for your highest-value work.",
     ctaHireLabel: "Hire an Assistant Angel",
+    dropdownRole: "Calendar, inbox & ops support",
+    useCases: ["Calendar Management", "Inbox Triage", "Travel & Expense", "Meeting Prep & Notes"],
   },
 ]
 
