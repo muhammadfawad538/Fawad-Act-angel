@@ -7,7 +7,7 @@
 // separate script its *hero* phone plays. Each persona has its own contact and photo there,
 // rather than the single shared stock avatar this used to carry.
 
-export type PersonaId = "sales" | "service" | "hr" | "assistance"
+export type PersonaId = "sales" | "service" | "hr" | "assistance1"
 
 export type ScriptLine = ["in" | "out", string]
 
