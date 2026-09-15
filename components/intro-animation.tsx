@@ -19,7 +19,7 @@ const LETTERS_OUT_TOTAL  = LETTER_OUT_STAGGER * (REAL_LETTERS - 1) + LETTER_OUT_
 // ── Icon-cluster phase — plays after the wordmark, before the curtain lifts ──────
 const ICONS_START        = LETTERS_IN_TOTAL + LETTERS_OUT_TOTAL
 
-type Phase = "idle" | "in" | "out" | "icons" | "done"
+type Phase = "idle" | "in" | "out" | "done"
 
 // Every value below is read directly off the reference build's live DOM/stylesheet
 // (https://aiactangel.netlify.app/) rather than inferred from screenshots — bubble sizes,
@@ -112,25 +112,6 @@ function markIntroSeen() {
 export function IntroAnimation({ onDone }: { onDone: () => void }) {
   const [phase, setPhase] = useState<Phase>("idle")
   const [curtainUp, setCurtainUp] = useState(false)
-  // Separate from `phase` on purpose: the icon cluster must unmount the moment its own
-  // fly-out/collect cycle finishes, not linger until `phase` becomes "done" (which was only
-  // set at ANIM_TOTAL — well after the curtain had already revealed the homepage underneath).
-  const [showIcons, setShowIcons] = useState(false)
-  // The cluster is laid out in absolute px (to match the reference exactly), so it has to be
-  // scaled down as one unit on smaller screens. This can't be done in pure CSS: scale() needs
-  // a unitless number, and there's no way to turn 100vw into one. Measured here instead.
-  // Starts at 1 so SSR and first paint agree — the effect corrects it before the icons show.
-  const [clusterScale, setClusterScale] = useState(1)
-
-  useEffect(() => {
-    const CLUSTER_W = 520  // px the cluster needs horizontally at full size
-    const CLUSTER_H = 900  // px it needs vertically (reaches ~400px above the hub)
-    const measure = () =>
-      setClusterScale(Math.min(1, window.innerWidth / CLUSTER_W, window.innerHeight / CLUSTER_H))
-    measure()
-    window.addEventListener("resize", measure)
-    return () => window.removeEventListener("resize", measure)
-  }, [])
 
   useEffect(() => {
     // Already played this session — tear down immediately and hand the page straight over.
@@ -153,16 +134,23 @@ export function IntroAnimation({ onDone }: { onDone: () => void }) {
     // real scenario.
     const tSeen = setTimeout(markIntroSeen, 0)
 
-    // Tiny delay so the browser has painted before we start transitioning
+    // Tiny delay so the browser has painted before we start transitioning.
+    // The second icon-cluster phase is removed completely, so the final headline starts
+    // immediately after the wordmark exits and there is no blank gap in the middle.
     const t0 = setTimeout(() => setPhase("in"), 80)
     const t1 = setTimeout(() => setPhase("out"), LETTERS_IN_TOTAL)
-    const t2 = setTimeout(() => { setPhase("icons"); setShowIcons(true) }, ICONS_START)
-    const t2b = setTimeout(() => setShowIcons(false), ICONS_START + ICONS_TOTAL)
     const t3 = setTimeout(() => setCurtainUp(true), CURTAIN_DELAY)
     const t4 = setTimeout(() => onDone(), HERO_REVEAL_MS)
+    // Only place `phase` flips to "done" — render bails out to null the instant it does (see
+    // below), so this must wait until the curtain has actually lifted. An earlier intermediate
+    // timer used to flip it much sooner (tuned for when an icon-cluster phase still sat between
+    // the wordmark and the closing line); once that phase was removed, that timer fired ~3s
+    // before the curtain even started lifting, tearing the whole white overlay down early and
+    // leaving the still-unrevealed hero (small video, hidden text) exposed and frozen until
+    // HERO_REVEAL_MS finally caught up — the "delayed enlarge" this was causing.
     const t5 = setTimeout(() => setPhase("done"), ANIM_TOTAL)
 
-    return () => { clearTimeout(tSeen); clearTimeout(t0); clearTimeout(t1); clearTimeout(t2); clearTimeout(t2b); clearTimeout(t3); clearTimeout(t4); clearTimeout(t5) }
+    return () => { clearTimeout(tSeen); clearTimeout(t0); clearTimeout(t1); clearTimeout(t3); clearTimeout(t4); clearTimeout(t5) }
   }, [onDone])
 
   if (phase === "done") return null
@@ -209,7 +197,7 @@ export function IntroAnimation({ onDone }: { onDone: () => void }) {
                 // idle → invisible starting position
                 const isIdle = phase === "idle"
                 const isIn   = phase === "in"
-                const isOut  = phase === "out" || phase === "icons"
+                const isOut  = phase === "out"
 
                 const opacity    = isIdle ? 0 : isIn ? 1 : 0
                 const blur       = isIdle ? 36 : isIn ? 0 : 24
@@ -248,123 +236,46 @@ export function IntroAnimation({ onDone }: { onDone: () => void }) {
         </div>
       </div>
 
-      {/* Icon cluster — plays once, after the wordmark fades, before the curtain lifts.
-          Bubbles are thrown out of the hub to a first waypoint, drift further out to a second,
-          then collapse back in and are absorbed as the hub itself morphs away. Waypoints ride
-          in as --dx1/--dy1/--dx2/--dy2 on a shared @keyframes (see globals.css).
-          Everything is in absolute px to match the reference exactly, so the whole cluster is
-          scaled as one unit rather than sized in percentages that would distort the layout. */}
-      {showIcons && (
-        <div className="absolute inset-0 overflow-hidden">
-          {/* Zero-size anchor: every child centers on this one point via translate(-50%,-50%),
-              so the px offsets above are measured from the hub's center, as in the reference.
-              Sits at 65% height, not centred — the reference anchors the whole cluster there
-              (~135px below centre at 900px tall) so the bubbles have room to fly upward and
-              leave space for the closing line, which lands higher up at 42%. */}
-          <div
-            className="absolute"
+      {/* Final headline — third animation only. The second icon-cluster phase has been removed
+          so the intro flows directly from the first wordmark sequence to the closing headline.
+          Hidden as soon as the curtain starts lifting (curtainUp), not just when the whole
+          overlay unmounts at ANIM_TOTAL: its own CSS animation holds it fully opaque forever
+          (fill: both) once it's faded in, so without this it kept sitting on screen through the
+          curtain lift and past HERO_REVEAL_MS — i.e. still visible on top of the already-loaded
+          homepage — until that later unmount finally caught up. curtainUp flips well before
+          HERO_REVEAL_MS, so this always clears the text before the homepage is visible. */}
+      {phase !== "idle" && !curtainUp && (
+        <h1
+          className="absolute left-1/2 font-sans text-[#111] text-center m-0 flex flex-col items-center"
+          style={{
+            top: "50%",
+            width: 780,
+            maxWidth: "92vw",
+            gap: "calc(0.35em + 12px)",
+            animation: `intro-text-in ${TEXT_DUR}ms ease ${TEXT_DELAY}ms both`,
+          }}
+        >
+          <span
             style={{
-              left: "50%",
-              top: "65%",
-              width: 0,
-              height: 0,
-              // Shrinks as one unit on smaller screens instead of letting bubbles fly
-              // off-canvas — see the measuring effect above for why this isn't pure CSS.
-              transform: `scale(${clusterScale})`,
+              fontWeight: 700,
+              fontSize: "clamp(38px, 6vw, 64px)",
+              lineHeight: 1.08,
+              letterSpacing: "-0.02em",
             }}
           >
-            {/* Bubbles render BEFORE the orb so the orb paints on top of them — that's what
-                makes the icons look like they slide back *behind* the logo and get absorbed,
-                rather than passing over it. Same DOM order the reference uses. */}
-            {BUBBLES.map((b, i) => (
-              <div
-                key={i}
-                className="absolute rounded-full flex items-center justify-center"
-                style={{
-                  left: 0,
-                  top: 0,
-                  width: b.size,
-                  height: b.size,
-                  background: "linear-gradient(135deg, rgba(17,17,17,0.72), rgba(17,17,17,0.5))",
-                  animation: `bubble-float ${BUBBLE_DUR}ms ease-in-out ${BUBBLE_DELAY0 + i * BUBBLE_STAGGER}ms both`,
-                  ["--dx1" as string]: `${b.dx1}px`,
-                  ["--dy1" as string]: `${b.dy1}px`,
-                  ["--dx2" as string]: `${b.dx2}px`,
-                  ["--dy2" as string]: `${b.dy2}px`,
-                } as React.CSSProperties}
-              >
-                <svg
-                  width={b.glyph}
-                  height={b.glyph}
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#FFFFFF"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  {b.icon}
-                </svg>
-              </div>
-            ))}
-
-            {/* Hub orb — painted after the bubbles so it covers them as they return. */}
-            <div
-              className="absolute rounded-full flex items-center justify-center"
-              style={{
-                left: 0,
-                top: 0,
-                width: ORB_SIZE,
-                height: ORB_SIZE,
-                background: "#F4F4F4",
-                boxShadow: "0 20px 44px -14px rgba(0,0,0,0.2)",
-                animation: `orb-in ${ORB_IN_DUR}ms ease both, orb-morph ${ORB_MORPH_DUR}ms ease ${ORB_MORPH_DELAY}ms both`,
-              }}
-            >
-              <img src="/icon2.png" alt="" className="w-[80%] h-[80%] object-contain" />
-            </div>
-          </div>
-
-          {/* Closing line — arrives as the orb collapses, and is the last thing on screen
-              before the curtain lifts. Centered on the full viewport (both axes handled by the
-              intro-text-in keyframes' translate(-50%,-50%)), independent of where the icon
-              cluster/orb above happen to sit.
-              Two independently-sized lines (not one heading with a uniform size) so the lead
-              line reads as the headline and the sub-line as supporting copy underneath it,
-              matching the client's reference: "AI That Acts." bigger and bolder, the longer
-              "Scale Your Business — Not Your Headcount." smaller beneath it. */}
-          <h1
-            className="absolute left-1/2 font-sans text-[#111] text-center m-0 flex flex-col items-center"
+            AI That Acts.
+          </span>
+          <span
             style={{
-              top: "50%",
-              width: 780,
-              maxWidth: "92vw",
-              gap: "calc(0.35em + 12px)",
-              animation: `intro-text-in ${TEXT_DUR}ms ease ${TEXT_DELAY}ms both`,
+              fontWeight: 600,
+              fontSize: "clamp(19px, 2.7vw, 30px)",
+              lineHeight: 1.2,
+              letterSpacing: "-0.01em",
             }}
           >
-            <span
-              style={{
-                fontWeight: 700,
-                fontSize: "clamp(38px, 6vw, 64px)",
-                lineHeight: 1.08,
-                letterSpacing: "-0.02em",
-              }}
-            >
-              AI That Acts.
-            </span>
-            <span
-              style={{
-                fontWeight: 600,
-                fontSize: "clamp(19px, 2.7vw, 30px)",
-                lineHeight: 1.2,
-                letterSpacing: "-0.01em",
-              }}
-            >
-              Scale Your Business — Not Your Headcount.
-            </span>
-          </h1>
-        </div>
+            Scale Your Business — Not Your Headcount.
+          </span>
+        </h1>
       )}
 
     </div>
