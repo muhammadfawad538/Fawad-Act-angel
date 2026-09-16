@@ -108,7 +108,6 @@ export default function AgenticPage() {
   // When the intro is skipped (already seen this session) there's nothing to overlap with,
   // so go straight to the zoomed state instead of holding it back for ~10s.
   useEffect(() => {
-    console.log(1)
     if (hasSeenIntro()) {
       setVideoReady(true);
       return;
