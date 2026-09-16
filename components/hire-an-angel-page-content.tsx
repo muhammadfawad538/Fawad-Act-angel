@@ -25,15 +25,40 @@ const PHONE_GLYPH_PATH =
  * than voice accents, and the CTA scrolls to the real phone demo already on this page instead of
  * promising a live WebRTC call the site doesn't have.
  */
+// Shared Scenario/Channel pill style — a light-purple fill (not a solid one) for the selected
+// pill, plus a hover lift/press animation, matching 11x.ai's own scenario/voice picker: on
+// 11x the pill shifts slightly upward on hover rather than growing, so this uses a translateY
+// instead of a scale.
+function pillClass(active: boolean) {
+  return `px-4 py-2 rounded-full text-[12.5px] font-medium border cursor-pointer transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 ${
+    active
+      ? "bg-[#EDE9F7] border-[#5D4387]/30 text-[#5D4387]"
+      : "border-black/15 text-black/60 hover:border-[#5D4387]/30 hover:bg-[#5D4387]/[0.05] hover:text-[#5D4387]"
+  }`
+}
+
 function LiveDemoSection({ persona }: { persona: Persona }) {
   const [scenario, setScenario] = useState(0)
   const [channel, setChannel] = useState(0)
 
   return (
-    <section className="mt-24">
-      <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center">
-        <div className="relative aspect-square w-full max-w-[420px] mx-auto md:mx-0 rounded-3xl overflow-hidden border border-black/[0.08] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.25)]">
-          <img src={persona.avatar} alt={persona.contact} className="w-full h-full object-cover" />
+    <section id="live-preview" className="mt-24 scroll-mt-24">
+      <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-stretch">
+        {/* No aspect-square: with items-stretch on the grid above, this column's height now
+            just fills the row (matching the text column's height) instead of a fixed 1:1 ratio,
+            so the card reads as a portrait panel. min-h-[420px] only matters below md, where
+            each column is its own row (no sibling height to stretch to). */}
+        <div className="relative w-full max-w-[420px] min-h-[420px] mx-auto md:mx-0 rounded-3xl overflow-hidden border border-black/[0.08] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.25)]">
+          {/* Standing in for the mp4 the 11x.ai reference plays here — there's no per-persona
+              video, so a slow, continuous Ken Burns zoom/pan on the still photo (defined in
+              globals.css) is what gives it that "alive"/video feel instead of a flat static
+              image. object-cover's overflow is what the animation zooms into, clipped by the
+              card's own overflow-hidden above. */}
+          <img
+            src={persona.avatar}
+            alt={persona.contact}
+            className="w-full h-full object-cover animate-[live-preview-motion_9s_ease-in-out_infinite]"
+          />
 
           <div className="absolute top-4 left-4 px-3 py-1.5 rounded-full bg-black/45 backdrop-blur-sm">
             <span className="text-[11px] font-medium text-white">
@@ -41,14 +66,11 @@ function LiveDemoSection({ persona }: { persona: Persona }) {
             </span>
           </div>
           <div className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/45 backdrop-blur-sm">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#34C759]" />
-            <span className="text-[11px] font-medium text-white">Active</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#34C759] animate-pulse" />
+            <span className="text-[11px] font-medium text-white">Live</span>
           </div>
 
-          <a
-            href="#demo"
-            className="absolute inset-x-3 bottom-3 flex items-center justify-between gap-3 px-3 py-2.5 rounded-2xl bg-black/55 backdrop-blur-md hover:bg-black/65 transition-colors"
-          >
+          <div className="absolute inset-x-3 bottom-3 flex items-center justify-between gap-3 px-3 py-2.5 rounded-2xl bg-black/55 backdrop-blur-md">
             <div className="flex items-center gap-2.5 min-w-0">
               <img src={persona.avatar} alt="" className="w-8 h-8 rounded-full object-cover shrink-0" />
               <div className="min-w-0">
@@ -56,12 +78,29 @@ function LiveDemoSection({ persona }: { persona: Persona }) {
                 <p className="text-[13px] font-medium text-white truncate">{persona.contact}</p>
               </div>
             </div>
-            <span className="flex items-center justify-center w-9 h-9 rounded-full bg-[#34C759] shrink-0">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff">
-                <path d={PHONE_GLYPH_PATH} />
-              </svg>
-            </span>
-          </a>
+
+            <div className="flex items-center gap-2 shrink-0">
+              {/* Decline — decorative (matches the phone-demo's own red/rotated-glyph decline
+                  button), not wired to anything since there's no real call to hang up on. */}
+              <span className="flex items-center justify-center w-9 h-9 rounded-full bg-[#FF3B30]" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff" style={{ transform: "rotate(135deg)" }}>
+                  <path d={PHONE_GLYPH_PATH} />
+                </svg>
+              </span>
+              {/* Accept — the actual link to the on-page demo. The animate-ping ring behind it
+                  is the "wavy" pulse 11x.ai uses on its own live-call accept button, signalling
+                  an incoming call waiting to be answered. */}
+              <a
+                href="#demo"
+                className="relative flex items-center justify-center w-9 h-9 rounded-full bg-[#34C759] hover:bg-[#2FB350] transition-colors"
+              >
+                <span className="absolute inset-0 rounded-full bg-[#34C759] animate-[ping-sm_1.5s_cubic-bezier(0,0,0.2,1)_infinite] opacity-75" aria-hidden="true" />
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff" className="relative">
+                  <path d={PHONE_GLYPH_PATH} />
+                </svg>
+              </a>
+            </div>
+          </div>
         </div>
 
         <div>
@@ -84,11 +123,7 @@ function LiveDemoSection({ persona }: { persona: Persona }) {
                   key={uc}
                   type="button"
                   onClick={() => setScenario(i)}
-                  className={`px-4 py-2 rounded-full text-[12.5px] font-medium border transition-colors ${
-                    i === scenario
-                      ? "bg-[#5D4387] border-[#5D4387] text-white"
-                      : "border-black/15 text-black/60 hover:border-black/30"
-                  }`}
+                  className={pillClass(i === scenario)}
                 >
                   {uc}
                 </button>
@@ -104,11 +139,7 @@ function LiveDemoSection({ persona }: { persona: Persona }) {
                   key={c}
                   type="button"
                   onClick={() => setChannel(i)}
-                  className={`px-4 py-2 rounded-full text-[12.5px] font-medium border transition-colors ${
-                    i === channel
-                      ? "bg-[#5D4387] border-[#5D4387] text-white"
-                      : "border-black/15 text-black/60 hover:border-black/30"
-                  }`}
+                  className={pillClass(i === channel)}
                 >
                   {c}
                 </button>
@@ -119,7 +150,7 @@ function LiveDemoSection({ persona }: { persona: Persona }) {
           <div className="mt-8 flex flex-wrap items-center gap-5">
             <a
               href="#demo"
-              className="px-7 py-3.5 bg-[#111] text-white text-[12px] font-semibold uppercase tracking-wide rounded-full hover:bg-black/80 transition-colors"
+              className="px-7 py-3.5 bg-[#111] text-white text-[12px] font-semibold uppercase tracking-wide rounded-full hover:bg-black/80 transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0"
             >
               Watch {persona.label} Live
             </a>
@@ -137,24 +168,30 @@ function LiveDemoSection({ persona }: { persona: Persona }) {
   )
 }
 
-// Shared CTA button pair — "Hire a [X] Angel" (filled) + "Experience an Angel" (outlined),
-// matching requirements/angel_pages.png. Used once in the hero and once again above the footer.
-function CtaButtons({ hireLabel }: { hireLabel?: string }) {
+// "Hire a [X] Angel" (filled) — hero only now. Was previously paired with an "Experience an
+// Angel" button in both the hero and the closing section; split into two standalone buttons so
+// each section can show just the one it needs (hero: hire; closing: experience).
+function HireButton({ hireLabel }: { hireLabel?: string }) {
   return (
-    <div className="flex flex-wrap items-center gap-3">
-      <Link
-        href="/get-started"
-        className="px-7 py-3.5 bg-[#5D4387] text-white text-[12px] font-semibold uppercase tracking-wide rounded-full hover:bg-[#7168A0] transition-colors"
-      >
-        {hireLabel}
-      </Link>
-      <a
-        href="#demo"
-        className="px-7 py-3.5 border border-black/15 text-[#111] text-[12px] font-semibold uppercase tracking-wide rounded-full hover:border-black/30 hover:bg-black/[0.03] transition-colors"
-      >
-        Experience an Angel
-      </a>
-    </div>
+    <Link
+      href="/get-started"
+      className="inline-block px-7 py-3.5 bg-[#5D4387] text-white text-[12px] font-semibold uppercase tracking-wide rounded-full hover:bg-[#7168A0] transition-colors"
+    >
+      {hireLabel}
+    </Link>
+  )
+}
+
+// "Experience an Angel" (outlined) — closing section only now. Scrolls to the Live Preview
+// section (not the hero's own phone demo) since that's the page's actual interactive preview.
+function ExperienceButton() {
+  return (
+    <a
+      href="#live-preview"
+      className="inline-block px-7 py-3.5 border border-black/15 text-[#111] text-[12px] font-semibold uppercase tracking-wide rounded-full hover:border-black/30 hover:bg-black/[0.03] transition-colors"
+    >
+      Experience an Angel
+    </a>
   )
 }
 
@@ -189,22 +226,27 @@ export function HireAnAngelPageContent({ personaId }: { personaId: PersonaId }) 
 
       <div className="flex-1 px-6 md:px-12 lg:px-20 pt-28 md:pt-32 pb-24">
         <main className="max-w-6xl mx-auto">
-          {/* Breadcrumb — above the tab row */}
-          <nav aria-label="Breadcrumb" className="text-[13px] text-black/45">
-            <Link href="/" className="hover:text-[#111] transition-colors">
+          {/* Breadcrumb — deliberately quieter than the tab row below it (smaller, lighter,
+              no bold/dark "current page" treatment) so it reads as page-hierarchy context, not
+              a second nav competing with the tabs. The tabs stay the one bold/dark element in
+              this header, so they're unambiguously the primary navigation. */}
+          <nav aria-label="Breadcrumb" className="text-[12px] text-black/35 tracking-wide">
+            <Link href="/" className="hover:text-black/60 transition-colors">
               Home
             </Link>
-            <span className="mx-2">›</span>
+            <span className="mx-1.5 text-black/25">›</span>
             <span>Hire an Angel</span>
-            <span className="mx-2">›</span>
-            <span className="text-[#111] font-medium">{persona.label}</span>
+            <span className="mx-1.5 text-black/25">›</span>
+            <span className="text-black/50">{persona.label}</span>
           </nav>
 
           {/* Persona tab row — left-aligned (not centered, and not embedded in the navbar). One
               shared underline (border-b on the row) with each link's own bottom border
               overlapping it via -mb-px — the classic tab-bar trick, so the active tab's
-              underline sits flush on the divider line instead of floating below it. */}
-          <div className="mt-4 flex flex-wrap items-center gap-x-8 gap-y-2 border-b border-black/[0.08]">
+              underline sits flush on the divider line instead of floating below it. mt-7 (was
+              mt-4): more breathing room from the quieter breadcrumb above, so the two don't read
+              as one crowded block. */}
+          <div className="mt-7 flex flex-wrap items-center gap-x-8 gap-y-2 border-b border-black/[0.08]">
             {PERSONAS.map((p) => {
               const active = p.id === personaId
               return (
@@ -228,7 +270,7 @@ export function HireAnAngelPageContent({ personaId }: { personaId: PersonaId }) 
             <>
               {/* Hero — two columns: copy + CTAs + trust line on the left, phone demo + a
                   floating "Business Outcome" card on the right. */}
-              <div className="mt-10 md:mt-14 grid md:grid-cols-2 gap-12 md:gap-16 items-start">
+              <div className="mt-10 md:mt-14 grid md:grid-cols-2 gap-12 md:gap-16 items-center">
                 <div>
                   {persona.eyebrow && (
                     <span className="inline-block px-4 py-1.5 rounded-full bg-[#EDE9F7] text-[#5D4387] text-[11px] font-semibold uppercase tracking-widest">
@@ -243,7 +285,7 @@ export function HireAnAngelPageContent({ personaId }: { personaId: PersonaId }) 
                   </p>
 
                   <div className="mt-8">
-                    <CtaButtons hireLabel={persona.ctaHireLabel} />
+                    <HireButton hireLabel={persona.ctaHireLabel} />
                   </div>
 
                   {/* Trust/differentiator line — identical wording across all 4 personas, so
@@ -260,12 +302,16 @@ export function HireAnAngelPageContent({ personaId }: { personaId: PersonaId }) 
                 </div>
 
                 {/* sticky: keeps the phone in view as the (usually shorter) left column
-                    finishes and the capabilities section begins, matching the reference. */}
+                    finishes and the capabilities section begins, matching the reference.
+                    width dropped from 300 to 240 (the device scales as a unit, so height drops
+                    with it) specifically to close the gap between this column and the shorter
+                    text column on the left — at 300 the phone ran noticeably taller than the
+                    copy, leaving dead space beneath the text. */}
                 <div className="flex flex-col items-center md:items-end md:sticky md:top-28">
                   <div id="demo" className="scroll-mt-24">
-                    <PersonaPhoneDemo personaId={personaId} active width={300} />
+                    <PersonaPhoneDemo personaId={personaId} active width={240} />
                   </div>
-                  <div className="mt-4 w-full max-w-[300px] rounded-xl border border-black/[0.08] bg-white px-5 py-4 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.15)]">
+                  <div className="mt-4 w-full max-w-[240px] rounded-xl border border-black/[0.08] bg-white px-5 py-4 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.15)]">
                     <p className="text-[10px] font-semibold uppercase tracking-widest text-[#5D4387]">
                       Business Outcome
                     </p>
@@ -276,14 +322,24 @@ export function HireAnAngelPageContent({ personaId }: { personaId: PersonaId }) 
 
               {/* Capabilities — 3-column bordered cards with a small icon swatch, bold title
                   and description each, straight from the content doc. */}
-              <section className="mt-24">
+              <section className="mt-12">
                 <h2 className="text-xs font-medium uppercase tracking-widest text-black/40">
                   Capabilities
                 </h2>
                 <div className="mt-6 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
                   {persona.capabilities!.map((c) => (
-                    <div key={c.title} className="rounded-2xl border border-black/[0.08] bg-white px-6 py-6">
-                      <span className="inline-block w-6 h-6 rounded-md bg-[#5D4387]" aria-hidden="true" />
+                    <div
+                      key={c.title}
+                      tabIndex={0}
+                      className="rounded-2xl border-2 border-black/[0.08] bg-white px-6 py-6 transition-colors cursor-pointer hover:border-[#5D4387] focus:outline-none focus:border-[#5D4387] active:border-[#5D4387]"
+                    >
+                      {/* Layered icon swatch — light-purple square with a smaller solid-purple
+                          square (60% of the outer size, not a circle) centered inside it,
+                          matching the design mockup (angelpageslight.vercel.app); previously just
+                          a single flat purple square. */}
+                      <span className="inline-flex items-center justify-center w-[25px] h-[25px] rounded-md bg-[#EDE9F7]" aria-hidden="true">
+                        <span className="w-[40%] h-[40%] rounded-[3px] bg-[#5D4387]" />
+                      </span>
                       <p className="mt-4 font-semibold text-[#111]">{c.title}</p>
                       <p className="mt-1.5 text-sm text-black/50 leading-relaxed">{c.description}</p>
                     </div>
@@ -317,11 +373,12 @@ export function HireAnAngelPageContent({ personaId }: { personaId: PersonaId }) 
                 <p className="mt-4 text-sm text-black/55 leading-relaxed">{persona.whatIsDescription}</p>
               </section>
 
-              {/* Closing CTA — same buttons as the hero. */}
+              {/* Closing CTA — "Experience an Angel" only (the hire button already lives in the
+                  hero above); this one scrolls down to the Live Preview section. */}
               <section className="mt-20 pb-4">
                 <p className="text-xl font-semibold text-[#111]">{persona.ctaLine}</p>
                 <div className="mt-6">
-                  <CtaButtons hireLabel={persona.ctaHireLabel} />
+                  <ExperienceButton />
                 </div>
               </section>
             </>
