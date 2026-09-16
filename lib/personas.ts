@@ -54,7 +54,7 @@ export const PERSONAS: Persona[] = [
     label: "Sales Angel",
     slug: "sales-angel",
     contact: "Alex Morgan",
-    avatar: "/images/sales_angel_avatar.png",
+    avatar: "/images/sales_angel.png",    
     role: "Sales",
     messages: [
       ["in", "Is the downtown listing still available?"],
@@ -90,7 +90,7 @@ export const PERSONAS: Persona[] = [
     label: "Service Angel",
     slug: "service-angel",
     contact: "Nora Bennett",
-    avatar: "/images/service_angel_avatar.png",
+    avatar: "/images/service_angel.png",
     role: "Service",
     messages: [
       ["in", "My order hasn't arrived yet, can you check?"],
@@ -126,7 +126,7 @@ export const PERSONAS: Persona[] = [
     label: "HR Angel",
     slug: "recruitment-angel",
     contact: "Mia Torres",
-    avatar: "/images/hr_angel_avatar.png",
+    avatar: "/images/hr_angel.png",
     role: "Human Resource",
     messages: [
       ["in", "I'd like to apply for the ops role."],
@@ -164,7 +164,7 @@ export const PERSONAS: Persona[] = [
     label: "Assistant Angel",
     slug: "executive-assistant-angel",
     contact: "Sarah Thomson",
-    avatar: "/images/assistant_angel_avatar.png",
+    avatar: "/images/assistant_angel.png",
     role: "Assistance",
     messages: [
       ["in", "Can you move my 3pm client call to tomorrow morning?"],
