@@ -31,10 +31,10 @@ export default function ContactPage() {
           <div className="mt-10 flex flex-col gap-2">
             <span className="text-lg text-[#111]">One Boston Place, # 2600, Boston, MA, 02108</span>
             <a
-              href="mailto:angel@actangel.com"
+              href="mailto:hello@actangel.com"
               className="text-lg text-[#111] underline underline-offset-2 hover:text-black/60 transition-colors"
             >
-              angel@actangel.com
+              hello@actangel.com
             </a>
           </div>
 

@@ -86,10 +86,10 @@ export default function TermsPage() {
           <p>
             Questions about these terms? Contact us at{" "}
             <a
-              href="mailto:angel@actangel.com"
+              href="mailto:hello@actangel.com"
               className="text-[#111] underline underline-offset-2 hover:text-black/60 transition-colors"
             >
-              angel@actangel.com
+              hello@actangel.com
             </a>
             .
           </p>

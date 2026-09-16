@@ -826,10 +826,10 @@ export default function AgenticPage() {
               One Boston Place, # 2600, Boston, MA, 02108
             </a>
             <a
-              href="mailto:angel@actangel.com"
+              href="mailto:hello@actangel.com"
               className="text-sm text-black/35 underline underline-offset-2 hover:text-black/70 transition-colors tracking-widest"
             >
-              angel@actangel.com
+              hello@actangel.com
             </a>
           </div>
 
