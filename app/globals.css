@@ -348,10 +348,13 @@ body[data-scroll-locked] {
 /* Live Preview card (hire-an-angel-page-content.tsx): a slow, continuous Ken Burns-style
    zoom/pan on the persona photo, standing in for the real mp4 the 11x.ai reference plays there
    (we only have still portraits per persona, not per-persona video). The constant subtle motion
-   is what reads as "alive"/video-like at a glance rather than a flat static photo. */
+   is what reads as "alive"/video-like at a glance rather than a flat static photo.
+   Runs from 0.88 to 0.95 (the original 1 to 1.08 motion, zoomed out 12%) so more of each persona
+   graphic fits the frame; the gap this opens above/below the photo is filled by the frame's own
+   gradient backdrop in hire-an-angel-page-content.tsx. */
 @keyframes live-preview-motion {
-  0%, 100% { transform: scale(1) translate(0, 0); }
-  50%      { transform: scale(1.08) translate(-1.5%, -1%); }
+  0%, 100% { transform: scale(0.88) translate(0, 0); }
+  50%      { transform: scale(0.9504) translate(-1.5%, -1%); }
 }
 
 /* Marquee animations */

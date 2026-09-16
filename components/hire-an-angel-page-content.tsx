@@ -16,6 +16,15 @@ const CHANNELS = ["Call", "Chat", "Email", "SMS", "Web"]
 const PHONE_GLYPH_PATH =
   "M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"
 
+// Live-preview photo fill. The zoomed-out photo no longer reaches the frame's top/bottom, so the
+// frame shows this gradient there — sampled from the persona images' own edges (light sky-grey
+// at the top, near-white at the bottom), which all 4 share. The photo's edges are feathered into
+// it so there's no hard line; the left/right feather only shows on the square mobile frame, since
+// on desktop the photo is wider than the frame and those edges are clipped off.
+const PHOTO_BACKDROP = "linear-gradient(to bottom, #DDE3E9, #F4F4F4)"
+const PHOTO_FEATHER =
+  "linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent), linear-gradient(to right, transparent, #000 8%, #000 92%, transparent)"
+
 /**
  * "Live Preview" section — same broad idea as 11x.ai's "Talk to Julian, live" card (a photo with
  * an incoming-call affordance on one side, a scenario/voice picker and CTA on the other), rebuilt
@@ -53,19 +62,37 @@ function LiveDemoSection({ persona }: { persona: Persona }) {
         {/* 1fr/2fr (not an even split): on 11x.ai the photo half is noticeably narrower than
             the content half, not a 50/50 column. */}
         <div className="grid md:grid-cols-[1fr_2fr] items-stretch">
-          {/* Portrait photo half — min-h only matters below md, where the grid stacks into
-              separate rows and there's no sibling row-height to stretch to. */}
-          <div className="relative w-full min-h-[420px]">
+          {/* Portrait photo half. On desktop its height comes from the text column beside it;
+              below md the grid stacks, so it's a plain square instead. overflow-hidden clips the
+              photo to this frame (it's deliberately wider than the frame on desktop, and the
+              zoom animation would otherwise also spill into the text column). */}
+          <div
+            className="relative w-full aspect-square md:aspect-auto md:min-h-[420px] overflow-hidden"
+            style={{ background: PHOTO_BACKDROP }}
+          >
             {/* Standing in for the mp4 the 11x.ai reference plays here — there's no per-persona
                 video, so a slow, continuous Ken Burns zoom/pan on the still photo (defined in
                 globals.css) is what gives it that "alive"/video feel instead of a flat static
-                image. object-cover's overflow is what the animation zooms into, clipped by this
-                div. */}
-            <img
-              src={persona.avatar}
-              alt={persona.contact}
-              className="absolute inset-0 w-full h-full object-cover animate-[live-preview-motion_9s_ease-in-out_infinite]"
-            />
+                image.
+                The photo keeps its own square shape (h-full + w-auto) rather than object-cover:
+                object-cover clips it to the frame's box, so zooming out shrank that box too and
+                opened gaps on every side. As a full square it overhangs the frame left and right
+                on desktop, so zooming out reveals more of its sides while only the top/bottom
+                open up (onto PHOTO_BACKDROP). max-w-none and shrink-0 stop Tailwind's img reset
+                and flex from squeezing it back down to the frame's width. */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <img
+                src={persona.avatar}
+                alt={persona.contact}
+                className="h-full w-auto max-w-none shrink-0 animate-[live-preview-motion_9s_ease-in-out_infinite]"
+                style={{
+                  maskImage: PHOTO_FEATHER,
+                  WebkitMaskImage: PHOTO_FEATHER,
+                  maskComposite: "intersect",
+                  WebkitMaskComposite: "source-in",
+                }}
+              />
+            </div>
 
             <div className="absolute top-4 left-4 px-3 py-1.5 rounded-full bg-black/45 backdrop-blur-sm">
               <span className="text-[11px] font-medium text-white">
