@@ -43,125 +43,135 @@ function LiveDemoSection({ persona }: { persona: Persona }) {
 
   return (
     <section id="live-preview" className="mt-24 scroll-mt-24">
-      <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-stretch">
-        {/* No aspect-square: with items-stretch on the grid above, this column's height now
-            just fills the row (matching the text column's height) instead of a fixed 1:1 ratio,
-            so the card reads as a portrait panel. min-h-[420px] only matters below md, where
-            each column is its own row (no sibling height to stretch to). */}
-        <div className="relative w-full max-w-[420px] min-h-[420px] mx-auto md:mx-0 rounded-3xl overflow-hidden border border-black/[0.08] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.25)]">
-          {/* Standing in for the mp4 the 11x.ai reference plays here — there's no per-persona
-              video, so a slow, continuous Ken Burns zoom/pan on the still photo (defined in
-              globals.css) is what gives it that "alive"/video feel instead of a flat static
-              image. object-cover's overflow is what the animation zooms into, clipped by the
-              card's own overflow-hidden above. */}
-          <img
-            src={persona.avatar}
-            alt={persona.contact}
-            className="w-full h-full object-cover animate-[live-preview-motion_9s_ease-in-out_infinite]"
-          />
+      {/* Single unified card (matching 11x.ai's "Talk to Julian, live" widget) — one bordered,
+          rounded, shadowed container holding both halves, rather than the photo floating as its
+          own separate card next to a plain text column. The inner grid has no gap/padding of its
+          own so the photo sits flush against the shared border on 3 sides and butts directly up
+          against the text column on the 4th — that seam is a plain edge, not independently
+          rounded, since only the OUTER card's corners are meant to read as rounded. */}
+      <div className="rounded-3xl border border-black/[0.08] bg-white overflow-hidden shadow-[0_20px_50px_-20px_rgba(0,0,0,0.25)]">
+        {/* 1fr/2fr (not an even split): on 11x.ai the photo half is noticeably narrower than
+            the content half, not a 50/50 column. */}
+        <div className="grid md:grid-cols-[1fr_2fr] items-stretch">
+          {/* Portrait photo half — min-h only matters below md, where the grid stacks into
+              separate rows and there's no sibling row-height to stretch to. */}
+          <div className="relative w-full min-h-[420px]">
+            {/* Standing in for the mp4 the 11x.ai reference plays here — there's no per-persona
+                video, so a slow, continuous Ken Burns zoom/pan on the still photo (defined in
+                globals.css) is what gives it that "alive"/video feel instead of a flat static
+                image. object-cover's overflow is what the animation zooms into, clipped by this
+                div. */}
+            <img
+              src={persona.avatar}
+              alt={persona.contact}
+              className="absolute inset-0 w-full h-full object-cover animate-[live-preview-motion_9s_ease-in-out_infinite]"
+            />
 
-          <div className="absolute top-4 left-4 px-3 py-1.5 rounded-full bg-black/45 backdrop-blur-sm">
-            <span className="text-[11px] font-medium text-white">
-              {persona.contact} · {persona.label}
+            <div className="absolute top-4 left-4 px-3 py-1.5 rounded-full bg-black/45 backdrop-blur-sm">
+              <span className="text-[11px] font-medium text-white">
+                {persona.contact} · {persona.label}
+              </span>
+            </div>
+            <div className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/45 backdrop-blur-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#34C759] animate-pulse" />
+              <span className="text-[11px] font-medium text-white">Live</span>
+            </div>
+
+            <div className="absolute inset-x-3 bottom-3 flex items-center justify-between gap-3 px-3 py-2.5 rounded-2xl bg-black/55 backdrop-blur-md">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <img src={persona.avatar} alt="" className="w-8 h-8 rounded-full object-cover shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-[10px] uppercase tracking-wide text-white/60">Incoming</p>
+                  <p className="text-[13px] font-medium text-white truncate">{persona.contact}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                {/* Decline — decorative (matches the phone-demo's own red/rotated-glyph decline
+                    button), not wired to anything since there's no real call to hang up on. */}
+                <span className="flex items-center justify-center w-9 h-9 rounded-full bg-[#FF3B30]" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff" style={{ transform: "rotate(135deg)" }}>
+                    <path d={PHONE_GLYPH_PATH} />
+                  </svg>
+                </span>
+                {/* Accept — the actual link to the on-page demo. The animate-ping ring behind it
+                    is the "wavy" pulse 11x.ai uses on its own live-call accept button, signalling
+                    an incoming call waiting to be answered. */}
+                <a
+                  href="#demo"
+                  className="relative flex items-center justify-center w-9 h-9 rounded-full bg-[#34C759] hover:bg-[#2FB350] transition-colors"
+                >
+                  <span className="absolute inset-0 rounded-full bg-[#34C759] animate-[ping-sm_1.5s_cubic-bezier(0,0,0.2,1)_infinite] opacity-75" aria-hidden="true" />
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff" className="relative">
+                    <path d={PHONE_GLYPH_PATH} />
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Content half — its own padding now that it's inside the shared card instead of
+              being a bare grid cell in the page's own gutter. */}
+          <div className="p-8 md:p-10 lg:p-12">
+            <span className="inline-block px-4 py-1.5 rounded-full bg-[#EDE9F7] text-[#5D4387] text-[11px] font-semibold uppercase tracking-widest">
+              Live Preview
             </span>
-          </div>
-          <div className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/45 backdrop-blur-sm">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#34C759] animate-pulse" />
-            <span className="text-[11px] font-medium text-white">Live</span>
-          </div>
+            <h2 className="mt-5 text-3xl md:text-4xl font-bold tracking-tight leading-[1.1]">
+              See a {persona.label} handle it, live.
+            </h2>
+            <p className="mt-4 text-[15px] text-black/55 leading-relaxed max-w-md">
+              Pick a scenario and a channel, then watch {persona.contact} — your {persona.label} —
+              take it from first message to next step.
+            </p>
 
-          <div className="absolute inset-x-3 bottom-3 flex items-center justify-between gap-3 px-3 py-2.5 rounded-2xl bg-black/55 backdrop-blur-md">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <img src={persona.avatar} alt="" className="w-8 h-8 rounded-full object-cover shrink-0" />
-              <div className="min-w-0">
-                <p className="text-[10px] uppercase tracking-wide text-white/60">Incoming</p>
-                <p className="text-[13px] font-medium text-white truncate">{persona.contact}</p>
+            <div className="mt-8">
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-black/40">Scenario</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {persona.useCases!.map((uc, i) => (
+                  <button
+                    key={uc}
+                    type="button"
+                    onClick={() => setScenario(i)}
+                    className={pillClass(i === scenario)}
+                  >
+                    {uc}
+                  </button>
+                ))}
               </div>
             </div>
 
-            <div className="flex items-center gap-2 shrink-0">
-              {/* Decline — decorative (matches the phone-demo's own red/rotated-glyph decline
-                  button), not wired to anything since there's no real call to hang up on. */}
-              <span className="flex items-center justify-center w-9 h-9 rounded-full bg-[#FF3B30]" aria-hidden="true">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff" style={{ transform: "rotate(135deg)" }}>
-                  <path d={PHONE_GLYPH_PATH} />
-                </svg>
-              </span>
-              {/* Accept — the actual link to the on-page demo. The animate-ping ring behind it
-                  is the "wavy" pulse 11x.ai uses on its own live-call accept button, signalling
-                  an incoming call waiting to be answered. */}
+            <div className="mt-6">
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-black/40">Channel</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {CHANNELS.map((c, i) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setChannel(i)}
+                    className={pillClass(i === channel)}
+                  >
+                    {c}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-8 flex flex-wrap items-center gap-5">
               <a
                 href="#demo"
-                className="relative flex items-center justify-center w-9 h-9 rounded-full bg-[#34C759] hover:bg-[#2FB350] transition-colors"
+                className="px-7 py-3.5 bg-[#111] text-white text-[12px] font-semibold uppercase tracking-wide rounded-full hover:bg-black/80 transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0"
               >
-                <span className="absolute inset-0 rounded-full bg-[#34C759] animate-[ping-sm_1.5s_cubic-bezier(0,0,0.2,1)_infinite] opacity-75" aria-hidden="true" />
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff" className="relative">
-                  <path d={PHONE_GLYPH_PATH} />
-                </svg>
+                Watch {persona.label} Live
               </a>
+              <Link
+                href="/get-started"
+                className="text-[13px] font-semibold text-[#111] hover:text-[#5D4387] transition-colors"
+              >
+                {persona.ctaHireLabel} →
+              </Link>
             </div>
+            <p className="mt-3 text-[12px] text-black/40">Runs an interactive preview right here on this page.</p>
           </div>
-        </div>
-
-        <div>
-          <span className="inline-block px-4 py-1.5 rounded-full bg-[#EDE9F7] text-[#5D4387] text-[11px] font-semibold uppercase tracking-widest">
-            Live Preview
-          </span>
-          <h2 className="mt-5 text-3xl md:text-4xl font-bold tracking-tight leading-[1.1]">
-            See a {persona.label} handle it, live.
-          </h2>
-          <p className="mt-4 text-[15px] text-black/55 leading-relaxed max-w-md">
-            Pick a scenario and a channel, then watch {persona.contact} — your {persona.label} —
-            take it from first message to next step.
-          </p>
-
-          <div className="mt-8">
-            <p className="text-[11px] font-semibold uppercase tracking-widest text-black/40">Scenario</p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {persona.useCases!.map((uc, i) => (
-                <button
-                  key={uc}
-                  type="button"
-                  onClick={() => setScenario(i)}
-                  className={pillClass(i === scenario)}
-                >
-                  {uc}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="mt-6">
-            <p className="text-[11px] font-semibold uppercase tracking-widest text-black/40">Channel</p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {CHANNELS.map((c, i) => (
-                <button
-                  key={c}
-                  type="button"
-                  onClick={() => setChannel(i)}
-                  className={pillClass(i === channel)}
-                >
-                  {c}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="mt-8 flex flex-wrap items-center gap-5">
-            <a
-              href="#demo"
-              className="px-7 py-3.5 bg-[#111] text-white text-[12px] font-semibold uppercase tracking-wide rounded-full hover:bg-black/80 transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0"
-            >
-              Watch {persona.label} Live
-            </a>
-            <Link
-              href="/get-started"
-              className="text-[13px] font-semibold text-[#111] hover:text-[#5D4387] transition-colors"
-            >
-              {persona.ctaHireLabel} →
-            </Link>
-          </div>
-          <p className="mt-3 text-[12px] text-black/40">Runs an interactive preview right here on this page.</p>
         </div>
       </div>
     </section>
