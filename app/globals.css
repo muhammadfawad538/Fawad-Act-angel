@@ -300,6 +300,15 @@
   100% { opacity: 0; transform: translate(-50%, -50%) scale(0); }
 }
 
+/* Smaller-radius version of Tailwind's own animate-ping (which scales to 2x — too far a reach
+   for a 36px call button, extending the ring ~18px past each edge). Caps the scale at 1.5x so
+   the ring only extends ~8-10px past the button's edge, matching 11x.ai's own accept-button
+   pulse. Used via the arbitrary-value utility animate-[ping-sm_1.5s_cubic-bezier(0,0,0.2,1)_infinite]. */
+@keyframes ping-sm {
+  0%   { transform: scale(1); opacity: 0.75; }
+  75%, 100% { transform: scale(1.5); opacity: 0; }
+}
+
 /* Icon bubbles: each one pops out of the hub to a first waypoint (--dx1/--dy1), then keeps
    drifting further out to a second, more distant one (--dx2/--dy2) — the two-stage outward
    journey is what makes the cluster look like it's expanding rather than just popping into
@@ -334,6 +343,18 @@ html {
 body[data-scroll-locked] {
   padding-right: 0 !important;
   margin-right: 0 !important;
+}
+
+/* Live Preview card (hire-an-angel-page-content.tsx): a slow, continuous Ken Burns-style
+   zoom/pan on the persona photo, standing in for the real mp4 the 11x.ai reference plays there
+   (we only have still portraits per persona, not per-persona video). The constant subtle motion
+   is what reads as "alive"/video-like at a glance rather than a flat static photo.
+   Runs from 0.88 to 0.95 (the original 1 to 1.08 motion, zoomed out 12%) so more of each persona
+   graphic fits the frame; the gap this opens above/below the photo is filled by the frame's own
+   gradient backdrop in hire-an-angel-page-content.tsx. */
+@keyframes live-preview-motion {
+  0%, 100% { transform: scale(0.88) translate(0, 0); }
+  50%      { transform: scale(0.9504) translate(-1.5%, -1%); }
 }
 
 /* Marquee animations */

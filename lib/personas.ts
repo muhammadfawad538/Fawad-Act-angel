@@ -30,6 +30,7 @@ export interface Persona {
   // rolled out persona-by-persona: HireAnAngelPageContent only renders these sections once a
   // persona actually has this data, so the pages we haven't gotten to yet keep today's
   // minimal layout instead of showing broken/empty sections.
+  eyebrow?: string // small badge above the hero headline, e.g. "Virtual AI Sales Employee"
   heroHeadline?: string
   heroSubtext?: string
   capabilities?: Capability[]
@@ -39,6 +40,12 @@ export interface Persona {
   whatIsDescription?: string
   ctaLine?: string
   ctaHireLabel?: string // e.g. "Hire a Sales Angel"
+
+  // "Hire an Angel" nav mega-menu card (requirements/Hire_an_angel_dropdown.png) — a short role
+  // subtitle under the name, and 4 use-case bullets. Reuses the `avatar` photo above rather than
+  // the mockup's separate halo/wings portrait set, which hasn't been provided yet.
+  dropdownRole?: string
+  useCases?: [string, string, string, string]
 }
 
 export const PERSONAS: Persona[] = [
@@ -47,7 +54,7 @@ export const PERSONAS: Persona[] = [
     label: "Sales Angel",
     slug: "sales-angel",
     contact: "Alex Morgan",
-    avatar: "/images/alex_morgan.webp",
+    avatar: "/images/sales_angel.png",
     role: "Sales",
     messages: [
       ["in", "Is the downtown listing still available?"],
@@ -55,6 +62,7 @@ export const PERSONAS: Persona[] = [
       ["in", "Saturday works"],
       ["out", "Booked — Sat, 11:00 AM"],
     ],
+    eyebrow: "Virtual AI Sales Employee",
     heroHeadline: "Turn Every Deal Into Action.",
     heroSubtext:
       "Your virtual AI sales employee engages deals, qualifies interest, books meetings, and moves opportunities forward across your connected sales systems.",
@@ -74,13 +82,15 @@ export const PERSONAS: Persona[] = [
       "A Sales Angel is a virtual AI sales employee from Act Angel AI that autonomously qualifies deals, follows up, schedules meetings, and updates connected sales systems within your defined rules and permissions.",
     ctaLine: "Put your next opportunity in motion.",
     ctaHireLabel: "Hire a Sales Angel",
+    dropdownRole: "Drives Sales",
+    useCases: ["Lead Qualification", "Discovery Calls", "Meeting Scheduling", "Pipeline Follow-Up"],
   },
   {
     id: "service",
     label: "Service Angel",
     slug: "service-angel",
     contact: "Nora Bennett",
-    avatar: "/images/nora_bennett.png",
+    avatar: "/images/service_angel.png",
     role: "Service",
     messages: [
       ["in", "My order hasn't arrived yet, can you check?"],
@@ -88,6 +98,7 @@ export const PERSONAS: Persona[] = [
       ["in", "Great, thank you!"],
       ["out", "You're welcome. I'll text you once it's delivered."],
     ],
+    eyebrow: "Virtual AI Customer Service Employee",
     heroHeadline: "From Customer Request to Resolution.",
     heroSubtext:
       "Your virtual AI service employee answers questions, acts on routine requests, and keeps customers informed across your connected support systems.",
@@ -107,13 +118,15 @@ export const PERSONAS: Persona[] = [
       "A Service Angel is a virtual AI customer service employee from Act Angel AI that answers questions and autonomously completes routine service workflows across connected systems, with escalation when human judgement is needed.",
     ctaLine: "Make every service interaction count.",
     ctaHireLabel: "Hire a Service Angel",
+    dropdownRole: "Supports Customers",
+    useCases: ["Ticket Triage & Resolution", "Order & Account Support", "Renewals & Upsell", "After-Hours Coverage"],
   },
   {
     id: "hr",
     label: "HR Angel",
     slug: "recruitment-angel",
     contact: "Mia Torres",
-    avatar: "/images/mia_torres.png",
+    avatar: "/images/hr_angel.png",
     role: "Human Resource",
     messages: [
       ["in", "I'd like to apply for the ops role."],
@@ -123,6 +136,7 @@ export const PERSONAS: Persona[] = [
     ],
     // Content doc's "HR Angel" section, used verbatim — displayed under the "HR Angel" label
     // above while the URL stays /hire-an-angel/recruitment-angel (route intentionally unchanged).
+    eyebrow: "Virtual AI HR Employee",
     heroHeadline: "Less HR Admin. More Human Impact.",
     heroSubtext:
       "Your virtual AI HR employee coordinates people processes, handles routine employee requests, and keeps work moving across your connected HR systems.",
@@ -142,23 +156,26 @@ export const PERSONAS: Persona[] = [
       "An HR Angel is a virtual AI employee from Act Angel AI that autonomously coordinates routine HR workflows across connected systems and approved data. Sensitive cases and employment decisions remain with authorised people.",
     ctaLine: "Give your people team more capacity.",
     ctaHireLabel: "Hire an HR Angel",
+    dropdownRole: "Talent Management",
+    useCases: ["Candidate Sourcing", "Resume Screening", "Interview Scheduling", "Candidate Follow-Up"],
   },
   {
     id: "assistance",
     label: "Assistant Angel",
     slug: "executive-assistant-angel",
     contact: "Sarah Thomson",
-    avatar: "/images/sarah_thomson.png",
+    avatar: "/images/assistant_angel.png",
     role: "Assistance",
     messages: [
-      ["in", "Can you move my 3pm to tomorrow morning?"],
-      ["out", "Done — moved to tomorrow at 9:00 AM and notified the attendees."],
+      ["in", "Can you move my 3pm client call to tomorrow morning?"],
+      ["out", "Done — moved your client call to tomorrow at 9:00 AM and notified the attendees."],
       ["in", "Perfect, thanks."],
       ["out", "Anytime. Your day is now clear until 11 AM."],
     ],
     // Content doc's "Assistant Angel" section, used verbatim — displayed under the "Assistant
     // Angel" label above while the URL stays /hire-an-angel/executive-assistant-angel (route
     // intentionally unchanged).
+    eyebrow: "Virtual AI Assistant Employee",
     heroHeadline: "Give Your Priorities Room to Move.",
     heroSubtext:
       "Your virtual AI assistant coordinates schedules, prepares information, and follows through on everyday work across your connected tools and workflows.",
@@ -178,17 +195,25 @@ export const PERSONAS: Persona[] = [
       "An Assistant Angel is a virtual AI assistant employee from Act Angel AI that autonomously coordinates administrative work across connected calendars, communication tools, data, and processes, following your permissions and approval rules.",
     ctaLine: "Make space for your highest-value work.",
     ctaHireLabel: "Hire an Assistant Angel",
+    dropdownRole: "Organizes Work",
+    useCases: ["Calendar Management", "Inbox Triage", "Travel & Expense", "Meeting Prep & Notes"],
   },
 ]
 
 // The theme's hero phone runs its own thread — a longer 5-message pricing conversation —
 // rather than reusing the Sales persona's modal script, so it's kept separate here.
+//
+// Doesn't ask for name/email/phone: that contact info is already captured automatically by the
+// product (caller ID, ad-click tracking, connected CRM, etc.), so the AI goes straight to
+// qualifying the actual need instead of the usual lead-form questions — the script itself is
+// the pitch for that.
 export const HERO_CONTACT = "Alex Morgan"
-export const HERO_AVATAR = "/images/alex_morgan.webp"
+export const HERO_AVATAR = "/images/sales_angel_avatar.png"
 export const HERO_MESSAGES: ScriptLine[] = [
   ["in", "Hi, I saw your ad — do you have time to chat about pricing?"],
-  ["out", "Of course! Could I get your name and what you're looking for?"],
-  ["in", "Sarah Chen, looking for the Pro plan for a 10-person team."],
-  ["out", "Perfect — I can set up a walkthrough tomorrow at 10:00 AM. Work for you?"],
-  ["out", "You're booked for 10:00 AM tomorrow. Talk soon, Sarah!"],
+  ["out", "Of course! What are you looking for — team size and use case?"],
+  ["in", "Looking for the Pro plan for a 10-person team."],
+  ["out", "Perfect — I can set up a walkthrough tomorrow at 10:00 AM. Does that work?"],
+  ["in", "Yes, that works!"],
+  ["out", "You're booked for 10:00 AM tomorrow. Talk soon!"],
 ]

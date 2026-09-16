@@ -280,7 +280,7 @@ export default function AgenticPage() {
                   staggered in after the buttons. */}
               <div className="flex gap-8 sm:gap-12 mt-10">
                 {[
-                  { value: "2 sec", label: "Response Time" },
+                  { value: "< 10 sec", label: "Response Time" },
                   { value: "99.9%", label: "Uptime" },
                   { value: "24/7", label: "Coverage" },
                 ].map((stat, i) => (
@@ -826,10 +826,10 @@ export default function AgenticPage() {
               One Boston Place, # 2600, Boston, MA, 02108
             </a>
             <a
-              href="mailto:hello@actangel.com"
-              className="text-sm text-black/35 hover:text-black/70 transition-colors tracking-widest"
+              href="mailto:angel@actangel.com"
+              className="text-sm text-black/35 underline underline-offset-2 hover:text-black/70 transition-colors tracking-widest"
             >
-              hello@actangel.com
+              angel@actangel.com
             </a>
           </div>
 

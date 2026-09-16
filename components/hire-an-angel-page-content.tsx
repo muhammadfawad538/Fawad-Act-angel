@@ -1,8 +1,194 @@
+"use client"
+
+import { useState } from "react"
 import Link from "next/link"
-import { PERSONAS, type PersonaId } from "@/lib/personas"
+import { PERSONAS, type Persona, type PersonaId } from "@/lib/personas"
 import { PersonaPhoneDemo } from "@/components/persona-phone-demo"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
+
+// Act Angel's own multi-channel concept (already used on the homepage's "always on / reachable
+// everywhere" section) — reused here as the second picker in LiveDemoSection below.
+const CHANNELS = ["Call", "Chat", "Email", "SMS", "Web"]
+
+// Live-preview photo fill. The zoomed-out photo no longer reaches the frame's top/bottom, so the
+// frame shows this gradient there — sampled from the persona images' own edges (light sky-grey
+// at the top, near-white at the bottom), which all 4 share. The photo's edges are feathered into
+// it so there's no hard line; the left/right feather only shows on the square mobile frame, since
+// on desktop the photo is wider than the frame and those edges are clipped off.
+const PHOTO_BACKDROP = "linear-gradient(to bottom, #DDE3E9, #F4F4F4)"
+const PHOTO_FEATHER =
+  "linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent), linear-gradient(to right, transparent, #000 8%, #000 92%, transparent)"
+
+/**
+ * "Live Preview" section — same broad idea as 11x.ai's "Talk to Julian, live" card (a photo with
+ * an incoming-call affordance on one side, a scenario/voice picker and CTA on the other), rebuilt
+ * in Act Angel's own palette/typography and wired to real product data instead of copied wording:
+ * the "Scenario" pills are each persona's actual use cases (lib/personas.ts), the second picker
+ * is Act Angel's own channel list (Call/Chat/Email/SMS/Web, already used on the homepage) rather
+ * than voice accents, and the CTA scrolls to the real phone demo already on this page instead of
+ * promising a live WebRTC call the site doesn't have.
+ */
+// Shared Scenario/Channel pill style — a light-purple fill (not a solid one) for the selected
+// pill, plus a hover lift/press animation, matching 11x.ai's own scenario/voice picker: on
+// 11x the pill shifts slightly upward on hover rather than growing, so this uses a translateY
+// instead of a scale.
+function pillClass(active: boolean) {
+  return `px-4 py-2 rounded-full text-[12.5px] font-medium border cursor-pointer transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 ${
+    active
+      ? "bg-[#EDE9F7] border-[#5D4387]/30 text-[#5D4387]"
+      : "border-black/15 text-black/60 hover:border-[#5D4387]/30 hover:bg-[#5D4387]/[0.05] hover:text-[#5D4387]"
+  }`
+}
+
+function LiveDemoSection({ persona }: { persona: Persona }) {
+  const [scenario, setScenario] = useState(0)
+  const [channel, setChannel] = useState(0)
+
+  return (
+    <section id="live-preview" className="mt-24 scroll-mt-24">
+      {/* Single unified card (matching 11x.ai's "Talk to Julian, live" widget) — one bordered,
+          rounded, shadowed container holding both halves, rather than the photo floating as its
+          own separate card next to a plain text column. The inner grid has no gap/padding of its
+          own so the photo sits flush against the shared border on 3 sides and butts directly up
+          against the text column on the 4th — that seam is a plain edge, not independently
+          rounded, since only the OUTER card's corners are meant to read as rounded. */}
+      <div className="rounded-3xl border border-black/[0.08] bg-white overflow-hidden shadow-[0_20px_50px_-20px_rgba(0,0,0,0.25)]">
+        {/* 1fr/2fr (not an even split): on 11x.ai the photo half is noticeably narrower than
+            the content half, not a 50/50 column. */}
+        <div className="grid md:grid-cols-[1fr_2fr] items-stretch">
+          {/* Portrait photo half. On desktop its height comes from the text column beside it;
+              below md the grid stacks, so it's a plain square instead. overflow-hidden clips the
+              photo to this frame (it's deliberately wider than the frame on desktop, and the
+              zoom animation would otherwise also spill into the text column). */}
+          <div
+            className="relative w-full aspect-square md:aspect-auto md:min-h-[420px] overflow-hidden"
+            style={{ background: PHOTO_BACKDROP }}
+          >
+            {/* Standing in for the mp4 the 11x.ai reference plays here — there's no per-persona
+                video, so a slow, continuous Ken Burns zoom/pan on the still photo (defined in
+                globals.css) is what gives it that "alive"/video feel instead of a flat static
+                image.
+                The photo keeps its own square shape (h-full + w-auto) rather than object-cover:
+                object-cover clips it to the frame's box, so zooming out shrank that box too and
+                opened gaps on every side. As a full square it overhangs the frame left and right
+                on desktop, so zooming out reveals more of its sides while only the top/bottom
+                open up (onto PHOTO_BACKDROP). max-w-none and shrink-0 stop Tailwind's img reset
+                and flex from squeezing it back down to the frame's width. */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <img
+                src={persona.avatar}
+                alt={persona.contact}
+                className="h-full w-auto max-w-none shrink-0 animate-[live-preview-motion_9s_ease-in-out_infinite]"
+                style={{
+                  maskImage: PHOTO_FEATHER,
+                  WebkitMaskImage: PHOTO_FEATHER,
+                  maskComposite: "intersect",
+                  WebkitMaskComposite: "source-in",
+                }}
+              />
+            </div>
+
+            <div className="absolute top-4 left-4 px-3 py-1.5 rounded-full bg-black/45 backdrop-blur-sm">
+              <span className="text-[11px] font-medium text-white">
+                {persona.contact} · {persona.label}
+              </span>
+            </div>
+            <div className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/45 backdrop-blur-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#34C759] animate-pulse" />
+              <span className="text-[11px] font-medium text-white">Live</span>
+            </div>
+
+          </div>
+
+          {/* Content half — its own padding now that it's inside the shared card instead of
+              being a bare grid cell in the page's own gutter. */}
+          <div className="p-8 md:p-10 lg:p-12">
+            <span className="inline-block px-4 py-1.5 rounded-full bg-[#EDE9F7] text-[#5D4387] text-[11px] font-semibold uppercase tracking-widest">
+              Live Preview
+            </span>
+            <h2 className="mt-5 text-3xl md:text-4xl font-bold tracking-tight leading-[1.1]">
+              See a {persona.label} handle it, live.
+            </h2>
+            <p className="mt-4 text-[15px] text-black/55 leading-relaxed max-w-md">
+              Pick a scenario and a channel, then watch {persona.contact} — your {persona.label} —
+              take it from first message to next step.
+            </p>
+
+            <div className="mt-8">
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-black/40">Scenario</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {persona.useCases!.map((uc, i) => (
+                  <button
+                    key={uc}
+                    type="button"
+                    onClick={() => setScenario(i)}
+                    className={pillClass(i === scenario)}
+                  >
+                    {uc}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-black/40">Channel</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {CHANNELS.map((c, i) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setChannel(i)}
+                    className={pillClass(i === channel)}
+                  >
+                    {c}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-8 flex flex-wrap items-center gap-5">
+              <Link
+                href="/get-started"
+                className="px-7 py-3.5 bg-[#111] text-white text-[12px] font-semibold uppercase tracking-wide rounded-full hover:bg-black/80 transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0"
+              >
+                {persona.ctaHireLabel}
+              </Link>
+            </div>
+            <p className="mt-3 text-[12px] text-black/40">Don&rsquo;t Take Our Word for It. Meet Your Angel.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// "Hire a [X] Angel" (filled) — hero only now. Was previously paired with an "Experience an
+// Angel" button in both the hero and the closing section; split into two standalone buttons so
+// each section can show just the one it needs (hero: hire; closing: experience).
+function HireButton({ hireLabel }: { hireLabel?: string }) {
+  return (
+    <Link
+      href="/get-started"
+      className="inline-block px-7 py-3.5 bg-[#5D4387] text-white text-[12px] font-semibold uppercase tracking-wide rounded-full hover:bg-[#7168A0] transition-colors"
+    >
+      {hireLabel}
+    </Link>
+  )
+}
+
+// "Experience an Angel" (outlined) — closing section only now. Scrolls to the Live Preview
+// section (not the hero's own phone demo) since that's the page's actual interactive preview.
+function ExperienceButton() {
+  return (
+    <a
+      href="#live-preview"
+      className="inline-block px-7 py-3.5 border border-black/15 text-[#111] text-[12px] font-semibold uppercase tracking-wide rounded-full hover:border-black/30 hover:bg-black/[0.03] transition-colors"
+    >
+      Experience an Angel
+    </a>
+  )
+}
 
 /**
  * Shared body for the 4 standalone Hire-an-Angel pages (app/hire-an-angel/<slug>/page.tsx) —
@@ -10,13 +196,21 @@ import { SiteFooter } from "@/components/site-footer"
  * row, and phone demo can't drift across the 4 routes. Mirrors the modal's own persona-picker
  * pill grid (components/hire-an-angel-modal.tsx, left intact for later reactivation) but as
  * real links between the 4 pages instead of in-place state.
+ *
+ * Layout matches requirements/angel_pages.png (colors/light theme) + screenshot1-3.png (full
+ * structure — the same design, just a dark-theme variant): left-aligned persona tabs, a
+ * two-column hero (eyebrow badge/headline/subtext/CTAs/trust line + phone demo with a floating
+ * "Business Outcome" card), a 3-column capabilities grid, a full-bleed outcome banner, an
+ * FAQ-style explainer, and a closing CTA — all above the site's normal footer.
+ * The site's own global nav (SiteHeader) is left untouched — the persona switcher shown
+ * embedded in the navbar in those reference shots was intentionally NOT adopted; it lives here
+ * instead, as its own left-aligned tab row (no breadcrumb above it).
  */
 export function HireAnAngelPageContent({ personaId }: { personaId: PersonaId }) {
   const persona = PERSONAS.find((p) => p.id === personaId) ?? PERSONAS[0]
   // Gates the full landing-page sections below (hero headline through CTA). Personas that
-  // haven't had their content doc copy filled in yet (lib/personas.ts) just keep today's
-  // minimal H1 + tabs + phone-demo layout instead of rendering half-empty sections — lets the
-  // 4 pages be rolled out one at a time instead of all at once.
+  // haven't had their content doc copy filled in yet (lib/personas.ts) just keep a bare
+  // phone-demo fallback instead of rendering half-empty sections.
   const hasLandingContent = !!persona.heroHeadline
 
   // flex flex-col + flex-1 on the content div below: keeps the footer pinned to the bottom
@@ -25,121 +219,154 @@ export function HireAnAngelPageContent({ personaId }: { personaId: PersonaId }) 
     <div className="bg-[#F5F4F0] text-[#111] min-h-screen flex flex-col font-sans antialiased">
       <SiteHeader />
 
-      <div className="flex-1 px-6 md:px-12 lg:px-20 py-24 md:py-32">
-        <main className="max-w-4xl mx-auto">
-          <div className="max-w-2xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl font-light tracking-tight leading-[1.05]">
-              {persona.label}
-            </h1>
-
-            {/* Shared tagline across all 4 persona pages, verbatim from the client's content doc
-                (requirements/Act_Angel_AI_Hire_an_Angel_Website_Content.pdf) — same line for
-                every persona, so it lives here in the shared body rather than per-persona data. */}
-            <p className="mt-3 text-base md:text-lg font-medium text-[#111]">
-              AI That Acts. Scale Your Business—Not Your Headcount.
-            </p>
-
-            {hasLandingContent && (
-              <>
-                <h2 className="mt-10 text-3xl md:text-4xl font-light tracking-tight leading-[1.1]">
-                  {persona.heroHeadline}
-                </h2>
-                <p className="mt-4 text-[15px] text-black/60 leading-relaxed">
-                  {persona.heroSubtext}
-                </p>
-              </>
-            )}
-
-            {/* Real tabs, not the modal's button grid: one shared underline (border-b on the
-                row) with each link's own bottom border overlapping it via -mb-px — the classic
-                tab-bar trick, so the active tab's underline sits flush on the divider line
-                instead of floating below it. */}
-            <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2 mt-10 border-b border-black/[0.08]">
-              {PERSONAS.map((p) => {
-                const active = p.id === personaId
-                return (
-                  <Link
-                    key={p.id}
-                    href={`/hire-an-angel/${p.slug}`}
-                    aria-current={active ? "page" : undefined}
-                    className="pb-3 text-[14px] font-medium border-b-2 -mb-px transition-colors duration-200 hover:text-[#111]"
-                    style={{
-                      color: active ? "#111111" : "#8A8A8A",
-                      borderColor: active ? "#111111" : "transparent",
-                    }}
-                  >
-                    {p.label}
-                  </Link>
-                )
-              })}
-            </div>
-
-            <div id="demo" className="flex justify-center mt-10 scroll-mt-24">
-              <PersonaPhoneDemo personaId={personaId} active width={340} />
-            </div>
+      <div className="flex-1 px-6 md:px-12 lg:px-20 pt-28 md:pt-32 pb-24">
+        <main className="max-w-6xl mx-auto">
+          {/* Persona tab row — left-aligned (not centered, and not embedded in the navbar). One
+              shared underline (border-b on the row) with each link's own bottom border
+              overlapping it via -mb-px — the classic tab-bar trick, so the active tab's
+              underline sits flush on the divider line instead of floating below it. */}
+          <div className="flex flex-wrap items-center gap-x-8 gap-y-2 border-b border-black/[0.08]">
+            {PERSONAS.map((p) => {
+              const active = p.id === personaId
+              return (
+                <Link
+                  key={p.id}
+                  href={`/hire-an-angel/${p.slug}`}
+                  aria-current={active ? "page" : undefined}
+                  className={`pb-3 text-[14px] font-medium border-b-2 -mb-px transition-colors duration-200 ${
+                    active
+                      ? "text-[#111] border-[#111]"
+                      : "text-[#8A8A8A] border-transparent hover:text-[#111]"
+                  }`}
+                >
+                  {p.label}
+                </Link>
+              )
+            })}
           </div>
 
-          {hasLandingContent && (
+          {hasLandingContent ? (
             <>
-              {/* Capabilities — bold lead-in + one-line description each, straight from the
-                  content doc. Two columns on larger screens; stacks to one on mobile. */}
-              <section className="mt-24">
-                <h3 className="text-xs font-medium uppercase tracking-widest text-black/40 text-center">
+              {/* Hero — two columns: copy + CTAs + trust line on the left, phone demo + a
+                  floating "Business Outcome" card on the right. */}
+              <div className="mt-10 md:mt-14 grid md:grid-cols-2 gap-12 md:gap-16 items-center">
+                <div>
+                  {persona.eyebrow && (
+                    <span className="inline-block px-4 py-1.5 rounded-full bg-[#EDE9F7] text-[#5D4387] text-[11px] font-semibold uppercase tracking-widest">
+                      {persona.eyebrow}
+                    </span>
+                  )}
+                  <h1 className="mt-5 text-4xl md:text-5xl font-bold tracking-tight leading-[1.08]">
+                    {persona.heroHeadline}
+                  </h1>
+                  <p className="mt-5 text-[15px] text-black/55 leading-relaxed max-w-md">
+                    {persona.heroSubtext}
+                  </p>
+
+                  <div className="mt-8">
+                    <HireButton hireLabel={persona.ctaHireLabel} />
+                  </div>
+
+                  {/* Trust/differentiator line — identical wording across all 4 personas, so
+                      it's hardcoded here rather than duplicated in each persona's data. */}
+                  <div className="mt-8 pl-4 border-l-2 border-[#5D4387]/40 max-w-md">
+                    <p className="text-[14px] font-semibold text-[#111]">
+                      No bad days. No fear. No greed. Just focus.
+                    </p>
+                    <p className="mt-1.5 text-[13px] text-black/50 leading-relaxed">
+                      Free from personal worries, emotional ups and downs, or self-interest. Your
+                      Virtual AI Employee stays focused on the work and your business goals—24/7.
+                    </p>
+                  </div>
+                </div>
+
+                {/* sticky: keeps the phone in view as the (usually shorter) left column
+                    finishes and the capabilities section begins, matching the reference.
+                    width dropped from 300 to 240 (the device scales as a unit, so height drops
+                    with it) specifically to close the gap between this column and the shorter
+                    text column on the left — at 300 the phone ran noticeably taller than the
+                    copy, leaving dead space beneath the text. */}
+                <div className="flex flex-col items-center md:items-end md:sticky md:top-28">
+                  <div id="demo" className="scroll-mt-24">
+                    <PersonaPhoneDemo personaId={personaId} active width={240} />
+                  </div>
+                  <div className="mt-4 w-full max-w-[240px] rounded-xl border border-black/[0.08] bg-white px-5 py-4 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.15)]">
+                    <p className="text-[10px] font-semibold uppercase tracking-widest text-[#5D4387]">
+                      Business Outcome
+                    </p>
+                    <p className="mt-1 text-[13px] font-semibold text-[#111]">{persona.outcomeTitle}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Capabilities — 3-column bordered cards with a small icon swatch, bold title
+                  and description each, straight from the content doc. */}
+              <section className="mt-12">
+                <h2 className="text-xs font-medium uppercase tracking-widest text-black/40">
                   Capabilities
-                </h3>
-                <div className="mt-8 grid sm:grid-cols-2 gap-x-12 gap-y-8">
+                </h2>
+                <div className="mt-6 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
                   {persona.capabilities!.map((c) => (
-                    <div key={c.title}>
-                      <p className="font-medium text-[#111]">{c.title}</p>
-                      <p className="mt-1 text-sm text-black/50 leading-relaxed">{c.description}</p>
+                    <div
+                      key={c.title}
+                      tabIndex={0}
+                      className="rounded-2xl border-2 border-black/[0.08] bg-white px-6 py-6 transition-colors cursor-pointer hover:border-[#5D4387] focus:outline-none focus:border-[#5D4387] active:border-[#5D4387]"
+                    >
+                      {/* Layered icon swatch — light-purple square with a smaller solid-purple
+                          square (60% of the outer size, not a circle) centered inside it,
+                          matching the design mockup (angelpageslight.vercel.app); previously just
+                          a single flat purple square. */}
+                      <span className="inline-flex items-center justify-center w-[25px] h-[25px] rounded-md bg-[#EDE9F7]" aria-hidden="true">
+                        <span className="w-[40%] h-[40%] rounded-[3px] bg-[#5D4387]" />
+                      </span>
+                      <p className="mt-4 font-semibold text-[#111]">{c.title}</p>
+                      <p className="mt-1.5 text-sm text-black/50 leading-relaxed">{c.description}</p>
                     </div>
                   ))}
                 </div>
               </section>
 
-              {/* Business outcome — a single highlighted callout, not another list. */}
-              <section className="mt-20 max-w-2xl mx-auto text-center rounded-2xl border border-black/[0.07] bg-white px-8 py-10">
-                <p className="text-xl font-light tracking-tight">{persona.outcomeTitle}</p>
-                <p className="mt-3 text-sm text-black/50 leading-relaxed">{persona.outcomeDescription}</p>
-              </section>
+              <LiveDemoSection persona={persona} />
 
-              {/* Plain-language explainer */}
-              <section className="mt-20 max-w-2xl mx-auto text-center">
-                <h3 className="text-2xl font-light tracking-tight">{persona.whatIsTitle}</h3>
-                <p className="mt-4 text-sm text-black/55 leading-relaxed">{persona.whatIsDescription}</p>
-              </section>
-
-              {/* Trust/differentiator line — identical wording across all 4 personas, so it's
-                  hardcoded here rather than duplicated in each persona's data. */}
-              <section className="mt-20 max-w-2xl mx-auto text-center">
-                <p className="text-lg font-medium">No bad days. No fear. No greed. Just focus.</p>
-                <p className="mt-3 text-sm text-black/50 leading-relaxed">
-                  Free from personal worries, emotional ups and downs, or self-interest. Your
-                  Virtual AI Employee stays focused on the work and your business goals—24/7.
+              {/* Business outcome — full-bleed gradient banner, reusing the same
+                  outcomeTitle/outcomeDescription already teased in the hero's floating card. */}
+              <section
+                className="mt-8 rounded-2xl px-8 py-10 md:px-12 md:py-12"
+                style={{ background: "linear-gradient(135deg, #5D4387, #7168A0)" }}
+              >
+                <p className="text-2xl md:text-3xl font-bold text-white tracking-tight">
+                  {persona.outcomeTitle}
+                </p>
+                <p className="mt-3 text-[15px] text-white/80 leading-relaxed max-w-2xl">
+                  {persona.outcomeDescription}
                 </p>
               </section>
 
-              {/* CTA — "Hire a [X] Angel" drives into the real lead-capture flow; "Experience an
-                  Angel" jumps back up to the phone demo already on this page rather than opening
-                  a separate modal, since the live demo is already right here. */}
-              <section className="mt-20 max-w-2xl mx-auto text-center pb-4">
-                <p className="text-lg font-medium">{persona.ctaLine}</p>
-                <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
-                  <Link
-                    href="/get-started"
-                    className="px-8 py-3 border border-black/15 text-[#111] text-sm rounded-xl hover:border-black/30 hover:bg-black/[0.03] transition-colors tracking-wide font-medium"
-                  >
-                    {persona.ctaHireLabel}
-                  </Link>
-                  <a
-                    href="#demo"
-                    className="px-8 py-3 bg-[#111] text-white text-sm rounded-xl hover:bg-[#333] transition-colors tracking-wide font-medium"
-                  >
-                    Experience an Angel
-                  </a>
+              {/* Plain-language explainer, tagged as answer-engine/FAQ-schema content per the
+                  reference design. */}
+              <section className="mt-20 max-w-2xl">
+                <span className="inline-block px-4 py-1.5 rounded-full border border-black/10 text-[10px] font-semibold uppercase tracking-widest text-black/45">
+                  Structured for Answer Engines · FAQPage Schema
+                </span>
+                <h2 className="mt-5 text-2xl md:text-3xl font-light tracking-tight">{persona.whatIsTitle}</h2>
+                <p className="mt-4 text-sm text-black/55 leading-relaxed">{persona.whatIsDescription}</p>
+              </section>
+
+              {/* Closing CTA — "Experience an Angel" only (the hire button already lives in the
+                  hero above); this one scrolls down to the Live Preview section. */}
+              <section className="mt-20 pb-4">
+                <p className="text-xl font-semibold text-[#111]">{persona.ctaLine}</p>
+                <div className="mt-6">
+                  <ExperienceButton />
                 </div>
               </section>
             </>
+          ) : (
+            <div className="mt-16 flex justify-center">
+              <div id="demo" className="scroll-mt-24">
+                <PersonaPhoneDemo personaId={personaId} active width={340} />
+              </div>
+            </div>
           )}
         </main>
       </div>
