@@ -167,8 +167,8 @@ export const PERSONAS: Persona[] = [
     avatar: "/images/assistant_angel_avatar.png",
     role: "Assistance",
     messages: [
-      ["in", "Can you move my 3pm to tomorrow morning?"],
-      ["out", "Done — moved to tomorrow at 9:00 AM and notified the attendees."],
+      ["in", "Can you move my 3pm client call to tomorrow morning?"],
+      ["out", "Done — moved your client call to tomorrow at 9:00 AM and notified the attendees."],
       ["in", "Perfect, thanks."],
       ["out", "Anytime. Your day is now clear until 11 AM."],
     ],
@@ -202,12 +202,18 @@ export const PERSONAS: Persona[] = [
 
 // The theme's hero phone runs its own thread — a longer 5-message pricing conversation —
 // rather than reusing the Sales persona's modal script, so it's kept separate here.
+//
+// Doesn't ask for name/email/phone: that contact info is already captured automatically by the
+// product (caller ID, ad-click tracking, connected CRM, etc.), so the AI goes straight to
+// qualifying the actual need instead of the usual lead-form questions — the script itself is
+// the pitch for that.
 export const HERO_CONTACT = "Alex Morgan"
 export const HERO_AVATAR = "/images/sales_angel_avatar.png"
 export const HERO_MESSAGES: ScriptLine[] = [
   ["in", "Hi, I saw your ad — do you have time to chat about pricing?"],
-  ["out", "Of course! Could I get your name and what you're looking for?"],
-  ["in", "Sarah Chen, looking for the Pro plan for a 10-person team."],
-  ["out", "Perfect — I can set up a walkthrough tomorrow at 10:00 AM. Work for you?"],
-  ["out", "You're booked for 10:00 AM tomorrow. Talk soon, Sarah!"],
+  ["out", "Of course! What are you looking for — team size and use case?"],
+  ["in", "Looking for the Pro plan for a 10-person team."],
+  ["out", "Perfect — I can set up a walkthrough tomorrow at 10:00 AM. Does that work?"],
+  ["in", "Yes, that works!"],
+  ["out", "You're booked for 10:00 AM tomorrow. Talk soon!"],
 ]
