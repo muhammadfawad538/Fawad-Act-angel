@@ -1,5 +1,4 @@
 import type { Metadata } from "next"
-import Link from "next/link"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 
@@ -84,17 +83,6 @@ export default function BehindTheAngelsPage() {
         <p className="mt-12 text-xl md:text-2xl font-light tracking-tight text-[#111] max-w-3xl">
           Perfect actions. Perfect timing. Lower cost. Limitless scale.
         </p>
-
-        {/* Forward link to the new philanthropy sub-page. */}
-        <div className="mt-16 pt-8 border-t border-black/[0.08]">
-          <Link
-            href="/behind-the-angels/progress-with-purpose"
-            className="inline-flex items-center gap-2 text-[15px] font-medium text-[#5D4387] hover:text-[#7168A0] transition-colors"
-          >
-            Progress with Purpose <span aria-hidden="true">→</span>
-          </Link>
-          <p className="mt-1.5 text-sm text-black/45">How we&rsquo;re building philanthropy into our business.</p>
-        </div>
       </main>
       </div>
 

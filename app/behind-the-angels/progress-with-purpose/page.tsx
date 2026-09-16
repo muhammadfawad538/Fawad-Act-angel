@@ -1,5 +1,4 @@
 import type { Metadata } from "next"
-import Link from "next/link"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 
@@ -75,25 +74,10 @@ export default function ProgressWithPurposePage() {
 
       <div className="flex-1 px-6 md:px-12 lg:px-20 pt-28 md:pt-32 pb-24">
         <main className="max-w-6xl mx-auto">
-          {/* Breadcrumb — same quiet, minimal treatment as the Hire-an-Angel persona pages
-              (components/hire-an-angel-page-content.tsx), reused here instead of the reference
-              build's own "← Behind the Angels" back link. */}
-          <nav aria-label="Breadcrumb" className="text-[12px] text-black/35 tracking-wide">
-            <Link href="/" className="hover:text-black/60 transition-colors">
-              Home
-            </Link>
-            <span className="mx-1.5 text-black/25">›</span>
-            <Link href="/behind-the-angels" className="hover:text-black/60 transition-colors">
-              Behind the Angels
-            </Link>
-            <span className="mx-1.5 text-black/25">›</span>
-            <span className="text-black/50">Progress with Purpose</span>
-          </nav>
-
           {/* Hero — left-aligned (not centered), matching the reference; the compact pass drops
               the h1's <br> so "Progress with Purpose." is one line, and un-caps the hero's own
               max-width (only .intro keeps one, at 1050px). */}
-          <section className="mt-5">
+          <section>
             <Eyebrow marginBottom={10}>Our philanthropic commitment</Eyebrow>
             <h1 style={{ fontSize: 48, fontWeight: 300, lineHeight: 1.1, letterSpacing: "-1.6px", margin: "0 0 9px", color: INK }}>
               Progress with <span style={{ color: PURPLE }}>Purpose.</span>

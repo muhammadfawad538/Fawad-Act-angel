@@ -11,11 +11,6 @@ import { SiteFooter } from "@/components/site-footer"
 // everywhere" section) — reused here as the second picker in LiveDemoSection below.
 const CHANNELS = ["Call", "Chat", "Email", "SMS", "Web"]
 
-// Phone glyph for the live-preview card's incoming-bar affordance below — redrawn small here
-// rather than importing persona-phone-demo's internal (unexported) copy of the same mark.
-const PHONE_GLYPH_PATH =
-  "M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"
-
 // Live-preview photo fill. The zoomed-out photo no longer reaches the frame's top/bottom, so the
 // frame shows this gradient there — sampled from the persona images' own edges (light sky-grey
 // at the top, near-white at the bottom), which all 4 share. The photo's edges are feathered into
@@ -104,37 +99,6 @@ function LiveDemoSection({ persona }: { persona: Persona }) {
               <span className="text-[11px] font-medium text-white">Live</span>
             </div>
 
-            <div className="absolute inset-x-3 bottom-3 flex items-center justify-between gap-3 px-3 py-2.5 rounded-2xl bg-black/55 backdrop-blur-md">
-              <div className="flex items-center gap-2.5 min-w-0">
-                <img src={persona.avatar} alt="" className="w-8 h-8 rounded-full object-cover shrink-0" />
-                <div className="min-w-0">
-                  <p className="text-[10px] uppercase tracking-wide text-white/60">Incoming</p>
-                  <p className="text-[13px] font-medium text-white truncate">{persona.contact}</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 shrink-0">
-                {/* Decline — decorative (matches the phone-demo's own red/rotated-glyph decline
-                    button), not wired to anything since there's no real call to hang up on. */}
-                <span className="flex items-center justify-center w-9 h-9 rounded-full bg-[#FF3B30]" aria-hidden="true">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff" style={{ transform: "rotate(135deg)" }}>
-                    <path d={PHONE_GLYPH_PATH} />
-                  </svg>
-                </span>
-                {/* Accept — the actual link to the on-page demo. The animate-ping ring behind it
-                    is the "wavy" pulse 11x.ai uses on its own live-call accept button, signalling
-                    an incoming call waiting to be answered. */}
-                <a
-                  href="#demo"
-                  className="relative flex items-center justify-center w-9 h-9 rounded-full bg-[#34C759] hover:bg-[#2FB350] transition-colors"
-                >
-                  <span className="absolute inset-0 rounded-full bg-[#34C759] animate-[ping-sm_1.5s_cubic-bezier(0,0,0.2,1)_infinite] opacity-75" aria-hidden="true" />
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff" className="relative">
-                    <path d={PHONE_GLYPH_PATH} />
-                  </svg>
-                </a>
-              </div>
-            </div>
           </div>
 
           {/* Content half — its own padding now that it's inside the shared card instead of
@@ -184,20 +148,14 @@ function LiveDemoSection({ persona }: { persona: Persona }) {
             </div>
 
             <div className="mt-8 flex flex-wrap items-center gap-5">
-              <a
-                href="#demo"
-                className="px-7 py-3.5 bg-[#111] text-white text-[12px] font-semibold uppercase tracking-wide rounded-full hover:bg-black/80 transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0"
-              >
-                Watch {persona.label} Live
-              </a>
               <Link
                 href="/get-started"
-                className="text-[13px] font-semibold text-[#111] hover:text-[#5D4387] transition-colors"
+                className="px-7 py-3.5 bg-[#111] text-white text-[12px] font-semibold uppercase tracking-wide rounded-full hover:bg-black/80 transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0"
               >
-                {persona.ctaHireLabel} →
+                {persona.ctaHireLabel}
               </Link>
             </div>
-            <p className="mt-3 text-[12px] text-black/40">Runs an interactive preview right here on this page.</p>
+            <p className="mt-3 text-[12px] text-black/40">Don&rsquo;t Take Our Word for It. Meet Your Angel.</p>
           </div>
         </div>
       </div>
@@ -240,13 +198,13 @@ function ExperienceButton() {
  * real links between the 4 pages instead of in-place state.
  *
  * Layout matches requirements/angel_pages.png (colors/light theme) + screenshot1-3.png (full
- * structure — the same design, just a dark-theme variant): left-aligned persona tabs above a
- * breadcrumb, a two-column hero (eyebrow badge/headline/subtext/CTAs/trust line + phone demo
- * with a floating "Business Outcome" card), a 3-column capabilities grid, a full-bleed outcome
- * banner, an FAQ-style explainer, and a closing CTA — all above the site's normal footer.
+ * structure — the same design, just a dark-theme variant): left-aligned persona tabs, a
+ * two-column hero (eyebrow badge/headline/subtext/CTAs/trust line + phone demo with a floating
+ * "Business Outcome" card), a 3-column capabilities grid, a full-bleed outcome banner, an
+ * FAQ-style explainer, and a closing CTA — all above the site's normal footer.
  * The site's own global nav (SiteHeader) is left untouched — the persona switcher shown
  * embedded in the navbar in those reference shots was intentionally NOT adopted; it lives here
- * instead, left-aligned above the breadcrumb.
+ * instead, as its own left-aligned tab row (no breadcrumb above it).
  */
 export function HireAnAngelPageContent({ personaId }: { personaId: PersonaId }) {
   const persona = PERSONAS.find((p) => p.id === personaId) ?? PERSONAS[0]
@@ -263,27 +221,11 @@ export function HireAnAngelPageContent({ personaId }: { personaId: PersonaId }) 
 
       <div className="flex-1 px-6 md:px-12 lg:px-20 pt-28 md:pt-32 pb-24">
         <main className="max-w-6xl mx-auto">
-          {/* Breadcrumb — deliberately quieter than the tab row below it (smaller, lighter,
-              no bold/dark "current page" treatment) so it reads as page-hierarchy context, not
-              a second nav competing with the tabs. The tabs stay the one bold/dark element in
-              this header, so they're unambiguously the primary navigation. */}
-          <nav aria-label="Breadcrumb" className="text-[12px] text-black/35 tracking-wide">
-            <Link href="/" className="hover:text-black/60 transition-colors">
-              Home
-            </Link>
-            <span className="mx-1.5 text-black/25">›</span>
-            <span>Hire an Angel</span>
-            <span className="mx-1.5 text-black/25">›</span>
-            <span className="text-black/50">{persona.label}</span>
-          </nav>
-
           {/* Persona tab row — left-aligned (not centered, and not embedded in the navbar). One
               shared underline (border-b on the row) with each link's own bottom border
               overlapping it via -mb-px — the classic tab-bar trick, so the active tab's
-              underline sits flush on the divider line instead of floating below it. mt-7 (was
-              mt-4): more breathing room from the quieter breadcrumb above, so the two don't read
-              as one crowded block. */}
-          <div className="mt-7 flex flex-wrap items-center gap-x-8 gap-y-2 border-b border-black/[0.08]">
+              underline sits flush on the divider line instead of floating below it. */}
+          <div className="flex flex-wrap items-center gap-x-8 gap-y-2 border-b border-black/[0.08]">
             {PERSONAS.map((p) => {
               const active = p.id === personaId
               return (

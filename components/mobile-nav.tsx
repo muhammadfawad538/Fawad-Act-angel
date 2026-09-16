@@ -5,6 +5,13 @@ import Link from "next/link";
 import posthog from "posthog-js";
 import { PERSONAS } from "@/lib/personas";
 
+// "Behind the Angels" dropdown items — plain data (not persona-driven like Hire an Angel), used
+// by both the desktop card grid and the mobile accordion below so the two can't drift.
+const BEHIND_ITEMS = [
+  { href: "/behind-the-angels", title: "About Us" },
+  { href: "/behind-the-angels/progress-with-purpose", title: "Our Social Impact" },
+];
+
 // Matches the reference theme's nav surface: a 75%-opaque white pill rather than the
 // barely-there 30% warm tint this used before, so the bar reads as a solid surface over
 // the hero video instead of letting it bleed through.
@@ -47,6 +54,7 @@ const NAV_CTA =
 export function MobileNav() {
   const [open, setOpen] = useState(false);
   const [personasOpen, setPersonasOpen] = useState(false);
+  const [behindAccordionOpen, setBehindAccordionOpen] = useState(false);
   // Desktop "Hire an Angel" mega-menu: hand-rolled instead of Radix's DropdownMenu, because
   // DropdownMenuContent anchors/aligns itself to the trigger button — fine for a small popover,
   // but this panel needs to sit centered under the whole nav bar regardless of where the
@@ -54,16 +62,61 @@ export function MobileNav() {
   // Buttons_update_header.png redesign right-aligned the nav group).
   const [hireOpen, setHireOpen] = useState(false);
   const hireRef = useRef<HTMLDivElement>(null);
+  // Desktop "Behind the Angels" dropdown — a plain 2-item list (About Us / Our Social Impact),
+  // so unlike Hire an Angel's mega-menu it's anchored to its own trigger (behindRef) rather than
+  // centered under the whole bar.
+  const [behindOpen, setBehindOpen] = useState(false);
+  const behindRef = useRef<HTMLDivElement>(null);
+
+  // Both desktop dropdowns open on hover rather than click. A short delay on close (instead of
+  // closing the instant the pointer leaves) is what stops them snapping shut while the mouse is
+  // still travelling from the trigger down to the panel — Hire an Angel's panel in particular
+  // sits centered under the whole bar, not directly under its own trigger, so there's real
+  // distance to cover. The timer is shared between the trigger and the panel (both call
+  // openHire/scheduleCloseHire), so entering either cancels a pending close from the other.
+  const hireCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const behindCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const openHire = () => {
+    if (hireCloseTimer.current) { clearTimeout(hireCloseTimer.current); hireCloseTimer.current = null; }
+    setBehindOpen(false);
+    setHireOpen(true);
+  };
+  const scheduleCloseHire = () => {
+    hireCloseTimer.current = setTimeout(() => setHireOpen(false), 150);
+  };
+  const openBehind = () => {
+    if (behindCloseTimer.current) { clearTimeout(behindCloseTimer.current); behindCloseTimer.current = null; }
+    setHireOpen(false);
+    setBehindOpen(true);
+  };
+  const scheduleCloseBehind = () => {
+    behindCloseTimer.current = setTimeout(() => setBehindOpen(false), 150);
+  };
+
+  // Clears any pending close timer left running if the nav unmounts mid-delay.
+  useEffect(() => {
+    return () => {
+      if (hireCloseTimer.current) clearTimeout(hireCloseTimer.current);
+      if (behindCloseTimer.current) clearTimeout(behindCloseTimer.current);
+    };
+  }, []);
 
   useEffect(() => {
-    if (!hireOpen) return;
+    if (!hireOpen && !behindOpen) return;
     function onPointerDown(e: MouseEvent) {
-      if (hireRef.current && !hireRef.current.contains(e.target as Node)) {
+      if (hireOpen && hireRef.current && !hireRef.current.contains(e.target as Node)) {
         setHireOpen(false);
+      }
+      if (behindOpen && behindRef.current && !behindRef.current.contains(e.target as Node)) {
+        setBehindOpen(false);
       }
     }
     function onKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") setHireOpen(false);
+      if (e.key === "Escape") {
+        setHireOpen(false);
+        setBehindOpen(false);
+      }
     }
     document.addEventListener("mousedown", onPointerDown);
     document.addEventListener("keydown", onKeyDown);
@@ -71,11 +124,12 @@ export function MobileNav() {
       document.removeEventListener("mousedown", onPointerDown);
       document.removeEventListener("keydown", onKeyDown);
     };
-  }, [hireOpen]);
+  }, [hireOpen, behindOpen]);
 
   const close = () => {
     setOpen(false);
     setPersonasOpen(false);
+    setBehindAccordionOpen(false);
   };
 
   return (
@@ -106,7 +160,9 @@ export function MobileNav() {
               menu handles that whole range instead. */}
           <div className="hidden lg:flex items-center gap-3">
             <button
-              onClick={() => setHireOpen((v) => !v)}
+              onClick={openHire}
+              onMouseEnter={openHire}
+              onMouseLeave={scheduleCloseHire}
               aria-expanded={hireOpen}
               className={`group outline-none cursor-pointer ${NAV_PILL}`}
             >
@@ -116,9 +172,44 @@ export function MobileNav() {
               </span>
             </button>
 
-            <Link href="/behind-the-angels" className={NAV_PILL}>
-              Behind the Angels
-            </Link>
+            <div
+              ref={behindRef}
+              className="relative"
+              onMouseEnter={openBehind}
+              onMouseLeave={scheduleCloseBehind}
+            >
+              <button
+                onClick={openBehind}
+                aria-expanded={behindOpen}
+                className={`group outline-none cursor-pointer ${NAV_PILL}`}
+              >
+                Behind the Angels
+                <span className={`text-[9px] transition-transform duration-200 ${behindOpen ? "rotate-180" : ""}`}>
+                  ⌄
+                </span>
+              </button>
+
+              {behindOpen && (
+                <div
+                  className="absolute top-full left-0 mt-2 w-[440px] rounded-2xl border border-black/[0.06] overflow-hidden z-50 p-3"
+                  style={NAV_STYLE}
+                >
+                  <div className="grid grid-cols-2 gap-2.5">
+                    {BEHIND_ITEMS.map((item) => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={() => setBehindOpen(false)}
+                        className="flex items-center justify-between gap-2 rounded-xl border border-black/[0.08] p-4 cursor-pointer hover:border-black/20 hover:bg-black/[0.02] transition-colors [font-family:system-ui,-apple-system,sans-serif]"
+                      >
+                        <p className="text-[14px] font-semibold text-[#111]">{item.title}</p>
+                        <span className="text-black/30 text-sm shrink-0">›</span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
             <Link href="/contact" className={NAV_PILL}>
               Contact
             </Link>
@@ -171,18 +262,22 @@ export function MobileNav() {
             above, which is itself only reachable at lg+, but this covers resizing the window
             down while the menu is still open. */}
         {hireOpen && (
-          <div className="hidden lg:flex absolute inset-x-0 top-full mt-2 justify-center z-50">
+          <div
+            className="hidden lg:flex absolute inset-x-0 top-full mt-2 justify-center z-50"
+            onMouseEnter={openHire}
+            onMouseLeave={scheduleCloseHire}
+          >
             <div
               className="w-[min(94vw,980px)] rounded-2xl border border-black/[0.06] overflow-hidden"
               style={NAV_STYLE}
             >
-              <div className="grid grid-cols-4 divide-x divide-black/[0.06] px-2">
+              <div className="grid grid-cols-4 gap-2.5 p-3">
                 {PERSONAS.map((p) => (
                   <Link
                     key={p.id}
                     href={`/hire-an-angel/${p.slug}`}
                     onClick={() => setHireOpen(false)}
-                    className="flex flex-col px-4 py-5 cursor-pointer hover:bg-black/[0.02] transition-colors [font-family:system-ui,-apple-system,sans-serif]"
+                    className="flex flex-col rounded-xl border border-black/[0.08] px-4 py-5 cursor-pointer hover:border-black/20 hover:bg-black/[0.02] transition-colors [font-family:system-ui,-apple-system,sans-serif]"
                   >
                     <div className="flex items-center gap-3">
                       <img
@@ -313,13 +408,37 @@ export function MobileNav() {
               </div>
             </div>
 
-            <Link
-              href="/behind-the-angels"
-              onClick={close}
-              className={`px-4 py-3 hover:bg-black/[0.03] rounded-xl ${NAV_ITEM}`}
+            {/* "Behind the Angels" — same inline-expandable pattern as "Hire an Angel" above,
+                just a plain 2-item list instead of persona cards. */}
+            <button
+              onClick={() => setBehindAccordionOpen((v) => !v)}
+              className={`flex items-center justify-between px-4 py-3 hover:bg-black/[0.03] rounded-xl ${NAV_ITEM}`}
             >
               Behind the Angels
-            </Link>
+              <span
+                className="text-[10px] transition-transform duration-200"
+                style={{ transform: behindAccordionOpen ? "rotate(180deg)" : "none" }}
+              >
+                ⌄
+              </span>
+            </button>
+            <div
+              className="overflow-hidden transition-all duration-200 ease-in-out"
+              style={{ maxHeight: behindAccordionOpen ? "200px" : "0px" }}
+            >
+              <div className="flex flex-col pb-1">
+                {BEHIND_ITEMS.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={close}
+                    className={`px-4 py-2.5 pl-8 hover:bg-black/[0.03] rounded-xl ${NAV_ITEM}`}
+                  >
+                    {item.title}
+                  </Link>
+                ))}
+              </div>
+            </div>
             <Link
               href="/contact"
               onClick={close}
