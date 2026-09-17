@@ -24,14 +24,14 @@ export function SiteFooter() {
             className="h-10 w-auto"
           />
         </Link>
-        <a href="#m" className="text-sm text-black/35 hover:text-black/70 transition-colors tracking-widest">
+        <a href="#m" className="text-sm text-black/55 hover:text-black/70 transition-colors tracking-widest">
           One Boston Place, # 2600, Boston, MA, 02108
         </a>
         <a
-          href="mailto:hello@actangel.com"
-          className="text-sm text-black/35 underline underline-offset-2 hover:text-black/70 transition-colors tracking-widest"
+          href="mailto:Hello@ActAngel.com"
+          className="text-sm text-[gray] font-medium underline underline-offset-2 hover:text-black/70 transition-colors tracking-widest"
         >
-          hello@actangel.com
+          Hello@ActAngel.com
         </a>
       </div>
 
@@ -41,26 +41,26 @@ export function SiteFooter() {
           first, while md:flex-row switches back to plain left-to-right, so the copyright
           (first in DOM) stays below the links. Same trick, no JS. */}
       <div className="max-w-6xl mx-auto mt-8 pt-6 border-t border-black/[0.04] flex flex-col-reverse md:flex-row md:items-center md:justify-between gap-4">
-        <span className="text-sm text-black/20">© 2026 Act Angel AI</span>
+        <span className="text-sm text-black/55">© 2026 Act Angel AI, Inc.</span>
         <div className="flex flex-wrap items-center justify-start md:justify-end gap-x-6 gap-y-2">
           <a
             href="/privacy"
             target="_blank"
-            className="text-sm text-black/35 hover:text-black/70 transition-colors tracking-widest"
+            className="text-sm text-black/55 hover:text-black/70 transition-colors tracking-widest"
           >
             Privacy Policy
           </a>
           <a
             href="/terms"
             target="_blank"
-            className="text-sm text-black/35 hover:text-black/70 transition-colors tracking-widest"
+            className="text-sm text-black/55 hover:text-black/70 transition-colors tracking-widest"
           >
             Terms &amp; Conditions
           </a>
           <a
             href="/cookies"
             target="_blank"
-            className="text-sm text-black/35 hover:text-black/70 transition-colors tracking-widest"
+            className="text-sm text-black/55 hover:text-black/70 transition-colors tracking-widest"
           >
             Cookies Policy
           </a>

@@ -208,7 +208,7 @@ export const PERSONAS: Persona[] = [
 // qualifying the actual need instead of the usual lead-form questions — the script itself is
 // the pitch for that.
 export const HERO_CONTACT = "Alex Morgan"
-export const HERO_AVATAR = "/images/sales_angel_avatar.png"
+export const HERO_AVATAR = "/images/sales_angel.png"
 export const HERO_MESSAGES: ScriptLine[] = [
   ["in", "Hi, I saw your ad — do you have time to chat about pricing?"],
   ["out", "Of course! What are you looking for — team size and use case?"],

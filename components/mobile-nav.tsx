@@ -5,10 +5,33 @@ import Link from "next/link";
 import posthog from "posthog-js";
 import { PERSONAS } from "@/lib/personas";
 
+// Dropdown/accordion toggle chevron — an SVG instead of the "⌄" text glyph this used before,
+// which sat visibly off-center against the label next to it (text-glyph vertical metrics vary
+// by font/browser, unlike an SVG's own tightly-cropped viewBox) and read as small/hard to notice.
+// flex items-center on every button/pill this sits in does the vertical centering; this just
+// needs a predictable box to center, which the glyph didn't reliably give it.
+function ChevronIcon({ open, className = "" }: { open: boolean; className?: string }) {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={`shrink-0 transition-transform duration-200 ${open ? "rotate-180" : ""} ${className}`}
+    >
+      <path d="M6 9l6 6 6-6" />
+    </svg>
+  );
+}
+
 // "Behind the Angels" dropdown items — plain data (not persona-driven like Hire an Angel), used
 // by both the desktop card grid and the mobile accordion below so the two can't drift.
 const BEHIND_ITEMS = [
-  { href: "/behind-the-angels", title: "About Us" },
+  { href: "/behind-the-angels/about-us", title: "About Us" },
   { href: "/behind-the-angels/progress-with-purpose", title: "Our Social Impact" },
 ];
 
@@ -167,9 +190,7 @@ export function MobileNav() {
               className={`group outline-none cursor-pointer ${NAV_PILL}`}
             >
               Hire an Angel
-              <span className={`text-[9px] transition-transform duration-200 ${hireOpen ? "rotate-180" : ""}`}>
-                ⌄
-              </span>
+              <ChevronIcon open={hireOpen} />
             </button>
 
             <div
@@ -184,9 +205,7 @@ export function MobileNav() {
                 className={`group outline-none cursor-pointer ${NAV_PILL}`}
               >
                 Behind the Angels
-                <span className={`text-[9px] transition-transform duration-200 ${behindOpen ? "rotate-180" : ""}`}>
-                  ⌄
-                </span>
+                <ChevronIcon open={behindOpen} />
               </button>
 
               {behindOpen && (
@@ -267,8 +286,13 @@ export function MobileNav() {
             onMouseEnter={openHire}
             onMouseLeave={scheduleCloseHire}
           >
+            {/* w-full (not a fixed/capped width): this panel sits inside the same max-w-6xl,
+                mx-auto wrapper as the nav bar itself (the outer hireRef div), so w-full makes it
+                exactly as wide as the navbar at every screen size — the previous 980px cap left
+                too little room per column on wide screens, truncating names/roles ("Assistant
+                An...", "Talent Managem..."). */}
             <div
-              className="w-[min(94vw,980px)] rounded-2xl border border-black/[0.06] overflow-hidden"
+              className="w-full rounded-2xl border border-black/[0.06] overflow-hidden"
               style={NAV_STYLE}
             >
               <div className="grid grid-cols-4 gap-2.5 p-3">
@@ -279,7 +303,9 @@ export function MobileNav() {
                     onClick={() => setHireOpen(false)}
                     className="flex flex-col rounded-xl border border-black/[0.08] px-4 py-5 cursor-pointer hover:border-black/20 hover:bg-black/[0.02] transition-colors [font-family:system-ui,-apple-system,sans-serif]"
                   >
-                    <div className="flex items-center gap-3">
+                    {/* Header as one rounded pill/capsule (not a plain row) — avatar inset at
+                        its left edge, chevron at its right edge, matching requirements/image.png. */}
+                    <div className="flex items-center gap-3 rounded-full bg-black/[0.035] pl-1.5 pr-4 py-1.5">
                       <img
                         src={p.avatar}
                         alt=""
@@ -341,100 +367,80 @@ export function MobileNav() {
               className={`flex items-center justify-between px-4 py-3 hover:bg-black/[0.03] rounded-xl ${NAV_ITEM}`}
             >
               Hire an Angel
-              <span
-                className="text-[10px] transition-transform duration-200"
-                style={{ transform: personasOpen ? "rotate(180deg)" : "none" }}
-              >
-                ⌄
-              </span>
+              <ChevronIcon open={personasOpen} />
             </button>
             <div
               className="overflow-hidden transition-all duration-200 ease-in-out"
               style={{ maxHeight: personasOpen ? "1400px" : "0px" }}
             >
-              {/* Same card content as the desktop mega-menu (photo, name, role, use cases): 1 per
-                  row on very small screens, 2-up from sm (640px) up to the lg breakpoint where
-                  this whole mobile panel gives way to the desktop mega-menu. border-r/border-b
-                  on index give the same flush line separation as the desktop grid's
-                  divide-x/divide-y, since Tailwind's `divide` utilities don't line up correctly
-                  once flex-wrap puts items on more than one row — and the divider pattern itself
-                  has to change between the 1-col and 2-col layouts (a bottom border on every
-                  item but the last vs. only on the first row). */}
-              <div className="flex flex-wrap border-t border-black/[0.06]">
-                {PERSONAS.map((p, i) => {
-                  const bottomAtBase = i < PERSONAS.length - 1; // 1-col: every item but the last
-                  const bottomAtSm = i < PERSONAS.length - 2; // 2-col: only the first row
-                  const rightAtSm = i % 2 === 0; // 2-col: left column only
-                  return (
-                    <Link
-                      key={p.id}
-                      href={`/hire-an-angel/${p.slug}`}
-                      onClick={close}
-                      className={`w-full sm:w-1/2 flex flex-col px-4 py-3 hover:bg-black/[0.03] transition-colors [font-family:system-ui,-apple-system,sans-serif] border-black/[0.06] ${
-                        bottomAtBase ? "border-b" : ""
-                      } ${bottomAtBase && !bottomAtSm ? "sm:border-b-0" : ""} ${
-                        rightAtSm ? "sm:border-r" : ""
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <img
-                          src={p.avatar}
-                          alt=""
-                          aria-hidden="true"
-                          className="w-9 h-9 rounded-full object-cover shrink-0"
-                        />
-                        <div className="min-w-0 flex-1">
-                          <p className="text-[13.5px] font-semibold text-[#111] truncate">{p.label}</p>
-                          <p className="text-[11px] text-black/50 truncate">{p.dropdownRole}</p>
-                        </div>
+              {/* Same card content as the desktop mega-menu (photo, name, role, use cases,
+                  pill-shaped header) — 1 per row below sm (640px), 2-up from sm up to the lg
+                  breakpoint where this whole mobile panel gives way to the desktop mega-menu.
+                  Each persona is its own bordered card with a gap between them (matching
+                  desktop), not flush columns separated by border-r/border-b lines. */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
+                {PERSONAS.map((p) => (
+                  <Link
+                    key={p.id}
+                    href={`/hire-an-angel/${p.slug}`}
+                    onClick={close}
+                    className="flex flex-col rounded-xl border border-black/[0.08] px-3 py-3 hover:border-black/20 hover:bg-black/[0.02] transition-colors [font-family:system-ui,-apple-system,sans-serif]"
+                  >
+                    <div className="flex items-center gap-2.5 rounded-full bg-black/[0.035] pl-1 pr-3 py-1">
+                      <img
+                        src={p.avatar}
+                        alt=""
+                        aria-hidden="true"
+                        className="w-9 h-9 rounded-full object-cover shrink-0"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[13.5px] font-semibold text-[#111] truncate">{p.label}</p>
+                        <p className="text-[11px] text-black/50 truncate">{p.dropdownRole}</p>
                       </div>
+                      <span className="text-black/30 text-sm shrink-0">›</span>
+                    </div>
 
-                      <div className="mt-2.5">
-                        <p className="text-[9.5px] font-medium uppercase tracking-widest text-black/40">
-                          Use Cases
-                        </p>
-                        <ul className="mt-1.5 flex flex-col gap-1">
-                          {p.useCases?.map((uc) => (
-                            <li key={uc} className="flex items-center gap-2 text-[12px] font-medium text-[#333]">
-                              <span className="w-1 h-1 rounded-full bg-[#5D4387] shrink-0" />
-                              {uc}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </Link>
-                  );
-                })}
+                    <div className="mt-3 pt-3 border-t border-black/[0.06]">
+                      <p className="text-[9.5px] font-medium uppercase tracking-widest text-black/40">
+                        Use Cases
+                      </p>
+                      <ul className="mt-1.5 flex flex-col gap-1">
+                        {p.useCases?.map((uc) => (
+                          <li key={uc} className="flex items-center gap-2 text-[12px] font-medium text-[#333]">
+                            <span className="w-1 h-1 rounded-full bg-[#5D4387] shrink-0" />
+                            {uc}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </Link>
+                ))}
               </div>
             </div>
 
             {/* "Behind the Angels" — same inline-expandable pattern as "Hire an Angel" above,
-                just a plain 2-item list instead of persona cards. */}
+                and now the same bordered-card treatment for its 2 items too. */}
             <button
               onClick={() => setBehindAccordionOpen((v) => !v)}
               className={`flex items-center justify-between px-4 py-3 hover:bg-black/[0.03] rounded-xl ${NAV_ITEM}`}
             >
               Behind the Angels
-              <span
-                className="text-[10px] transition-transform duration-200"
-                style={{ transform: behindAccordionOpen ? "rotate(180deg)" : "none" }}
-              >
-                ⌄
-              </span>
+              <ChevronIcon open={behindAccordionOpen} />
             </button>
             <div
               className="overflow-hidden transition-all duration-200 ease-in-out"
               style={{ maxHeight: behindAccordionOpen ? "200px" : "0px" }}
             >
-              <div className="flex flex-col pb-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 px-2 pt-2 pb-1">
                 {BEHIND_ITEMS.map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
                     onClick={close}
-                    className={`px-4 py-2.5 pl-8 hover:bg-black/[0.03] rounded-xl ${NAV_ITEM}`}
+                    className="flex items-center justify-between gap-2 rounded-xl border border-black/[0.08] p-3 hover:border-black/20 hover:bg-black/[0.03] transition-colors [font-family:system-ui,-apple-system,sans-serif]"
                   >
-                    {item.title}
+                    <p className="text-[13px] font-semibold text-[#111]">{item.title}</p>
+                    <span className="text-black/30 text-sm shrink-0">›</span>
                   </Link>
                 ))}
               </div>

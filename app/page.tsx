@@ -232,7 +232,7 @@ export default function AgenticPage() {
               </h1>
 
               <p
-                className="text-base sm:text-lg text-[#111]/60 max-w-sm mb-8"
+                className="text-base sm:text-lg font-medium text-[#111]/70 max-w-sm mb-8"
                 style={{
                   fontFamily: '"IBM Plex Sans", sans-serif',
                   opacity: heroReady ? 1 : 0,
@@ -356,12 +356,12 @@ export default function AgenticPage() {
             <img
               src="/icon2.png"
               alt="Act Angel AI"
-              className="w-[48px] h-[48px] object-contain"
+              className="w-[86px] h-[86px] object-contain"
             />
             <RevealText className="mt-5 text-4xl md:text-5xl lg:text-6xl font-light tracking-tight leading-[1.05]">
               Reachable everywhere
             </RevealText>
-            <p className="mt-4 max-w-lg text-sm leading-relaxed text-black/45">
+            <p className="mt-4 max-w-lg text-sm font-medium leading-relaxed text-[#111]/70">
               One Angel. Every Touchpoint. Nothing Gets Lost.
             </p>
           </div>
@@ -485,12 +485,12 @@ export default function AgenticPage() {
             <img
               src="/icon2.png"
               alt="Act Angel AI"
-              className="w-[48px] h-[48px] object-contain"
+              className="w-[86px] h-[86px] object-contain"
             />
             <RevealText className="mt-5 text-4xl md:text-5xl font-light tracking-tight leading-[1.05]">
               All Your Tools.
             </RevealText>
-            <p className="mt-4 text-md text-black/45 leading-relaxed max-w-xlg">
+            <p className="mt-4 text-md font-medium text-[#111]/70 leading-relaxed max-w-xlg">
               Act Angel AI works alongside the platforms your business already
               runs on.
             </p>
@@ -740,7 +740,7 @@ export default function AgenticPage() {
             <img
               src="/icon2.png"
               alt="Act Angel AI"
-              className="w-[48px] h-[48px] object-contain"
+              className="w-[86px] h-[86px] object-contain"
             />
             <RevealText className="mt-5 text-4xl md:text-5xl font-light tracking-tight leading-[1.05]">
               {"60% of a seller's time\nisn't spent selling."}
@@ -822,39 +822,39 @@ export default function AgenticPage() {
                 className="h-10 w-auto"
               />
             </Link>
-            <a href="#m" className="text-sm text-black/35 hover:text-black/70 transition-colors tracking-widest">
+            <a href="#m" className="text-sm text-black/55 hover:text-black/70 transition-colors tracking-widest">
               One Boston Place, # 2600, Boston, MA, 02108
             </a>
             <a
-              href="mailto:hello@actangel.com"
-              className="text-sm text-black/35 underline underline-offset-2 hover:text-black/70 transition-colors tracking-widest"
+              href="mailto:Hello@ActAngel.com"
+              className="text-sm text-[gray] font-medium underline underline-offset-2 hover:text-black/70 transition-colors tracking-widest"
             >
-              hello@actangel.com
+              Hello@ActAngel.com
             </a>
           </div>
 
         </div>
         <div className="max-w-6xl mx-auto mt-8 pt-6 border-t border-black/[0.04] flex flex-col-reverse md:flex-row md:items-center md:justify-between gap-4">
-          <span className="text-sm text-black/20">© 2026 Act Angel AI</span>
+          <span className="text-sm text-black/55">© 2026 Act Angel AI, Inc.</span>
           <div className="flex flex-wrap items-center justify-start md:justify-end gap-x-6 gap-y-2">
             <a
               href="/privacy"
               target="_blank"
-              className="text-sm text-black/35 hover:text-black/70 transition-colors tracking-widest"
+              className="text-sm text-black/55 hover:text-black/70 transition-colors tracking-widest"
             >
               Privacy Policy
             </a>
             <a
               href="/terms"
               target="_blank"
-              className="text-sm text-black/35 hover:text-black/70 transition-colors tracking-widest"
+              className="text-sm text-black/55 hover:text-black/70 transition-colors tracking-widest"
             >
               Terms &amp; Conditions
             </a>
             <a
               href="/cookies"
               target="_blank"
-              className="text-sm text-black/35 hover:text-black/70 transition-colors tracking-widest"
+              className="text-sm text-black/55 hover:text-black/70 transition-colors tracking-widest"
             >
               Cookies Policy
             </a>

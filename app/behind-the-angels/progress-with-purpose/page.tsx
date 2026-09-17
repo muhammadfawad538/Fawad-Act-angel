@@ -34,13 +34,40 @@ const LINE = "#DDD7E5"
 const WASH = "#EFEAF5"
 const VISION_TEXT = "#51465F"
 
-function Eyebrow({ children, marginBottom }: { children: React.ReactNode; marginBottom: number }) {
+function Eyebrow({
+  children,
+  marginBottom,
+  center,
+  line = true,
+  pill = false,
+}: {
+  children: React.ReactNode
+  marginBottom: number
+  center?: boolean
+  line?: boolean
+  pill?: boolean
+}) {
+  // Pill variant — a rounded badge (matching the persona pages' own eyebrow pill style)
+  // instead of the plain uppercase-text-with-a-line treatment used elsewhere on this page.
+  if (pill) {
+    return (
+      <p style={{ margin: `0 0 ${marginBottom}px`, textAlign: center ? "center" : undefined }}>
+        <span
+          className="inline-block rounded-full uppercase"
+          style={{ fontSize: 11, letterSpacing: 2, fontWeight: 650, color: PURPLE, background: WASH, padding: "7px 18px" }}
+        >
+          {children}
+        </span>
+      </p>
+    )
+  }
+
   return (
     <p
-      className="flex items-center gap-3 uppercase"
+      className={`flex items-center gap-3 uppercase ${center ? "justify-center" : ""}`}
       style={{ fontSize: 11, letterSpacing: 2, fontWeight: 650, color: PURPLE, margin: `0 0 ${marginBottom}px` }}
     >
-      <span aria-hidden="true" style={{ width: 30, height: 1, background: "currentColor", flexShrink: 0 }} />
+      {line && <span aria-hidden="true" style={{ width: 30, height: 1, background: "currentColor", flexShrink: 0 }} />}
       {children}
     </p>
   )
@@ -74,18 +101,18 @@ export default function ProgressWithPurposePage() {
 
       <div className="flex-1 px-6 md:px-12 lg:px-20 pt-28 md:pt-32 pb-24">
         <main className="max-w-6xl mx-auto">
-          {/* Hero — left-aligned (not centered), matching the reference; the compact pass drops
-              the h1's <br> so "Progress with Purpose." is one line, and un-caps the hero's own
-              max-width (only .intro keeps one, at 1050px). */}
-          <section>
-            <Eyebrow marginBottom={10}>Our philanthropic commitment</Eyebrow>
+          {/* Hero — centered (the reference itself is left-aligned; centered per explicit
+              request here instead). The compact pass drops the h1's <br> so "Progress with
+              Purpose." is one line. */}
+          <section style={{ textAlign: "center" }}>
+            <Eyebrow center pill marginBottom={16}>Our philanthropic commitment</Eyebrow>
             <h1 style={{ fontSize: 48, fontWeight: 300, lineHeight: 1.1, letterSpacing: "-1.6px", margin: "0 0 9px", color: INK }}>
               Progress with <span style={{ color: PURPLE }}>Purpose.</span>
             </h1>
             <p style={{ fontSize: 21, lineHeight: 1.5, color: PURPLE, fontWeight: 400, letterSpacing: "-0.4px", margin: "0 0 12px" }}>
               We choose to measure success by the good we do with it.
             </p>
-            <p style={{ maxWidth: 1050, fontSize: 16, color: MUTED, lineHeight: 1.5, margin: 0 }}>
+            <p style={{ maxWidth: 1050, margin: "0 auto", fontSize: 16, color: MUTED, lineHeight: 1.5 }}>
               As AI transforms our world, we believe growing wealth and influence bring a
               responsibility to serve others. We are building philanthropy into our business
               through three commitments.

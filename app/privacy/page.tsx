@@ -98,10 +98,10 @@ export default function PrivacyPage() {
           <p>
             For any privacy question or request, contact us at{" "}
             <a
-              href="mailto:hello@actangel.com"
+              href="mailto:Hello@ActAngel.com"
               className="text-[#111] underline underline-offset-2 hover:text-black/60 transition-colors"
             >
-              hello@actangel.com
+              Hello@ActAngel.com
             </a>
             .
           </p>
