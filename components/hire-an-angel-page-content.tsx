@@ -278,6 +278,18 @@ export function HireAnAngelPageContent({ personaId }: { personaId: PersonaId }) 
                       Virtual AI Employee stays focused on the work and your business goals—24/7.
                     </p>
                   </div>
+                  {/* inline-block (not w-full max-w-[240px]): the card now shrinks/grows to fit
+                      its content instead of wrapping to a fixed width — outcomeTitle stays on
+                      one line (sm:whitespace-nowrap) from sm up, and some personas' titles (e.g.
+                      HR's "Smoother processes. More time for people.") are too long to fit a
+                      240px card on one line otherwise. Below sm, it's still allowed to wrap
+                      (whitespace-normal) so it doesn't overflow a narrow phone screen. */}
+                  <div className="mt-4 inline-block rounded-xl border border-black/[0.08] bg-white px-5 py-4 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.15)]">
+                    <p className="text-[10px] font-semibold uppercase tracking-widest text-[#5D4387]">
+                      Business Outcome
+                    </p>
+                    <p className="mt-1 text-[13px] font-semibold text-[#111] whitespace-normal sm:whitespace-nowrap">{persona.outcomeTitle}</p>
+                  </div>
                 </div>
 
                 {/* sticky: keeps the phone in view as the (usually shorter) left column
@@ -290,12 +302,12 @@ export function HireAnAngelPageContent({ personaId }: { personaId: PersonaId }) 
                   <div id="demo" className="scroll-mt-24">
                     <PersonaPhoneDemo personaId={personaId} active width={240} />
                   </div>
-                  <div className="mt-4 w-full max-w-[240px] rounded-xl border border-black/[0.08] bg-white px-5 py-4 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.15)]">
+                  {/* <div className="mt-4 w-full max-w-[240px] rounded-xl border border-black/[0.08] bg-white px-5 py-4 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.15)]">
                     <p className="text-[10px] font-semibold uppercase tracking-widest text-[#5D4387]">
                       Business Outcome
                     </p>
                     <p className="mt-1 text-[13px] font-semibold text-[#111]">{persona.outcomeTitle}</p>
-                  </div>
+                  </div> */}
                 </div>
               </div>
 
