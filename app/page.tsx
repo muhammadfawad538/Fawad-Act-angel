@@ -693,7 +693,6 @@ export default function AgenticPage() {
                           backgroundSize: "cover",
                           backgroundPosition: "center",
                           backgroundRepeat: "no-repeat",
-                          boxShadow: "0 0 0 3px rgba(255,255,255,0.9)",
                           border: "none",
                         }}
                       >
@@ -716,9 +715,9 @@ export default function AgenticPage() {
                           {tool.icon}
                         </svg>
                       </div>
-                      <span className="tools-orbit-label text-[11px] text-black/45 tracking-wide text-center whitespace-nowrap">
+                      {/* <span className="tools-orbit-label text-[11px] text-black/45 tracking-wide text-center whitespace-nowrap">
                         {tool.name}
-                      </span>
+                      </span> */}
                     </div>
                   );
                 })}
