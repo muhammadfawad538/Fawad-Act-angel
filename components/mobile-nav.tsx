@@ -208,9 +208,16 @@ export function MobileNav() {
                 <ChevronIcon open={behindOpen} />
               </button>
 
+              {/* mt-5 (not mt-2, like Hire an Angel's panel): this panel is anchored to
+                  behindRef, which wraps just the button — top-full lands at the button's own
+                  bottom edge, 12px (the nav's own py-3 bottom padding) short of the nav bar's
+                  actual bottom edge. Hire an Angel's panel is anchored to hireRef, which wraps
+                  the whole nav bar, so its top-full already includes that 12px. The extra 12px
+                  here (on top of the same 8px/mt-2 gap) makes both panels open at the same depth
+                  below the bar instead of Behind the Angels opening 12px shallower. */}
               {behindOpen && (
                 <div
-                  className="absolute top-full left-0 mt-2 w-[440px] rounded-2xl border border-black/[0.06] overflow-hidden z-50 p-3"
+                  className="absolute top-full left-1/2 -translate-x-1/2 mt-5 w-[440px] rounded-2xl border border-black/[0.06] overflow-hidden z-50 p-3"
                   style={NAV_STYLE}
                 >
                   <div className="grid grid-cols-2 gap-2.5">
