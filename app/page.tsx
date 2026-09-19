@@ -496,147 +496,45 @@ export default function AgenticPage() {
             </p>
           </div>
 
-          {/* Circular orbit layout based on the original 720x460 tool-hub stage. */}
+          {/* Scattered tool cloud around the centre hub, laid out on a 720x460 stage. Below
+              760px globals.css drops the absolute positioning entirely and reflows these into
+              a plain grid, so NODE_POSITIONS only applies from that width up. */}
           {(() => {
+            // Colored brand/product logos (public/images/icons) rather than the plain
+            // stroked SVG glyphs this used before, matching the reference composition in
+            // "All_your_tools - catch_agent.png".
             const TOOLS = [
-              {
-                name: "Salesforce",
-                color: "56,132,255",
-                bgImage: "/images/salesforce_bg.png",
-                icon: (
-                  <path d="M12 3a5 5 0 0 1 4.546 2.914A4 4 0 0 1 17.5 5.8a4.2 4.2 0 0 1 4.2 4.2 4 4 0 0 1-.3 1.514A3.5 3.5 0 0 1 20.5 18h-15A4 4 0 0 1 4 14.3a4 4 0 0 1 2.1-3.53A4.5 4.5 0 0 1 6 10a4.5 4.5 0 0 1 6-4.24A5 5 0 0 1 12 3z" />
-                ),
-              },
-              {
-                name: "SAP",
-                color: "52,199,89",
-                bgImage: "/images/sap_bg.png",
-                icon: (
-                  <>
-                    <ellipse cx="12" cy="6" rx="8" ry="3" />
-                    <path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6" />
-                    <path d="M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6" />
-                  </>
-                ),
-              },
-              {
-                name: "Email",
-                color: "142,142,147",
-                bgImage: "/images/email_bg.png",
-                icon: (
-                  <>
-                    <rect x="3" y="5" width="18" height="14" rx="2" />
-                    <path d="m3 7 9 6 9-6" />
-                  </>
-                ),
-              },
-              {
-                name: "Calendar",
-                color: "255,159,10",
-                bgImage: "/images/calendar_bg.png",
-                icon: (
-                  <>
-                    <rect x="3" y="4" width="18" height="18" rx="2" />
-                    <path d="M16 2v4M8 2v4M3 10h18" />
-                  </>
-                ),
-              },
-              {
-                name: "Chat",
-                color: "56,132,255",
-                bgImage: "/images/chat_bg.png",
-                icon: (
-                  <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
-                ),
-              },
-              {
-                name: "Messaging",
-                color: "255,149,0",
-                bgImage: "/images/message_bg.png",
-                icon: (
-                  <>
-                    <path d="M21 6H3v12h18V6z" />
-                    <path d="M3 7l9 6 9-6" />
-                  </>
-                ),
-              },
-              {
-                name: "Video",
-                color: "52,199,89",
-                bgImage: "/images/video_bg.png",
-                icon: (
-                  <>
-                    <rect x="2" y="6" width="14" height="12" rx="2" />
-                    <path d="m16 10 6-3v10l-6-3" />
-                  </>
-                ),
-              },
-              {
-                name: "Docs",
-                color: "52,199,89",
-                bgImage: "/images/docs_bg.png",
-                icon: (
-                  <>
-                    <path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
-                    <path d="M14 3v6h6" />
-                  </>
-                ),
-              },
-              {
-                name: "Maps",
-                color: "255,149,0",
-                bgImage: "/images/maps_bg.png",
-                icon: (
-                  <>
-                    <path d="M12 21s-7-6.5-7-11a7 7 0 1 1 14 0c0 4.5-7 11-7 11z" />
-                    <circle cx="12" cy="10" r="2.5" />
-                  </>
-                ),
-              },
-              {
-                name: "Notes",
-                color: "56,132,255",
-                bgImage: "/images/notes_bg.png",
-                icon: (
-                  <>
-                    <rect x="4" y="3" width="16" height="18" rx="2" />
-                    <path d="M8 8h8M8 12h8M8 16h5" />
-                  </>
-                ),
-              },
-              {
-                name: "Tasks",
-                color: "255,69,58",
-                bgImage: "/images/tasks_bg.png",
-                icon: (
-                  <>
-                    <rect x="3" y="4" width="18" height="16" rx="2" />
-                    <path d="m7 9 2 2 3-3M7 15h10" />
-                  </>
-                ),
-              },
-              {
-                name: "Marketing",
-                color: "175,82,222",
-                bgImage: "/images/marketing_bg.png",
-                icon: (
-                  <path d="M3 11v2a2 2 0 0 0 2 2h1l3 4v-6M6 11l10-5v14l-10-5" />
-                ),
-              },
+              { name: "Salesforce", logo: "/images/icons/salesforce.png" },
+              { name: "SAP", logo: "/images/icons/sap.svg" },
+              { name: "Email", logo: "/images/icons/email.png" },              
+              { name: "Chat", logo: "/images/icons/chat.png" },
+              { name: "Video", logo: "/images/icons/video.png" },
+              { name: "Docs", logo: "/images/icons/docs.png" },
+              { name: "Calendar", logo: "/images/icons/calender.png" },
+              { name: "Maps", logo: "/images/icons/maps.png" },
+              { name: "Notes", logo: "/images/icons/notes.png" },
+              { name: "Messaging", logo: "/images/icons/message.png" },              
+              { name: "Tasks", logo: "/images/icons/tasks.png" },
+              { name: "Marketing", logo: "/images/icons/marketing.png" },
             ];
+            // Scattered, not a ring: the reference sets its tools at irregular angles AND
+            // irregular distances from the hub, so these were generated to vary both (radius
+            // ~130-290 in this 720x460 stage) while keeping every node clear of the hub and at
+            // least ~92px from its neighbours. Values are each node's top-left corner, so the
+            // stage centre (360,230) is a node's left/top + 36 (half of its 72px box).
             const NODE_POSITIONS = [
-              [328, 23],
-              [478, 46],
-              [588, 110],
-              [628, 198],
-              [588, 286],
-              [478, 350],
-              [328, 373],
-              [178, 350],
-              [68, 286],
-              [28, 198],
-              [68, 110],
-              [178, 46],
+              [603, 189],
+              [491, 246],
+              [402, 345],
+              [279, 366],
+              [183, 292],
+              [71, 283],
+              [38, 180],
+              [150, 101],
+              [257, 81],
+              [348, 20],
+              [452, 109],
+              [558, 91],
             ];
 
             return (
@@ -655,10 +553,6 @@ export default function AgenticPage() {
                     top: "50%",
                     transform: "translate(-50%, -50%)",
                     borderRadius: "60%",
-                    backgroundImage: "url('/images/tools_logo_bg.png')",
-                    backgroundSize: "150% 150%",
-                    backgroundPosition: "center",
-                    backgroundRepeat: "no-repeat",
                     boxShadow: "rgba(0, 0, 0, 0.06) 0px 0px 18px 6px",
                     zIndex: 2,
                     animation: "centerLevitate 5s ease-in-out infinite",
@@ -686,34 +580,19 @@ export default function AgenticPage() {
                         animationDelay: `${i * 0.24}s`,
                       }}
                     >
-                      <div
-                        className="relative rounded-full flex items-center justify-center w-[72px] h-[72px]"
-                        style={{
-                          backgroundImage: `url('${tool.bgImage}')`,
-                          backgroundSize: "cover",
-                          backgroundPosition: "center",
-                          backgroundRepeat: "no-repeat",
-                          border: "none",
-                        }}
-                      >
-                        <span
-                          className="absolute w-1 h-1 rounded-full bg-white"
-                          style={{
-                            top: "22%",
-                            left: "28%",
-                            animation: `pulse-dot ${2 + (i % 3) * 0.4}s ease-in-out infinite`,
-                          }}
+                      {/* Plain white circle behind each logo (the pastel orb images are gone),
+                          with a soft glow in the brand purple (#5D4387) standing in for the
+                          reference's pink one. The logo sits at 56% rather than filling the box,
+                          so it stays inset from the circle's edge — at full size the
+                          square-backed logos (Maps, Tasks) would cover the circle completely and
+                          it wouldn't read. */}
+                      <div className="flex items-center justify-center w-[72px] h-[72px] rounded-full bg-white shadow-[0_4px_18px_2px_rgba(93,67,135,0.28)]">
+                        <img
+                          src={tool.logo}
+                          alt={tool.name}
+                          loading="lazy"
+                          className="w-[56%] h-[56%] object-contain"
                         />
-                        <svg
-                          width="40%"
-                          height="40%"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="rgba(17,24,39,0.65)"
-                          strokeWidth="1.6"
-                        >
-                          {tool.icon}
-                        </svg>
                       </div>
                       {/* <span className="tools-orbit-label text-[11px] text-black/45 tracking-wide text-center whitespace-nowrap">
                         {tool.name}
