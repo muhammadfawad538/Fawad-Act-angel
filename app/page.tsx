@@ -516,26 +516,46 @@ export default function AgenticPage() {
             // more room across its middle than that inner square uses, so these get a bigger
             // box — sized so their corners still clear the circle's edge.
             const TOOLS: { name: string; logo: string; pos: [number, number]; size?: number }[] = [
-              { name: "Salesforce", logo: "/images/icons/salesforce.png", pos: [603, 189], size: 76 },
-              { name: "SAP", logo: "/images/icons/sap.svg", pos: [491, 246], size: 76 },              
-              { name: "Gmail", logo: "/images/icons/gmail.svg", pos: [582, 288] },
-              { name: "Outlook", logo: "/images/icons/outlook.svg", pos: [136, 146] },
-              { name: "Chat", logo: "/images/icons/chat.svg", pos: [279, 366] },
-              { name: "Google Meet", logo: "/images/icons/google_meet.svg", pos: [402, 345] },
-              { name: "Zoom", logo: "/images/icons/zoom.png", pos: [183, 292] },
-              { name: "Docs", logo: "/images/icons/google_docs.svg", pos: [71, 283] },
-              { name: "Calendar", logo: "/images/icons/google_calendar.svg", pos: [38, 180] },
-              { name: "Maps", logo: "/images/icons/google_maps.svg", pos: [110, 46] },
-              { name: "Notes", logo: "/images/icons/notes.png", pos: [227, 37] },
-              { name: "WhatsApp", logo: "/images/icons/whatsapp.svg", pos: [348, 20] },
-              { name: "Tasks", logo: "/images/icons/tasks.png", pos: [452, 109] },
-              { name: "Marketing", logo: "/images/icons/marketing.png", pos: [558, 91] },
+              { name: "Salesforce", logo: "/images/icons/salesforce.png", pos: [278, 20], size: 76 },
+              { name: "SAP", logo: "/images/icons/sap.svg", pos: [443, 27], size: 76 },              
+              { name: "Gmail", logo: "/images/icons/gmail.svg", pos: [422, 286] },
+              { name: "Outlook", logo: "/images/icons/outlook.svg", pos: [196, 66] },
+              { name: "Chat", logo: "/images/icons/chat.svg", pos: [136, 82] },
+              { name: "Google Meet", logo: "/images/icons/google_meet.svg", pos: [282, 316] },
+              { name: "Zoom", logo: "/images/icons/zoom.png", pos: [110, 292] },
+              { name: "Docs", logo: "/images/icons/google_docs.svg", pos: [41, 123] },
+              { name: "Calendar", logo: "/images/icons/google_calendar.svg", pos: [86, 192] },
+              { name: "Maps", logo: "/images/icons/google_maps.svg", pos: [538, 76] },              
+              { name: "WhatsApp", logo: "/images/icons/whatsapp.svg", pos: [392, 90] },              
+              { name: "Slack", logo: "/images/icons/slack.svg", pos: [212, 276] },
+              { name: "Otter", logo: "/images/icons/otter.png", pos: [568, 174] },
+              { name: "Googletv", logo: "/images/icons/googletv.png", pos: [698, 194] },
+              { name: "Notion", logo: "/images/icons/notion.svg", pos: [613, 34] },
+              { name: "HubSpot", logo: "/images/icons/hubspot.svg", pos: [668, 124] },
+              { name: "Asana", logo: "/images/icons/asana.svg", pos: [26, 242] },
+              { name: "ClickUp", logo: "/images/icons/clickup.svg", pos: [26, 342] }, 
+              { name: "Fathom", logo: "/images/icons/fathom.png", pos: [662, 312] },              
+              { name: "Cloud", logo: "/images/icons/cloud.png", pos: [522, 286], size: 96 },
+              { name: "Fireflies", logo: "/images/icons/fireflies.png", pos: [488, 420] },
+              { name: "Phone", logo: "/images/icons/phone.png", pos: [372, 346] },     
+              { name: "Spiral", logo: "/images/icons/spiral.png", pos: [106, 22] },                   
+              { name: "Todoist", logo: "/images/icons/todoist.svg", pos: [222, 416] },
+              { name: "monday.com", logo: "/images/icons/mondaydotcom.png", pos: [636, 412] },
               // { name: "Email", logo: "/images/icons/email.png" },
               // { name: "Video", logo: "/images/icons/video.png" },
+              // { name: "Notes", logo: "/images/icons/notes.png", pos: [227, 37] },
+              // { name: "Tasks", logo: "/images/icons/tasks.png", pos: [452, 109] },
+              // { name: "Marketing", logo: "/images/icons/marketing.png", pos: [558, 91] },
             ];
 
             return (
-              <div className="tools-orbit relative w-full max-w-[940px] aspect-[720/420] mx-auto">
+              // max-w bumped from 940 to 1100: the 14->21 icon count needed tighter positions
+              // (down from ~100 to ~78 units apart in the 720-unit coordinate space) than the
+              // original layout used. Node size stays a fixed 72px regardless of container width,
+              // so widening the container (rather than re-deriving every position at a smaller
+              // scale) is what buys back that lost breathing room — 78 units now maps to ~119px
+              // of real separation instead of ~100px, comparable to the original spacing.
+              <div className="tools-orbit relative w-full max-w-[1100px] aspect-[720/420] mx-auto">
                 {/* Center hub — hidden below md: the hub gets cramped against the orbiting
                     tool nodes on small screens, so it's dropped rather than shrunk further.
                     display/alignItems/justifyContent removed from inline style (they used to
@@ -550,19 +570,25 @@ export default function AgenticPage() {
                     top: "50%",
                     transform: "translate(-50%, -50%)",
                     borderRadius: "60%",
-                    // Same purple glow as the 12 tool circles, scaled up ~1.4x to match this
-                    // hub's larger 100px size so it reads at the same relative strength.
-                    boxShadow: "0 6px 25px 4px rgba(93,67,135,0.45)",
+                    // Same purple glow as the tool circles, scaled up with this larger hub so it
+                    // reads at the same relative strength.
+                    boxShadow: "0 12px 50px 8px rgba(93,67,135,0.45)",
                     zIndex: 2,
                     animation: "centerLevitate 5s ease-in-out infinite",
-                    width: 100,
-                    height: 100,
+                    // 200px, but never more than 26% of the stage width. The tool positions are
+                    // percentages of the stage while this hub was a fixed size, so on the
+                    // narrower desktop widths (the stage goes down to ~665px) a fixed 200px hub
+                    // runs into the nearest icons (Tasks, WhatsApp) — especially at the top of
+                    // its float. The cap keeps a clear gap there; from a ~770px-wide stage up
+                    // it's the full 200px.
+                    width: "min(200px, 26%)",
+                    aspectRatio: "1",
                   }}
                 >
                   <img
                     src="/icon2.png"
                     alt="Act Angel AI"
-                    className="w-[80px] h-[80px] object-contain"
+                    className="w-[80%] h-[80%] object-contain"
                   />
                 </div>
 
@@ -579,8 +605,8 @@ export default function AgenticPage() {
                         shorthand is exclusive, so it would be 1px off at exactly 540/760px.
                         `hidden!` is important so it beats globals.css's grid rule
                         `.tools-orbit-node { display: flex }`, which would otherwise win. */}
-                    {i===12 && <div className="tools-orbit-node absolute [@media(max-width:540px)]:hidden!" style={{ left: '50%', top: '50%' }} />}
-                    {i===13 && <div className="tools-orbit-node absolute [@media(540px<width<=760px)]:hidden!" style={{ left: '50%', top: '50%' }} />}
+                    {/* {i===12 && <div className="tools-orbit-node absolute [@media(max-width:540px)]:hidden!" style={{ left: '50%', top: '50%' }} />} */}
+                    {i===24 && <div className="tools-orbit-node absolute [@media(540px<width<=760px)]:hidden!" style={{ left: '50%', top: '50%' }} />}
                     <div
                       className="tools-orbit-node absolute"
                       style={{
