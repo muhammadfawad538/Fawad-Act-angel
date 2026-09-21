@@ -36,6 +36,12 @@ export default function ContactPage() {
             >
               Hello@ActAngel.com
             </a>
+             <a
+              href="tel:+18573133591"
+              className="text-lg text-[#111] hover:text-black/60 transition-colors"
+            >
+              +1 (857) 313 - 3591
+            </a>
           </div>
 
           <Link
