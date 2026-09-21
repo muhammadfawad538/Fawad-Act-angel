@@ -498,43 +498,40 @@ export default function AgenticPage() {
 
           {/* Scattered tool cloud around the centre hub, laid out on a 720x460 stage. Below
               760px globals.css drops the absolute positioning entirely and reflows these into
-              a plain grid, so NODE_POSITIONS only applies from that width up. */}
+              a plain grid, so each tool's `pos` only applies from that width up. */}
           {(() => {
             // Colored brand/product logos (public/images/icons) rather than the plain
             // stroked SVG glyphs this used before, matching the reference composition in
-            // "All_your_tools - catch_agent.png".
-            const TOOLS = [
-              { name: "Salesforce", logo: "/images/icons/salesforce.png" },
-              { name: "SAP", logo: "/images/icons/sap.svg" },
-              { name: "Email", logo: "/images/icons/email.png" },              
-              { name: "Chat", logo: "/images/icons/chat.png" },
-              { name: "Video", logo: "/images/icons/video.png" },
-              { name: "Docs", logo: "/images/icons/docs.png" },
-              { name: "Calendar", logo: "/images/icons/calender.png" },
-              { name: "Maps", logo: "/images/icons/maps.png" },
-              { name: "Notes", logo: "/images/icons/notes.png" },
-              { name: "Messaging", logo: "/images/icons/message.png" },              
-              { name: "Tasks", logo: "/images/icons/tasks.png" },
-              { name: "Marketing", logo: "/images/icons/marketing.png" },
-            ];
-            // Scattered, not a ring: the reference sets its tools at irregular angles AND
-            // irregular distances from the hub, so these were generated to vary both (radius
-            // ~130-290 in this 720x460 stage) while keeping every node clear of the hub and at
-            // least ~92px from its neighbours. Values are each node's top-left corner, so the
-            // stage centre (360,230) is a node's left/top + 36 (half of its 72px box).
-            const NODE_POSITIONS = [
-              [603, 189],
-              [491, 246],
-              [402, 345],
-              [279, 366],
-              [183, 292],
-              [71, 283],
-              [38, 180],
-              [150, 101],
-              [257, 81],
-              [348, 20],
-              [452, 109],
-              [558, 91],
+            // "All_your_tools_catch_agent.png".
+            //
+            // Each tool carries its own position (`pos`) instead of indexing into a separate
+            // positions array — with two parallel arrays, commenting a tool out silently shifted
+            // every later tool into its neighbour's spot. `pos` is the node's top-left corner on
+            // a 720x460 stage (centre = 360,230; nodes are 72px). The spots are scattered at
+            // irregular angles and distances from the hub (radius ~130-290), all clear of the hub
+            // and ~100px+ apart — pick a free gap if you add a tool.
+            // `size` (optional, % of the circle, default 62) is only for wide wordmark-style
+            // logos: every logo is fit into the same square box, so a 2:1 logo like SAP gets
+            // capped by the box's width and renders half as tall as a square icon. A circle has
+            // more room across its middle than that inner square uses, so these get a bigger
+            // box — sized so their corners still clear the circle's edge.
+            const TOOLS: { name: string; logo: string; pos: [number, number]; size?: number }[] = [
+              { name: "Salesforce", logo: "/images/icons/salesforce.png", pos: [603, 189], size: 76 },
+              { name: "SAP", logo: "/images/icons/sap.svg", pos: [491, 246], size: 76 },              
+              { name: "Gmail", logo: "/images/icons/gmail.svg", pos: [582, 288] },
+              { name: "Outlook", logo: "/images/icons/outlook.svg", pos: [136, 146] },
+              { name: "Chat", logo: "/images/icons/chat.svg", pos: [279, 366] },
+              { name: "Google Meet", logo: "/images/icons/google_meet.svg", pos: [402, 345] },
+              { name: "Zoom", logo: "/images/icons/zoom.png", pos: [183, 292] },
+              { name: "Docs", logo: "/images/icons/google_docs.svg", pos: [71, 283] },
+              { name: "Calendar", logo: "/images/icons/google_calendar.svg", pos: [38, 180] },
+              { name: "Maps", logo: "/images/icons/google_maps.svg", pos: [110, 46] },
+              { name: "Notes", logo: "/images/icons/notes.png", pos: [227, 37] },
+              { name: "WhatsApp", logo: "/images/icons/whatsapp.svg", pos: [348, 20] },
+              { name: "Tasks", logo: "/images/icons/tasks.png", pos: [452, 109] },
+              { name: "Marketing", logo: "/images/icons/marketing.png", pos: [558, 91] },
+              // { name: "Email", logo: "/images/icons/email.png" },
+              // { name: "Video", logo: "/images/icons/video.png" },
             ];
 
             return (
@@ -546,14 +543,16 @@ export default function AgenticPage() {
                     className) because an inline `display` can't be responsive and would have
                     overridden `hidden` at every breakpoint regardless of the md: prefix. */}
                 <div
-                  className="hidden md:flex absolute rounded-full bg-white items-center justify-center z-10"
+                  className="hidden md:flex absolute rounded-full bg-[#EDECE9] items-center justify-center z-10"
                   style={{
                     position: "absolute",
                     left: "50%",
                     top: "50%",
                     transform: "translate(-50%, -50%)",
                     borderRadius: "60%",
-                    boxShadow: "rgba(0, 0, 0, 0.06) 0px 0px 18px 6px",
+                    // Same purple glow as the 12 tool circles, scaled up ~1.4x to match this
+                    // hub's larger 100px size so it reads at the same relative strength.
+                    boxShadow: "0 6px 25px 4px rgba(93,67,135,0.45)",
                     zIndex: 2,
                     animation: "centerLevitate 5s ease-in-out infinite",
                     width: 100,
@@ -568,11 +567,21 @@ export default function AgenticPage() {
                 </div>
 
                 {TOOLS.map((tool, i) => {
-                  const [left, top] = NODE_POSITIONS[i];
+                  const [left, top] = tool.pos;
 
                   return (
+                    <React.Fragment key={tool.name}>
+                    {/* Blank grid cells before the last two icons. i===12 centres the last pair in
+                        the 4-column view (hidden in the 3-column view); i===13 splits it to the
+                        outer columns in the 3-column view (hidden in the 4-column view). The media
+                        queries mirror globals.css's grid breakpoints exactly (3 columns at
+                        max-width 540px, 4 columns above that up to 760px) — Tailwind's max-[...]
+                        shorthand is exclusive, so it would be 1px off at exactly 540/760px.
+                        `hidden!` is important so it beats globals.css's grid rule
+                        `.tools-orbit-node { display: flex }`, which would otherwise win. */}
+                    {i===12 && <div className="tools-orbit-node absolute [@media(max-width:540px)]:hidden!" style={{ left: '50%', top: '50%' }} />}
+                    {i===13 && <div className="tools-orbit-node absolute [@media(540px<width<=760px)]:hidden!" style={{ left: '50%', top: '50%' }} />}
                     <div
-                      key={tool.name}
                       className="tools-orbit-node absolute"
                       style={{
                         left: `${(left / 720) * 100}%`,
@@ -580,24 +589,26 @@ export default function AgenticPage() {
                         animationDelay: `${i * 0.24}s`,
                       }}
                     >
-                      {/* Plain white circle behind each logo (the pastel orb images are gone),
-                          with a soft glow in the brand purple (#5D4387) standing in for the
+                      {/* Light warm-grey circle (#EDECE9, as in the reference) behind each logo,
+                          with a glow in the brand purple (#5D4387) standing in for the
                           reference's pink one. The logo sits at 56% rather than filling the box,
                           so it stays inset from the circle's edge — at full size the
                           square-backed logos (Maps, Tasks) would cover the circle completely and
                           it wouldn't read. */}
-                      <div className="flex items-center justify-center w-[72px] h-[72px] rounded-full bg-white shadow-[0_4px_18px_2px_rgba(93,67,135,0.28)]">
+                      <div className="flex items-center justify-center w-[72px] h-[72px] rounded-full bg-[#EDECE9] shadow-[0_4px_18px_3px_rgba(93,67,135,0.45)]">
                         <img
                           src={tool.logo}
                           alt={tool.name}
                           loading="lazy"
-                          className="w-[56%] h-[56%] object-contain"
+                          className="object-contain"
+                          style={{ width: `${tool.size ?? 62}%`, height: `${tool.size ?? 62}%` }}
                         />
                       </div>
                       {/* <span className="tools-orbit-label text-[11px] text-black/45 tracking-wide text-center whitespace-nowrap">
                         {tool.name}
                       </span> */}
                     </div>
+                    </React.Fragment>
                   );
                 })}
               </div>
