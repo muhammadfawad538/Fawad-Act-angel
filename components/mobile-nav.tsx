@@ -45,6 +45,21 @@ const NAV_STYLE = {
   boxShadow: "0 10px 30px -12px rgba(0,0,0,0.12)",
 } as const;
 
+// Same surface, more opaque — for the floating dropdown/accordion panels (Hire an Angel,
+// Behind the Angels, the mobile menu) rather than the always-at-the-top main bar. Those panels
+// open directly over whatever page content sits underneath (e.g. a heading), and at the main
+// bar's 75% opacity that content showed through enough to fight with the menu item text for
+// attention. Pushed close to fully solid (99%) plus a stronger blur: enough that whatever's
+// behind still registers as "something's there" (the panel doesn't look like a flat cutout),
+// but not legible — 96% still let text shapes read through clearly enough to compete with the
+// menu items.
+const NAV_DROPDOWN_STYLE = {
+  ...NAV_STYLE,
+  backdropFilter: "blur(28px)",
+  WebkitBackdropFilter: "blur(28px)",
+  background: "rgba(255,255,255,0.99)",
+} as const;
+
 // Menu-item typography, matching the reference theme's nav: 14px / weight 500 / #4A4A4A,
 // with no extra letter-spacing. Hover darkens to near-black.
 // font-family is set explicitly (not inherited font-sans/Geist) to match
@@ -218,7 +233,7 @@ export function MobileNav() {
               {behindOpen && (
                 <div
                   className="absolute top-full left-1/2 -translate-x-1/2 mt-5 w-[440px] rounded-2xl border border-black/[0.06] overflow-hidden z-50 p-3"
-                  style={NAV_STYLE}
+                  style={NAV_DROPDOWN_STYLE}
                 >
                   <div className="grid grid-cols-2 gap-2.5">
                     {BEHIND_ITEMS.map((item) => (
@@ -300,7 +315,7 @@ export function MobileNav() {
                 An...", "Talent Managem..."). */}
             <div
               className="w-full rounded-2xl border border-black/[0.06] overflow-hidden"
-              style={NAV_STYLE}
+              style={NAV_DROPDOWN_STYLE}
             >
               <div className="grid grid-cols-4 gap-2.5 p-3">
                 {PERSONAS.map((p) => (
@@ -366,7 +381,7 @@ export function MobileNav() {
         >
           <div
             className="rounded-2xl border border-black/[0.06] px-2 py-2 flex flex-col"
-            style={NAV_STYLE}
+            style={NAV_DROPDOWN_STYLE}
           >
             {/* "Hire an Angel" — inline expandable list, not a flyout (flyouts don't work well nested in an open mobile sheet) */}
             <button
