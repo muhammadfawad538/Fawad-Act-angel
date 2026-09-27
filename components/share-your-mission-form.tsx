@@ -129,10 +129,6 @@ export function ShareYourMissionForm() {
         </div>
         <h3 className="text-lg font-medium">Your brief is ready to send.</h3>
         <p className="text-sm text-black/55 max-w-sm">
-          Your email app will open with this brief addressed to Act Angel AI.
-          Send the email to complete your enquiry.
-        </p>
-        <p className="text-sm text-black/55 max-w-sm">
           Please send the prepared email to{" "}
           <a
             href={`mailto:${MISSION_EMAIL}`}
@@ -163,7 +159,7 @@ export function ShareYourMissionForm() {
         <h2 className="text-base font-semibold text-[#111]">
           Your organization
         </h2>
-        <div className="mt-5 grid sm:grid-cols-2 gap-x-6 gap-y-6">
+        <div className="mt-5 grid sm:grid-cols-2 gap-x-4 gap-y-4">
           <div>
             <label className={labelClass}>Organization name</label>
             <input
@@ -253,7 +249,7 @@ export function ShareYourMissionForm() {
         <h2 className="text-base font-semibold text-[#111]">
           How Hope Angel could help
         </h2>
-        <div className="mt-5 grid sm:grid-cols-2 gap-x-6 gap-y-6">
+        <div className="mt-5 grid sm:grid-cols-2 gap-x-4 gap-y-4">
           <div>
             <label className={labelClass}>Your first priority</label>
             <select
@@ -293,7 +289,7 @@ export function ShareYourMissionForm() {
               className={`${textareaClass} mt-2`}
             />
           </div>
-          <div>
+          <div className="sm:col-span-2">
             <label className={optionalLabelClass}>
               Current tools or communication channels
             </label>
@@ -311,7 +307,7 @@ export function ShareYourMissionForm() {
         <h2 className="text-base font-semibold text-[#111]">
           Who we can contact
         </h2>
-        <div className="mt-5 grid sm:grid-cols-2 gap-x-6 gap-y-6">
+        <div className="mt-5 grid sm:grid-cols-2 gap-x-4 gap-y-4">
           <div>
             <label className={labelClass}>Your name</label>
             <input
@@ -348,43 +344,48 @@ export function ShareYourMissionForm() {
           </div>
         </div>
       </div>
+      <div className="flex flex-col gap-4">
+        <label className="flex items-start gap-2 text-[14px] text-black/55 leading-snug">
+          <input
+            type="checkbox"
+            checked={authorized}
+            onChange={(e) => setAuthorized(e.target.checked)}
+            className="mt-0.5 shrink-0"
+          />
+          I am authorized to contact Act Angel AI on behalf of this
+          organization. The details I provided are accurate to the best of my
+          knowledge. I understand that complimentary service depends on
+          eligibility, authenticity, and ethical review.
+        </label>
 
-      <label className="flex items-start gap-2.5 text-[12px] text-black/55 leading-snug">
-        <input
-          type="checkbox"
-          checked={authorized}
-          onChange={(e) => setAuthorized(e.target.checked)}
-          className="mt-0.5 shrink-0"
-        />
-        I am authorized to contact Act Angel AI on behalf of this organization.
-        The details I provided are accurate to the best of my knowledge. I
-        understand that complimentary service depends on eligibility,
-        authenticity, and ethical review.
-      </label>
+        {error && <div className="text-xs text-red-600">{error}</div>}
 
-      {error && <div className="text-xs text-red-600">{error}</div>}
-
-      <button
-        type="submit"
-        disabled={!canSubmit}
-        className={primaryButtonClass}
-      >
-        Prepare My Mission Brief
-      </button>
-
-      <p className="text-[10.5px] leading-tight text-black/40">
-        We use these details to review your enquiry and contact you. Please do
-        not include personal information about beneficiaries or confidential
-        financial records. See our{" "}
-        <Link
-          href="/privacy"
-          target="_blank"
-          className="underline hover:text-black/60"
+        <p className="text-[10.5px] leading-tight text-black/60">
+          We use these details to review your enquiry and contact you. Please do
+          not include personal information about beneficiaries or confidential
+          financial records. See our{" "}
+          <Link
+            href="/privacy"
+            target="_blank"
+            className="underline hover:text-black/60"
+          >
+            Privacy Policy
+          </Link>
+          .
+        </p>
+        <button
+          type="submit"
+          disabled={!canSubmit}
+          className={primaryButtonClass}
         >
-          Privacy Policy
-        </Link>
-        .
-      </p>
+          Prepare My Mission Brief
+        </button>
+
+        <p className="text-[10.5px] leading-tight text-black/60 text-center">
+          Your email app will open with this brief addressed to Act Angel AI.
+          Send the email to complete your enquiry.
+        </p>
+      </div>
     </form>
   );
 }

@@ -443,10 +443,10 @@ export function HireAnAngelPageContent({
                       240px card on one line otherwise. Below sm, it's still allowed to wrap
                       (whitespace-normal) so it doesn't overflow a narrow phone screen. */}
                   <div className="mt-4 inline-block rounded-xl border border-black/[0.08] bg-white px-5 py-4 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.15)]">
-                    <p className="text-[10px] font-semibold uppercase tracking-widest text-[#5D4387]">
+                    <p className="text-[13px] font-semibold uppercase tracking-widest text-[#5D4387]">
                       {persona.outcomeLabel ?? "Business Outcome"}
                     </p>
-                    <p className="mt-1 text-[13px] font-semibold text-[#111] whitespace-normal sm:whitespace-nowrap">
+                    <p className="mt-1 text-[15px] font-semibold text-[#111] whitespace-normal sm:whitespace-nowrap">
                       {persona.outcomeCardTitle ?? persona.outcomeTitle}
                     </p>
                   </div>
