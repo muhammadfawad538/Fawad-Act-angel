@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import posthog from "posthog-js";
 import { PERSONAS } from "@/lib/personas";
 
@@ -90,6 +91,13 @@ const NAV_CTA =
 // parent. HireAnAngelModal/MeetYourAngelModal (still fully intact) simply aren't wired to
 // anything here anymore.
 export function MobileNav() {
+  // On the Hope Angel page, the reference design replaces the nav's whole primary CTA
+  // ("Get Started") with "Share Your Mission" instead of showing both a dedicated outlined
+  // pill AND the usual filled CTA — so the outlined pill below only renders elsewhere.
+  const pathname = usePathname();
+  const isHopeAngel = pathname?.startsWith("/hire-an-angel/hope-angel") ?? false;
+  const missionHref = "/hire-an-angel/hope-angel#share-your-mission";
+
   const [open, setOpen] = useState(false);
   const [personasOpen, setPersonasOpen] = useState(false);
   const [behindAccordionOpen, setBehindAccordionOpen] = useState(false);
@@ -254,6 +262,19 @@ export function MobileNav() {
             <Link href="/contact" className={NAV_PILL}>
               Contact
             </Link>
+            {/* Shown on every page, like the other 3 nav pills — a bare hash + plain anchor
+                when already on the Hope Angel page (next/link's Link doesn't reliably
+                re-trigger a scroll-to-hash when only the hash changes on the SAME route),
+                otherwise a normal cross-page Link. */}
+            {isHopeAngel ? (
+              <a href="#share-your-mission" className={NAV_PILL}>
+                Share Your Mission
+              </a>
+            ) : (
+              <Link href={missionHref} className={NAV_PILL}>
+                Share Your Mission
+              </Link>
+            )}
 
             <Link
               href="/get-started"
@@ -317,7 +338,7 @@ export function MobileNav() {
               className="w-full rounded-2xl border border-black/[0.06] overflow-hidden"
               style={NAV_DROPDOWN_STYLE}
             >
-              <div className="grid grid-cols-4 gap-2.5 p-3">
+              <div className="grid grid-cols-5 gap-2.5 p-3">
                 {PERSONAS.map((p) => (
                   <Link
                     key={p.id}
@@ -474,6 +495,23 @@ export function MobileNav() {
             >
               Contact
             </Link>
+            {isHopeAngel ? (
+              <a
+                href="#share-your-mission"
+                onClick={close}
+                className={`px-4 py-3 hover:bg-black/[0.03] rounded-xl ${NAV_ITEM}`}
+              >
+                Share Your Mission
+              </a>
+            ) : (
+              <Link
+                href={missionHref}
+                onClick={close}
+                className={`px-4 py-3 hover:bg-black/[0.03] rounded-xl ${NAV_ITEM}`}
+              >
+                Share Your Mission
+              </Link>
+            )}
 
             <div className="mt-1 px-2 pb-1 flex justify-center">
               <Link

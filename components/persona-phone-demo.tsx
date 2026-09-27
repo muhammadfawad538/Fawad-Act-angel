@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { PERSONAS, type PersonaId, type ScriptLine } from "@/lib/personas"
+import { PERSONAS, type PersonaId, type ScriptLine, type CampaignDemo } from "@/lib/personas"
 
 type Stage = "call" | "connecting" | "messages"
 
@@ -58,6 +58,58 @@ function StatusBar() {
   )
 }
 
+// Hope Angel's variant of the "messages" stage — the reference site shows a campaign-progress
+// card here instead of a chat thread (nonprofits ask "how close are we to goal", not "what did
+// they say"), so this swaps in for the chat bubbles above only when persona.campaignDemo is set.
+function CampaignDemoScreen({ photo, name, demo }: { photo: string; name: string; demo: CampaignDemo }) {
+  const pct = Math.min(100, Math.round((demo.raisedValue / demo.goalValue) * 100))
+  return (
+    <div className="absolute inset-0 flex flex-col" style={{ background: "#FAF9F7", padding: "70px 20px 33px" }}>
+      <div className="flex items-center" style={{ gap: 12 }}>
+        <img src={photo} alt="" className="object-cover" style={{ width: 44, height: 44, borderRadius: "50%" }} />
+        <div>
+          <p className="text-[16px]" style={{ fontWeight: 600, color: "#111" }}>{name}</p>
+          <p className="text-[13px]" style={{ color: "#8C8C8C" }}>{demo.tagline}</p>
+        </div>
+      </div>
+
+      <span
+        className="text-[11px] font-medium self-start"
+        style={{ marginTop: 20, padding: "6px 14px", borderRadius: 999, background: "#EDE9F7", color: "#5D4387" }}
+      >
+        {demo.scenarioTag}
+      </span>
+
+      <div
+        style={{
+          marginTop: "auto",
+          padding: 18,
+          borderRadius: 18,
+          background: "#FFFFFF",
+          boxShadow: "0 10px 30px -15px rgba(0,0,0,0.15)",
+        }}
+      >
+        <p className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: "#8C8C8C" }}>
+          Campaign progress
+        </p>
+        <div style={{ marginTop: 10, height: 8, borderRadius: 999, background: "#EDECE8", overflow: "hidden" }}>
+          <div style={{ width: `${pct}%`, height: "100%", borderRadius: 999, background: "#5D4387" }} />
+        </div>
+        <p className="text-[14px]" style={{ marginTop: 8, fontWeight: 600, color: "#111" }}>
+          {demo.raised} / {demo.goal}
+        </p>
+      </div>
+
+      <div
+        className="flex items-center justify-center text-[13px] font-medium"
+        style={{ marginTop: 14, height: 44, borderRadius: 999, background: "#5D4387", color: "#fff" }}
+      >
+        {demo.ctaLabel}
+      </div>
+    </div>
+  )
+}
+
 interface PersonaPhoneDemoProps {
   /** Persona whose contact + thread to play. Omit to use the hero's own script. */
   personaId?: PersonaId
@@ -80,6 +132,7 @@ export function PersonaPhoneDemo({
   const name = contact ?? persona?.contact ?? PERSONAS[0].contact
   const photo = avatar ?? persona?.avatar ?? PERSONAS[0].avatar
   const script = messages ?? persona?.messages ?? PERSONAS[0].messages
+  const campaignDemo = persona?.campaignDemo
 
   const [stage, setStage] = useState<Stage>("call")
   const [messagesShown, setMessagesShown] = useState(0)
@@ -195,7 +248,11 @@ export function PersonaPhoneDemo({
             </div>
           )}
 
-          {stage === "messages" && (
+          {stage === "messages" && campaignDemo && (
+            <CampaignDemoScreen photo={photo} name={name} demo={campaignDemo} />
+          )}
+
+          {stage === "messages" && !campaignDemo && (
             <div className="absolute inset-0 flex flex-col">
               {/* Chat header — its 53px top padding is what clears the status bar/notch */}
               <div

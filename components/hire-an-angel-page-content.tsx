@@ -1,24 +1,25 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { PERSONAS, type Persona, type PersonaId } from "@/lib/personas"
-import { PersonaPhoneDemo } from "@/components/persona-phone-demo"
-import { SiteHeader } from "@/components/site-header"
-import { SiteFooter } from "@/components/site-footer"
+import { useState } from "react";
+import Link from "next/link";
+import { PERSONAS, type Persona, type PersonaId } from "@/lib/personas";
+import { PersonaPhoneDemo } from "@/components/persona-phone-demo";
+import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
+import { ShareYourMissionForm } from "@/components/share-your-mission-form";
 
 // Act Angel's own multi-channel concept (already used on the homepage's "always on / reachable
 // everywhere" section) — reused here as the second picker in LiveDemoSection below.
-const CHANNELS = ["Call", "Chat", "Email", "SMS", "Web"]
+const CHANNELS = ["Call", "Chat", "Email", "SMS", "Web"];
 
 // Live-preview photo fill. The zoomed-out photo no longer reaches the frame's top/bottom, so the
 // frame shows this gradient there — sampled from the persona images' own edges (light sky-grey
 // at the top, near-white at the bottom), which all 4 share. The photo's edges are feathered into
 // it so there's no hard line; the left/right feather only shows on the square mobile frame, since
 // on desktop the photo is wider than the frame and those edges are clipped off.
-const PHOTO_BACKDROP = "linear-gradient(to bottom, #DDE3E9, #F4F4F4)"
+const PHOTO_BACKDROP = "linear-gradient(to bottom, #DDE3E9, #F4F4F4)";
 const PHOTO_FEATHER =
-  "linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent), linear-gradient(to right, transparent, #000 8%, #000 92%, transparent)"
+  "linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent), linear-gradient(to right, transparent, #000 8%, #000 92%, transparent)";
 
 /**
  * "Live Preview" section — same broad idea as 11x.ai's "Talk to Julian, live" card (a photo with
@@ -33,17 +34,52 @@ const PHOTO_FEATHER =
 // pill, plus a hover lift/press animation, matching 11x.ai's own scenario/voice picker: on
 // 11x the pill shifts slightly upward on hover rather than growing, so this uses a translateY
 // instead of a scale.
+// Collapsed-by-default Q&A row for the FAQ section's accordion entries (everything past the
+// first faqs[] item, which renders as a plain headline+paragraph instead — see the "What is
+// Hope Angel?" explainer section below).
+function FaqAccordionItem({
+  question,
+  answer,
+}: {
+  question: string;
+  answer: string;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="border-t border-black/[0.08] py-5">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="w-full flex items-center justify-between gap-4 text-left cursor-pointer"
+      >
+        <span className="text-[15px] font-semibold text-[#111]">
+          {question}
+        </span>
+        <span className="text-[#5D4387] text-xl leading-none shrink-0">
+          {open ? "−" : "+"}
+        </span>
+      </button>
+      {open && (
+        <p className="mt-3 text-sm text-black/55 leading-relaxed">{answer}</p>
+      )}
+    </div>
+  );
+}
+
 function pillClass(active: boolean) {
-  return `px-4 py-2 rounded-full text-[12.5px] font-medium border cursor-pointer transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 ${
+  return `px-5 py-2.5 rounded-full text-[13px] font-medium border cursor-pointer transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 ${
     active
       ? "bg-[#EDE9F7] border-[#5D4387]/30 text-[#5D4387]"
       : "border-black/15 text-black/60 hover:border-[#5D4387]/30 hover:bg-[#5D4387]/[0.05] hover:text-[#5D4387]"
-  }`
+  }`;
 }
 
 function LiveDemoSection({ persona }: { persona: Persona }) {
-  const [scenario, setScenario] = useState(0)
-  const [channel, setChannel] = useState(0)
+  const [scenario, setScenario] = useState(0);
+  const [channel, setChannel] = useState(0);
+  const scenarios = persona.scenarios ?? persona.useCases!;
+  const channels = persona.channels ?? CHANNELS;
 
   return (
     <section id="live-preview" className="mt-24 scroll-mt-24">
@@ -54,15 +90,14 @@ function LiveDemoSection({ persona }: { persona: Persona }) {
           against the text column on the 4th — that seam is a plain edge, not independently
           rounded, since only the OUTER card's corners are meant to read as rounded. */}
       <div className="rounded-3xl border border-black/[0.08] bg-white overflow-hidden shadow-[0_20px_50px_-20px_rgba(0,0,0,0.25)]">
-        {/* 1fr/2fr (not an even split): on 11x.ai the photo half is noticeably narrower than
-            the content half, not a 50/50 column. */}
-        <div className="grid md:grid-cols-[1fr_2fr] items-stretch">
+        {/* 45/55 split — photo column at 45% width. */}
+        <div className="grid md:grid-cols-[45%_55%] items-stretch">
           {/* Portrait photo half. On desktop its height comes from the text column beside it;
               below md the grid stacks, so it's a plain square instead. overflow-hidden clips the
               photo to this frame (it's deliberately wider than the frame on desktop, and the
               zoom animation would otherwise also spill into the text column). */}
           <div
-            className="relative w-full aspect-square md:aspect-auto md:min-h-[420px] overflow-hidden"
+            className="relative w-full aspect-square md:aspect-auto md:min-h-[600px] overflow-hidden"
             style={{ background: PHOTO_BACKDROP }}
           >
             {/* Standing in for the mp4 the 11x.ai reference plays here — there's no per-persona
@@ -91,34 +126,91 @@ function LiveDemoSection({ persona }: { persona: Persona }) {
 
             <div className="absolute top-4 left-4 px-3 py-1.5 rounded-full bg-black/45 backdrop-blur-sm">
               <span className="text-[11px] font-medium text-white">
-                {persona.contact} · {persona.label}
+                {persona.contact} ·{" "}
+                {persona.livePreviewPillLabel ?? persona.label}
               </span>
             </div>
             <div className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/45 backdrop-blur-sm">
               <span className="w-1.5 h-1.5 rounded-full bg-[#34C759] animate-pulse" />
-              <span className="text-[11px] font-medium text-white">Live</span>
+              <span className="text-[11px] font-medium text-white">
+                {persona.liveDemoBadgeLabel ?? "Live"}
+              </span>
             </div>
 
+            {/* Campaign-progress overlay — Hope Angel-only, a question/answer bubble pair plus
+                a donation progress card sitting over the photo's bottom edge. Content follows
+                whichever Scenario pill is selected (persona.campaignScenarios, aligned by index
+                with `scenarios`); falls back to the static campaignDemo text when a persona
+                hasn't got per-scenario data. */}
+            {(persona.campaignScenarios || persona.campaignDemo) && (() => {
+              const fallback = persona.campaignDemo
+              const active = persona.campaignScenarios?.[scenario] ?? {
+                question: "How close are you to the campaign goal?",
+                answer: `Our example campaign has raised ${fallback!.raised} toward a ${fallback!.goal} goal. May I show you how your contribution can help?`,
+                progressValueText: `${fallback!.raised} / ${fallback!.goal}`,
+                progressPct: Math.min(100, Math.round((fallback!.raisedValue / fallback!.goalValue) * 100)),
+              }
+              return (
+                <div className="absolute inset-x-4 bottom-4 flex flex-col gap-2">
+                  <div className="self-end max-w-[85%] px-4 py-2 rounded-2xl rounded-br-sm bg-black/70 backdrop-blur-sm text-white text-[13px] font-medium">
+                    {active.question}
+                  </div>
+                  <div className="flex items-start gap-2 px-4 py-3 rounded-2xl rounded-bl-sm bg-white shadow-[0_10px_30px_-15px_rgba(0,0,0,0.3)]">
+                    <img
+                      src={persona.avatar}
+                      alt=""
+                      aria-hidden="true"
+                      className="w-6 h-6 rounded-full object-cover shrink-0 mt-0.5"
+                    />
+                    <span className="text-[13px] text-[#111] leading-relaxed">
+                      {active.answer}
+                    </span>
+                  </div>
+                  <div className="px-4 py-3 rounded-xl bg-white shadow-[0_10px_30px_-15px_rgba(0,0,0,0.3)]">
+                    <div className="flex items-center justify-between text-[12px]">
+                      <span className="text-black/50">
+                        Sample campaign progress
+                      </span>
+                      <span className="font-semibold text-[#111]">
+                        {active.progressValueText}
+                      </span>
+                    </div>
+                    <div className="mt-2 h-1.5 rounded-full bg-black/10 overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-[#5D4387]"
+                        style={{ width: `${active.progressPct}%` }}
+                      />
+                    </div>
+                    <p className="mt-1.5 text-[10px] text-black/40">
+                      Illustrative example, not live donation data.
+                    </p>
+                  </div>
+                </div>
+              )
+            })()}
           </div>
 
           {/* Content half — its own padding now that it's inside the shared card instead of
               being a bare grid cell in the page's own gutter. */}
-          <div className="p-8 md:p-10 lg:p-12">
+          <div className="p-10 md:p-12 lg:p-14">
             <span className="inline-block px-4 py-1.5 rounded-full bg-[#EDE9F7] text-[#5D4387] text-[11px] font-semibold uppercase tracking-widest">
               Live Preview
             </span>
-            <h2 className="mt-5 text-3xl md:text-4xl font-bold tracking-tight leading-[1.1]">
-              See a {persona.label} handle it, live.
+            <h2 className="mt-6 text-3xl md:text-4xl font-bold tracking-tight leading-[1.15]">
+              {persona.liveDemoHeadline ??
+                `See a ${persona.label} handle it, live.`}
             </h2>
-            <p className="mt-4 text-[15px] text-black/55 leading-relaxed max-w-md">
-              Pick a scenario and a channel, then watch {persona.contact} — your {persona.label} —
-              take it from first message to next step.
+            <p className="mt-5 text-[15px] text-black/55 leading-relaxed max-w-md">
+              {persona.liveDemoSubtext ??
+                `Pick a scenario and a channel, then watch ${persona.contact} — your ${persona.label} — take it from first message to next step.`}
             </p>
 
-            <div className="mt-8">
-              <p className="text-[11px] font-semibold uppercase tracking-widest text-black/40">Scenario</p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {persona.useCases!.map((uc, i) => (
+            <div className="mt-10">
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-black/40">
+                Scenario
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2.5">
+                {scenarios.map((uc, i) => (
                   <button
                     key={uc}
                     type="button"
@@ -131,10 +223,12 @@ function LiveDemoSection({ persona }: { persona: Persona }) {
               </div>
             </div>
 
-            <div className="mt-6">
-              <p className="text-[11px] font-semibold uppercase tracking-widest text-black/40">Channel</p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {CHANNELS.map((c, i) => (
+            <div className="mt-8">
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-black/40">
+                Channel
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2.5">
+                {channels.map((c, i) => (
                   <button
                     key={c}
                     type="button"
@@ -147,47 +241,87 @@ function LiveDemoSection({ persona }: { persona: Persona }) {
               </div>
             </div>
 
-            <div className="mt-8 flex flex-wrap items-center gap-5">
-              <Link
-                href="/get-started"
-                className="px-7 py-3.5 bg-[#111] text-white text-[12px] font-semibold uppercase tracking-wide rounded-full hover:bg-black/80 transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0"
-              >
-                {persona.ctaHireLabel}
-              </Link>
+            <div className="mt-10 flex flex-wrap items-center gap-5">
+              {(() => {
+                const href = persona.liveDemoCtaHref ?? persona.ctaHref ?? "/get-started"
+                const label = persona.liveDemoCtaLabel ?? persona.ctaHireLabel
+                const className = `px-7 py-3.5 text-white text-[12px] font-semibold uppercase tracking-wide rounded-full transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 ${
+                  persona.liveDemoCtaVariant === "purple"
+                    ? "bg-[#5D4387] hover:bg-[#7168A0]"
+                    : "bg-[#111] hover:bg-black/80"
+                }`
+                // Next's Link doesn't reliably re-trigger a scroll-to-hash when only the hash
+                // changes on the SAME route (no pathname change) — a plain anchor lets the
+                // browser handle the in-page jump natively instead.
+                return href.startsWith("#") ? (
+                  <a href={href} className={className}>
+                    {label}
+                  </a>
+                ) : (
+                  <Link href={href} className={className}>
+                    {label}
+                  </Link>
+                )
+              })()}
             </div>
-            <p className="mt-3 text-[12px] text-black/40">Don&rsquo;t Take Our Word for It. Meet Your Angel.</p>
+            <p className="mt-3 text-[12px] text-black/40">
+              {persona.liveDemoCaption ??
+                "Don’t Take Our Word for It. Meet Your Angel."}
+            </p>
           </div>
         </div>
       </div>
     </section>
-  )
+  );
 }
 
 // "Hire a [X] Angel" (filled) — hero only now. Was previously paired with an "Experience an
 // Angel" button in both the hero and the closing section; split into two standalone buttons so
 // each section can show just the one it needs (hero: hire; closing: experience).
-function HireButton({ hireLabel }: { hireLabel?: string }) {
+function HireButton({
+  hireLabel,
+  href = "/get-started",
+}: {
+  hireLabel?: string;
+  href?: string;
+}) {
+  const className =
+    "inline-block px-7 py-3.5 bg-[#5D4387] text-white text-[12px] font-semibold uppercase tracking-wide rounded-full hover:bg-[#7168A0] transition-colors";
+  // Next's Link doesn't reliably re-trigger a scroll-to-hash when only the hash changes on the
+  // SAME route (no pathname change) — a plain anchor lets the browser handle the in-page jump
+  // natively instead (used by Hope Angel's "Share Your Mission" CTAs).
+  if (href.startsWith("#")) {
+    return (
+      <a href={href} className={className}>
+        {hireLabel}
+      </a>
+    );
+  }
   return (
-    <Link
-      href="/get-started"
-      className="inline-block px-7 py-3.5 bg-[#5D4387] text-white text-[12px] font-semibold uppercase tracking-wide rounded-full hover:bg-[#7168A0] transition-colors"
-    >
+    <Link href={href} className={className}>
       {hireLabel}
     </Link>
-  )
+  );
 }
 
 // "Experience an Angel" (outlined) — closing section only now. Scrolls to the Live Preview
-// section (not the hero's own phone demo) since that's the page's actual interactive preview.
-function ExperienceButton() {
+// section (not the hero's own phone demo) since that's the page's actual interactive preview,
+// unless a persona provides its own closing CTA target (Hope Angel's "Share Your Mission").
+function ExperienceButton({
+  label = "Experience an Angel",
+  href = "#live-preview",
+}: {
+  label?: string;
+  href?: string;
+}) {
   return (
     <a
-      href="#live-preview"
+      href={href}
       className="inline-block px-7 py-3.5 border border-black/15 text-[#111] text-[12px] font-semibold uppercase tracking-wide rounded-full hover:border-black/30 hover:bg-black/[0.03] transition-colors"
     >
-      Experience an Angel
+      {label}
     </a>
-  )
+  );
 }
 
 /**
@@ -206,12 +340,16 @@ function ExperienceButton() {
  * embedded in the navbar in those reference shots was intentionally NOT adopted; it lives here
  * instead, as its own left-aligned tab row (no breadcrumb above it).
  */
-export function HireAnAngelPageContent({ personaId }: { personaId: PersonaId }) {
-  const persona = PERSONAS.find((p) => p.id === personaId) ?? PERSONAS[0]
+export function HireAnAngelPageContent({
+  personaId,
+}: {
+  personaId: PersonaId;
+}) {
+  const persona = PERSONAS.find((p) => p.id === personaId) ?? PERSONAS[0];
   // Gates the full landing-page sections below (hero headline through CTA). Personas that
   // haven't had their content doc copy filled in yet (lib/personas.ts) just keep a bare
   // phone-demo fallback instead of rendering half-empty sections.
-  const hasLandingContent = !!persona.heroHeadline
+  const hasLandingContent = !!persona.heroHeadline;
 
   // flex flex-col + flex-1 on the content div below: keeps the footer pinned to the bottom
   // of the screen on short-content pages instead of stranded right after the content.
@@ -227,7 +365,7 @@ export function HireAnAngelPageContent({ personaId }: { personaId: PersonaId }) 
               underline sits flush on the divider line instead of floating below it. */}
           <div className="flex flex-wrap items-center gap-x-8 gap-y-2 border-b border-black/[0.08]">
             {PERSONAS.map((p) => {
-              const active = p.id === personaId
+              const active = p.id === personaId;
               return (
                 <Link
                   key={p.id}
@@ -241,7 +379,7 @@ export function HireAnAngelPageContent({ personaId }: { personaId: PersonaId }) 
                 >
                   {p.label}
                 </Link>
-              )
+              );
             })}
           </div>
 
@@ -262,20 +400,29 @@ export function HireAnAngelPageContent({ personaId }: { personaId: PersonaId }) 
                   <p className="mt-5 text-[15px] text-black/55 leading-relaxed max-w-md">
                     {persona.heroSubtext}
                   </p>
+                  {persona.heroSubtext2 && (
+                    <p className="mt-3 text-[15px] text-black/55 leading-relaxed max-w-md">
+                      {persona.heroSubtext2}
+                    </p>
+                  )}
 
                   <div className="mt-8">
-                    <HireButton hireLabel={persona.ctaHireLabel} />
+                    <HireButton
+                      hireLabel={persona.ctaHireLabel}
+                      href={persona.ctaHref}
+                    />
                   </div>
 
-                  {/* Trust/differentiator line — identical wording across all 4 personas, so
-                      it's hardcoded here rather than duplicated in each persona's data. */}
+                  {/* Trust/differentiator line — identical wording across all 4 original personas,
+                      so it's hardcoded here; personas.ts's trustSubtext lets one (e.g. Hope Angel)
+                      override the second line where the client's copy differs. */}
                   <div className="mt-8 pl-4 border-l-2 border-[#5D4387]/40 max-w-md">
                     <p className="text-[14px] font-semibold text-[#111]">
                       No bad days. No fear. No greed. Just focus.
                     </p>
                     <p className="mt-1.5 text-[13px] text-black/50 leading-relaxed">
-                      Free from personal worries, emotional ups and downs, or self-interest. Your
-                      Virtual AI Employee stays focused on the work and your business goals—24/7.
+                      {persona.trustSubtext ??
+                        "Free from personal worries, emotional ups and downs, or self-interest. Your Virtual AI Employee stays focused on the work and your business goals—24/7."}
                     </p>
                   </div>
                   {/* inline-block (not w-full max-w-[240px]): the card now shrinks/grows to fit
@@ -286,9 +433,11 @@ export function HireAnAngelPageContent({ personaId }: { personaId: PersonaId }) 
                       (whitespace-normal) so it doesn't overflow a narrow phone screen. */}
                   <div className="mt-4 inline-block rounded-xl border border-black/[0.08] bg-white px-5 py-4 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.15)]">
                     <p className="text-[10px] font-semibold uppercase tracking-widest text-[#5D4387]">
-                      Business Outcome
+                      {persona.outcomeLabel ?? "Business Outcome"}
                     </p>
-                    <p className="mt-1 text-[13px] font-semibold text-[#111] whitespace-normal sm:whitespace-nowrap">{persona.outcomeTitle}</p>
+                    <p className="mt-1 text-[13px] font-semibold text-[#111] whitespace-normal sm:whitespace-nowrap">
+                      {persona.outcomeCardTitle ?? persona.outcomeTitle}
+                    </p>
                   </div>
                 </div>
 
@@ -300,7 +449,11 @@ export function HireAnAngelPageContent({ personaId }: { personaId: PersonaId }) 
                     copy, leaving dead space beneath the text. */}
                 <div className="flex flex-col items-center md:items-end md:sticky md:top-28">
                   <div id="demo" className="scroll-mt-24">
-                    <PersonaPhoneDemo personaId={personaId} active width={240} />
+                    <PersonaPhoneDemo
+                      personaId={personaId}
+                      active
+                      width={240}
+                    />
                   </div>
                   {/* <div className="mt-4 w-full max-w-[240px] rounded-xl border border-black/[0.08] bg-white px-5 py-4 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.15)]">
                     <p className="text-[10px] font-semibold uppercase tracking-widest text-[#5D4387]">
@@ -314,25 +467,44 @@ export function HireAnAngelPageContent({ personaId }: { personaId: PersonaId }) 
               {/* Capabilities — 3-column bordered cards with a small icon swatch, bold title
                   and description each, straight from the content doc. */}
               <section className="mt-12">
-                <h2 className="text-xs font-medium uppercase tracking-widest text-black/40">
+                <h2
+                  className={
+                    persona.capabilitiesNumbered
+                      ? "text-2xl md:text-3xl font-bold tracking-tight text-[#111] uppercase"
+                      : "text-xs font-medium uppercase tracking-widest text-black/40"
+                  }
+                >
                   Capabilities
                 </h2>
-                <div className="mt-6 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                  {persona.capabilities!.map((c) => (
+                <div className="mt-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                  {persona.capabilities!.map((c, i) => (
                     <div
                       key={c.title}
                       tabIndex={0}
                       className="rounded-2xl border-2 border-black/[0.08] bg-white px-6 py-6 transition-colors cursor-pointer hover:border-[#5D4387] focus:outline-none focus:border-[#5D4387] active:border-[#5D4387]"
                     >
-                      {/* Layered icon swatch — light-purple square with a smaller solid-purple
-                          square (60% of the outer size, not a circle) centered inside it,
-                          matching the design mockup (angelpageslight.vercel.app); previously just
-                          a single flat purple square. */}
-                      <span className="inline-flex items-center justify-center w-[25px] h-[25px] rounded-md bg-[#EDE9F7]" aria-hidden="true">
-                        <span className="w-[40%] h-[40%] rounded-[3px] bg-[#5D4387]" />
-                      </span>
-                      <p className="mt-4 font-semibold text-[#111]">{c.title}</p>
-                      <p className="mt-1.5 text-sm text-black/50 leading-relaxed">{c.description}</p>
+                      {persona.capabilitiesNumbered ? (
+                        <span className="text-[13px] font-semibold text-[#5D4387]">
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
+                      ) : (
+                        // Layered icon swatch — light-purple square with a smaller solid-purple
+                        // square (60% of the outer size, not a circle) centered inside it,
+                        // matching the design mockup (angelpageslight.vercel.app); previously
+                        // just a single flat purple square.
+                        <span
+                          className="inline-flex items-center justify-center w-[25px] h-[25px] rounded-md bg-[#EDE9F7]"
+                          aria-hidden="true"
+                        >
+                          <span className="w-[40%] h-[40%] rounded-[3px] bg-[#5D4387]" />
+                        </span>
+                      )}
+                      <p className="mt-4 font-semibold text-[#111]">
+                        {c.title}
+                      </p>
+                      <p className="mt-1.5 text-sm text-black/50 leading-relaxed">
+                        {c.description}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -344,7 +516,9 @@ export function HireAnAngelPageContent({ personaId }: { personaId: PersonaId }) 
                   outcomeTitle/outcomeDescription already teased in the hero's floating card. */}
               <section
                 className="mt-8 rounded-2xl px-8 py-10 md:px-12 md:py-12"
-                style={{ background: "linear-gradient(135deg, #5D4387, #7168A0)" }}
+                style={{
+                  background: "linear-gradient(135deg, #5D4387, #7168A0)",
+                }}
               >
                 <p className="text-2xl md:text-3xl font-bold text-white tracking-tight">
                   {persona.outcomeTitle}
@@ -355,23 +529,138 @@ export function HireAnAngelPageContent({ personaId }: { personaId: PersonaId }) 
               </section>
 
               {/* Plain-language explainer, tagged as answer-engine/FAQ-schema content per the
-                  reference design. */}
+                  reference design. Personas with a faqs list (e.g. Hope Angel) render its first
+                  entry the same way — big headline + paragraph — then the remaining entries as a
+                  collapsed accordion, matching the reference; personas without a faqs list just
+                  get the single whatIsTitle/whatIsDescription paragraph. */}
               <section className="mt-20 max-w-2xl">
                 <span className="inline-block px-4 py-1.5 rounded-full border border-black/10 text-[10px] font-semibold uppercase tracking-widest text-black/45">
-                  Structured for Answer Engines · FAQPage Schema
+                  {persona.faqEyebrow ??
+                    "Structured for Answer Engines · FAQPage Schema"}
                 </span>
-                <h2 className="mt-5 text-2xl md:text-3xl font-light tracking-tight">{persona.whatIsTitle}</h2>
-                <p className="mt-4 text-sm text-black/55 leading-relaxed">{persona.whatIsDescription}</p>
+                {persona.faqs ? (
+                  <>
+                    <h2 className="mt-5 text-2xl md:text-3xl font-light tracking-tight">
+                      {persona.faqs[0].question}
+                    </h2>
+                    <p className="mt-4 text-sm text-black/55 leading-relaxed">
+                      {persona.faqs[0].answer}
+                    </p>
+                    <div className="mt-8 border-b border-black/[0.08]">
+                      {persona.faqs.slice(1).map((f) => (
+                        <FaqAccordionItem
+                          key={f.question}
+                          question={f.question}
+                          answer={f.answer}
+                        />
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <h2 className="mt-5 text-2xl md:text-3xl font-light tracking-tight">
+                      {persona.whatIsTitle}
+                    </h2>
+                    <p className="mt-4 text-sm text-black/55 leading-relaxed">
+                      {persona.whatIsDescription}
+                    </p>
+                  </>
+                )}
               </section>
 
-              {/* Closing CTA — "Experience an Angel" only (the hire button already lives in the
-                  hero above); this one scrolls down to the Live Preview section. */}
-              <section className="mt-20 pb-4">
-                <p className="text-xl font-semibold text-[#111]">{persona.ctaLine}</p>
-                <div className="mt-6">
-                  <ExperienceButton />
-                </div>
+              {/* Closing CTA. Most personas just get "Experience an Angel" scrolling back up to
+                  the Live Preview section (the hire button already lives in the hero above);
+                  a persona with closingHeadline set (Hope Angel) gets the richer eyebrow +
+                  headline + paragraph + single-CTA closer from the reference design instead. */}
+              <section className="mt-20 pb-4 max-w-2xl">
+                {persona.closingHeadline ? (
+                  <>
+                    {persona.closingEyebrow && (
+                      <span className="inline-block px-4 py-1.5 rounded-full bg-[#EDE9F7] text-[#5D4387] text-[11px] font-semibold uppercase tracking-widest">
+                        {persona.closingEyebrow}
+                      </span>
+                    )}
+                    <h2 className="mt-5 text-2xl md:text-3xl font-bold tracking-tight">
+                      {persona.closingHeadline}
+                    </h2>
+                    {persona.closingDescription && (
+                      <p className="mt-4 text-sm text-black/55 leading-relaxed">
+                        {persona.closingDescription}
+                      </p>
+                    )}
+                    <div className="mt-6">
+                      <HireButton
+                        hireLabel={persona.closingCtaLabel}
+                        href={persona.closingCtaHref}
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-xl font-semibold text-[#111]">
+                      {persona.ctaLine}
+                    </p>
+                    <div className="mt-6">
+                      <ExperienceButton />
+                    </div>
+                  </>
+                )}
               </section>
+
+              {/* Pull-quote banner between the closing CTA and the mission form — Hope
+                  Angel-only (persona.closingQuote). */}
+              {persona.closingQuote && (
+                <section className="mt-10 pb-4">
+                  <div className="rounded-2xl bg-[#EDE9F7] pl-6 pr-6 py-6 md:py-7 border-l-4 border-[#5D4387] flex flex-wrap items-center justify-between gap-4">
+                    <p className="text-lg md:text-xl font-bold text-[#111] tracking-tight">
+                      &ldquo;{persona.closingQuote}&rdquo;
+                    </p>
+                    {persona.closingQuoteTag && (
+                      <span className="text-[11px] font-semibold uppercase tracking-widest text-[#5D4387] whitespace-nowrap">
+                        {persona.closingQuoteTag}
+                      </span>
+                    )}
+                  </div>
+                </section>
+              )}
+
+              {/* Nonprofit application form, embedded directly on the page (not a separate
+                  route) — matches the reference site, where "Share Your Mission" scrolls down
+                  to this same section instead of navigating away. Only Hope Angel opts in. */}
+              {persona.showMissionForm && (
+                <section
+                  id="share-your-mission"
+                  className="mt-20 pb-4 scroll-mt-24"
+                >
+                  <div className="rounded-3xl bg-[#EDE9F7] p-8 md:p-12">
+                    <div className="grid md:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] gap-10 md:gap-14 items-start">
+                      <div className="md:sticky md:top-28">
+                        <span className="inline-block px-4 py-1.5 rounded-full bg-white text-[#5D4387] text-[11px] font-semibold uppercase tracking-widest">
+                          Share Your Mission
+                        </span>
+                        <h2 className="mt-5 text-2xl md:text-3xl font-bold tracking-tight">
+                          Tell us about the good you do.
+                        </h2>
+                        <p className="mt-4 text-[15px] text-black/55 leading-relaxed">
+                          A few details help Act Angel AI understand your
+                          organization, verify its standing, and see where Hope
+                          Angel could serve. Please share public links where
+                          possible; we can request further evidence during
+                          review.
+                        </p>
+                        <ol className="mt-6 flex flex-col gap-1.5 text-[13px] text-black/45 border-l-2 border-[#5D4387]/30 pl-4">
+                          <li>1. Share your NPO details</li>
+                          <li>2. AAA reviews your organization</li>
+                          <li>3. Explore an Angel if you wish</li>
+                        </ol>
+                      </div>
+                      <div className="bg-white border border-black/[0.08] rounded-2xl p-6 md:p-8">
+                        <ShareYourMissionForm />
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              )}
             </>
           ) : (
             <div className="mt-16 flex justify-center">
@@ -385,5 +674,5 @@ export function HireAnAngelPageContent({ personaId }: { personaId: PersonaId }) 
 
       <SiteFooter />
     </div>
-  )
+  );
 }
