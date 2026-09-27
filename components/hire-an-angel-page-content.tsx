@@ -142,57 +142,63 @@ function LiveDemoSection({ persona }: { persona: Persona }) {
                 whichever Scenario pill is selected (persona.campaignScenarios, aligned by index
                 with `scenarios`); falls back to the static campaignDemo text when a persona
                 hasn't got per-scenario data. */}
-            {(persona.campaignScenarios || persona.campaignDemo) && (() => {
-              const fallback = persona.campaignDemo
-              const active = persona.campaignScenarios?.[scenario] ?? {
-                question: "How close are you to the campaign goal?",
-                answer: `Our example campaign has raised ${fallback!.raised} toward a ${fallback!.goal} goal. May I show you how your contribution can help?`,
-                progressValueText: `${fallback!.raised} / ${fallback!.goal}`,
-                progressPct: Math.min(100, Math.round((fallback!.raisedValue / fallback!.goalValue) * 100)),
-              }
-              return (
-                <div className="absolute inset-x-4 bottom-4 flex flex-col gap-2">
-                  <div className="self-end max-w-[85%] px-4 py-2 rounded-2xl rounded-br-sm bg-black/70 backdrop-blur-sm text-white text-[13px] font-medium">
-                    {active.question}
-                  </div>
-                  <div className="flex items-start gap-2 px-4 py-3 rounded-2xl rounded-bl-sm bg-white shadow-[0_10px_30px_-15px_rgba(0,0,0,0.3)]">
-                    <img
-                      src={persona.avatar}
-                      alt=""
-                      aria-hidden="true"
-                      className="w-6 h-6 rounded-full object-cover shrink-0 mt-0.5"
-                    />
-                    <span className="text-[13px] text-[#111] leading-relaxed">
-                      {active.answer}
-                    </span>
-                  </div>
-                  <div className="px-4 py-3 rounded-xl bg-white shadow-[0_10px_30px_-15px_rgba(0,0,0,0.3)]">
-                    <div className="flex items-center justify-between text-[12px]">
-                      <span className="text-black/50">
-                        Sample campaign progress
-                      </span>
-                      <span className="font-semibold text-[#111]">
-                        {active.progressValueText}
-                      </span>
+            {(persona.campaignScenarios || persona.campaignDemo) &&
+              (() => {
+                const fallback = persona.campaignDemo;
+                const active = persona.campaignScenarios?.[scenario] ?? {
+                  question: "How close are you to the campaign goal?",
+                  answer: `Our example campaign has raised ${fallback!.raised} toward a ${fallback!.goal} goal. May I show you how your contribution can help?`,
+                  progressValueText: `${fallback!.raised} / ${fallback!.goal}`,
+                  progressPct: Math.min(
+                    100,
+                    Math.round(
+                      (fallback!.raisedValue / fallback!.goalValue) * 100,
+                    ),
+                  ),
+                };
+                return (
+                  <div className="absolute inset-x-4 bottom-4 flex flex-col gap-2">
+                    <div className="self-end max-w-[85%] px-4 py-2 rounded-2xl rounded-br-sm bg-black/70 backdrop-blur-sm text-white text-[13px] font-medium">
+                      {active.question}
                     </div>
-                    <div className="mt-2 h-1.5 rounded-full bg-black/10 overflow-hidden">
-                      <div
-                        className="h-full rounded-full bg-[#5D4387]"
-                        style={{ width: `${active.progressPct}%` }}
+                    <div className="flex items-start gap-2 px-4 py-3 rounded-2xl rounded-bl-sm bg-white shadow-[0_10px_30px_-15px_rgba(0,0,0,0.3)]">
+                      <img
+                        src={persona.avatar}
+                        alt=""
+                        aria-hidden="true"
+                        className="w-6 h-6 rounded-full object-cover shrink-0 mt-0.5"
                       />
+                      <span className="text-[13px] text-[#111] leading-relaxed">
+                        {active.answer}
+                      </span>
                     </div>
-                    <p className="mt-1.5 text-[10px] text-black/40">
-                      Illustrative example, not live donation data.
-                    </p>
+                    <div className="px-4 py-3 rounded-xl bg-white shadow-[0_10px_30px_-15px_rgba(0,0,0,0.3)]">
+                      <div className="flex items-center justify-between text-[12px]">
+                        <span className="text-black/50">
+                          Sample campaign progress
+                        </span>
+                        <span className="font-semibold text-[#111]">
+                          {active.progressValueText}
+                        </span>
+                      </div>
+                      <div className="mt-2 h-1.5 rounded-full bg-black/10 overflow-hidden">
+                        <div
+                          className="h-full rounded-full bg-[#5D4387]"
+                          style={{ width: `${active.progressPct}%` }}
+                        />
+                      </div>
+                      <p className="mt-1.5 text-[10px] text-black/40">
+                        Illustrative example, not live donation data.
+                      </p>
+                    </div>
                   </div>
-                </div>
-              )
-            })()}
+                );
+              })()}
           </div>
 
           {/* Content half — its own padding now that it's inside the shared card instead of
               being a bare grid cell in the page's own gutter. */}
-          <div className="p-10 md:p-12 lg:p-14">
+          <div className="p-10 md:p-12 lg:p-8">
             <span className="inline-block px-4 py-1.5 rounded-full bg-[#EDE9F7] text-[#5D4387] text-[11px] font-semibold uppercase tracking-widest">
               Live Preview
             </span>
@@ -223,6 +229,31 @@ function LiveDemoSection({ persona }: { persona: Persona }) {
               </div>
             </div>
 
+            <div className="mt-10 flex flex-wrap items-center gap-5">
+              {(() => {
+                const href =
+                  persona.liveDemoCtaHref ?? persona.ctaHref ?? "/get-started";
+                const label = persona.liveDemoCtaLabel ?? persona.ctaHireLabel;
+                const className = `px-7 py-3.5 text-white text-[12px] font-semibold uppercase tracking-wide rounded-full transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 ${
+                  persona.liveDemoCtaVariant === "purple"
+                    ? "bg-[#5D4387] hover:bg-[#7168A0]"
+                    : "bg-[#111] hover:bg-black/80"
+                }`;
+                // Next's Link doesn't reliably re-trigger a scroll-to-hash when only the hash
+                // changes on the SAME route (no pathname change) — a plain anchor lets the
+                // browser handle the in-page jump natively instead.
+                return href.startsWith("#") ? (
+                  <a href={href} className={className}>
+                    {label}
+                  </a>
+                ) : (
+                  <Link href={href} className={className}>
+                    {label}
+                  </Link>
+                );
+              })()}
+            </div>
+
             <div className="mt-8">
               <p className="text-[11px] font-semibold uppercase tracking-widest text-black/40">
                 Channel
@@ -239,30 +270,6 @@ function LiveDemoSection({ persona }: { persona: Persona }) {
                   </button>
                 ))}
               </div>
-            </div>
-
-            <div className="mt-10 flex flex-wrap items-center gap-5">
-              {(() => {
-                const href = persona.liveDemoCtaHref ?? persona.ctaHref ?? "/get-started"
-                const label = persona.liveDemoCtaLabel ?? persona.ctaHireLabel
-                const className = `px-7 py-3.5 text-white text-[12px] font-semibold uppercase tracking-wide rounded-full transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 ${
-                  persona.liveDemoCtaVariant === "purple"
-                    ? "bg-[#5D4387] hover:bg-[#7168A0]"
-                    : "bg-[#111] hover:bg-black/80"
-                }`
-                // Next's Link doesn't reliably re-trigger a scroll-to-hash when only the hash
-                // changes on the SAME route (no pathname change) — a plain anchor lets the
-                // browser handle the in-page jump natively instead.
-                return href.startsWith("#") ? (
-                  <a href={href} className={className}>
-                    {label}
-                  </a>
-                ) : (
-                  <Link href={href} className={className}>
-                    {label}
-                  </Link>
-                )
-              })()}
             </div>
             <p className="mt-3 text-[12px] text-black/40">
               {persona.liveDemoCaption ??
@@ -363,7 +370,7 @@ export function HireAnAngelPageContent({
               shared underline (border-b on the row) with each link's own bottom border
               overlapping it via -mb-px — the classic tab-bar trick, so the active tab's
               underline sits flush on the divider line instead of floating below it. */}
-          <div className="flex flex-wrap items-center gap-x-8 gap-y-2 border-b border-black/[0.08]">
+          <div className="flex flex-nowrap items-center gap-x-8 overflow-x-auto no-scrollbar border-b border-black/[0.08]">
             {PERSONAS.map((p) => {
               const active = p.id === personaId;
               return (
@@ -371,7 +378,7 @@ export function HireAnAngelPageContent({
                   key={p.id}
                   href={`/hire-an-angel/${p.slug}`}
                   aria-current={active ? "page" : undefined}
-                  className={`pb-3 text-[14px] font-medium border-b-2 -mb-px transition-colors duration-200 ${
+                  className={`shrink-0 whitespace-nowrap pb-3 text-[14px] font-medium border-b-2 -mb-px transition-colors duration-200 ${
                     active
                       ? "text-[#111] border-[#111]"
                       : "text-[#8A8A8A] border-transparent hover:text-[#111]"
@@ -386,8 +393,12 @@ export function HireAnAngelPageContent({
           {hasLandingContent ? (
             <>
               {/* Hero — two columns: copy + CTAs + trust line on the left, phone demo + a
-                  floating "Business Outcome" card on the right. */}
-              <div className="mt-10 md:mt-14 grid md:grid-cols-2 gap-12 md:gap-16 items-center">
+                  floating "Business Outcome" card on the right. items-start (not items-center):
+                  personas' text columns vary in height (Hope Angel's extra heroSubtext2
+                  paragraph makes it taller than the other 4), and centering the phone against
+                  that height shifted its top position — and thus its gap from the nav — per
+                  persona. Top-aligning keeps that gap identical everywhere. */}
+              <div className="mt-10 md:mt-14 grid md:grid-cols-2 gap-12 md:gap-16 items-start">
                 <div>
                   {persona.eyebrow && (
                     <span className="inline-block px-4 py-1.5 rounded-full bg-[#EDE9F7] text-[#5D4387] text-[11px] font-semibold uppercase tracking-widest">
@@ -515,15 +526,15 @@ export function HireAnAngelPageContent({
               {/* Business outcome — full-bleed gradient banner, reusing the same
                   outcomeTitle/outcomeDescription already teased in the hero's floating card. */}
               <section
-                className="mt-8 rounded-2xl px-8 py-10 md:px-12 md:py-12"
+                className="mt-8 rounded-2xl px-8 py-12 md:px-12 md:py-14"
                 style={{
                   background: "linear-gradient(135deg, #5D4387, #7168A0)",
                 }}
               >
-                <p className="text-2xl md:text-3xl font-bold text-white tracking-tight">
+                <p className="text-3xl md:text-4xl font-bold text-white tracking-tight">
                   {persona.outcomeTitle}
                 </p>
-                <p className="mt-3 text-[15px] text-white/80 leading-relaxed max-w-2xl">
+                <p className="mt-4 text-base text-white/90 leading-relaxed max-w-4xl">
                   {persona.outcomeDescription}
                 </p>
               </section>
@@ -616,7 +627,7 @@ export function HireAnAngelPageContent({
                       &ldquo;{persona.closingQuote}&rdquo;
                     </p>
                     {persona.closingQuoteTag && (
-                      <span className="text-[11px] font-semibold uppercase tracking-widest text-[#5D4387] whitespace-nowrap">
+                      <span className="text-[14px] font-bold uppercase tracking-widest text-[#5D4387] whitespace-nowrap">
                         {persona.closingQuoteTag}
                       </span>
                     )}
@@ -649,7 +660,9 @@ export function HireAnAngelPageContent({
                           review.
                         </p>
                         <ol className="mt-6 flex flex-col gap-1.5 text-[13px] text-black/45 border-l-2 border-[#5D4387]/30 pl-4">
-                          <li>1. Share your NPO details</li>
+                          <li className="font-bold text-[#111]">
+                            1. Share your NPO details
+                          </li>
                           <li>2. AAA reviews your organization</li>
                           <li>3. Explore an Angel if you wish</li>
                         </ol>
@@ -673,6 +686,24 @@ export function HireAnAngelPageContent({
       </div>
 
       <SiteFooter />
+
+      {/* Floating "Share Your Mission" widget — Hope Angel-only (persona.showMissionForm),
+          pinned to the bottom-right of the viewport on every scroll position, matching the
+          reference design's persistent conversion prompt. */}
+      {persona.showMissionForm && (
+        <a
+          href="#share-your-mission"
+          className="fixed bottom-6 right-6 z-40 hidden sm:flex items-center gap-3 pl-6 pr-2 py-2 rounded-full bg-white shadow-[0_10px_40px_-10px_rgba(0,0,0,0.3)] border border-black/[0.06] hover:shadow-[0_14px_44px_-8px_rgba(0,0,0,0.35)] transition-shadow"
+        >
+          <span className="text-[13px] font-medium text-black/60 whitespace-nowrap">
+            {persona.label} for your NPO
+          </span>
+          <span className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-[#5D4387] text-white text-[12px] font-semibold uppercase tracking-wide rounded-full whitespace-nowrap">
+            Share Your Mission
+            <span aria-hidden="true">↗</span>
+          </span>
+        </a>
+      )}
     </div>
   );
 }

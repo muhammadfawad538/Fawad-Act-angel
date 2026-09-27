@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { PERSONAS, type PersonaId, type ScriptLine, type CampaignDemo } from "@/lib/personas"
+import { PERSONAS, type PersonaId, type ScriptLine, type CampaignDemo, type CampaignSlide } from "@/lib/personas"
 
 type Stage = "call" | "connecting" | "messages"
 
@@ -61,50 +61,83 @@ function StatusBar() {
 // Hope Angel's variant of the "messages" stage — the reference site shows a campaign-progress
 // card here instead of a chat thread (nonprofits ask "how close are we to goal", not "what did
 // they say"), so this swaps in for the chat bubbles above only when persona.campaignDemo is set.
-function CampaignDemoScreen({ photo, name, demo }: { photo: string; name: string; demo: CampaignDemo }) {
+function CampaignDemoScreen({
+  photo, name, demo, slide, revealedCount,
+}: { photo: string; name: string; demo: CampaignDemo; slide?: CampaignSlide; revealedCount: number }) {
   const pct = Math.min(100, Math.round((demo.raisedValue / demo.goalValue) * 100))
   return (
-    <div className="absolute inset-0 flex flex-col" style={{ background: "#FAF9F7", padding: "70px 20px 33px" }}>
-      <div className="flex items-center" style={{ gap: 12 }}>
-        <img src={photo} alt="" className="object-cover" style={{ width: 44, height: 44, borderRadius: "50%" }} />
-        <div>
-          <p className="text-[16px]" style={{ fontWeight: 600, color: "#111" }}>{name}</p>
-          <p className="text-[13px]" style={{ color: "#8C8C8C" }}>{demo.tagline}</p>
-        </div>
-      </div>
-
-      <span
-        className="text-[11px] font-medium self-start"
-        style={{ marginTop: 20, padding: "6px 14px", borderRadius: 999, background: "#EDE9F7", color: "#5D4387" }}
-      >
-        {demo.scenarioTag}
-      </span>
-
+    <div className="absolute inset-0 flex flex-col">
+      {/* Same chat-header treatment as the message-thread stage below (28px avatar, name only,
+          #FAF9F7 bar, 53px top padding clearing the status bar/notch) — only the body beneath
+          it swaps chat bubbles for the campaign card, so the two "messages" stages read as one
+          consistent phone design rather than two different UIs. */}
       <div
-        style={{
-          marginTop: "auto",
-          padding: 18,
-          borderRadius: 18,
-          background: "#FFFFFF",
-          boxShadow: "0 10px 30px -15px rgba(0,0,0,0.15)",
-        }}
+        className="flex items-center shrink-0"
+        style={{ background: "#FAF9F7", padding: "53px 19px 14px", borderBottom: "1px solid #EDECE8", gap: 10 }}
       >
-        <p className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: "#8C8C8C" }}>
-          Campaign progress
-        </p>
-        <div style={{ marginTop: 10, height: 8, borderRadius: 999, background: "#EDECE8", overflow: "hidden" }}>
-          <div style={{ width: `${pct}%`, height: "100%", borderRadius: 999, background: "#5D4387" }} />
-        </div>
-        <p className="text-[14px]" style={{ marginTop: 8, fontWeight: 600, color: "#111" }}>
-          {demo.raised} / {demo.goal}
-        </p>
+        <img src={photo} alt="" className="object-cover" style={{ width: 28, height: 28, borderRadius: "50%" }} />
+        <span className="text-[16px]" style={{ fontWeight: 500, color: "#111" }}>{name}</span>
       </div>
 
       <div
-        className="flex items-center justify-center text-[13px] font-medium"
-        style={{ marginTop: 14, height: 44, borderRadius: 999, background: "#5D4387", color: "#fff" }}
+        className="flex flex-col overflow-hidden"
+        style={{ flex: 1, padding: "17px 17px 33px", justifyContent: "flex-end", gap: 10 }}
       >
-        {demo.ctaLabel}
+        <p className="text-[13px]" style={{ color: "#8C8C8C" }}>{demo.tagline}</p>
+
+        {slide && (
+          <>
+            <span
+              className="text-[11px] font-medium self-start"
+              style={{ padding: "6px 14px", borderRadius: 999, background: "#EDE9F7", color: "#5D4387" }}
+            >
+              {slide.scenarioTag}
+            </span>
+            {revealedCount >= 1 && (
+              <div
+                className="self-end"
+                style={{ maxWidth: "85%", padding: "10px 14px", borderRadius: 16, fontSize: 13, fontWeight: 500, lineHeight: 1.4, background: "rgba(0,0,0,0.7)", color: "#fff", animation: "message-in 0.8s ease both" }}
+              >
+                {slide.question}
+              </div>
+            )}
+            {revealedCount >= 2 && (
+              <div
+                className="self-start flex items-start"
+                style={{ maxWidth: "92%", gap: 8, padding: "10px 14px", borderRadius: 16, fontSize: 13, lineHeight: 1.4, background: "#fff", color: "#111", boxShadow: "0 10px 30px -15px rgba(0,0,0,0.3)", animation: "message-in 0.8s ease both" }}
+              >
+                <img src={photo} alt="" className="object-cover shrink-0" style={{ width: 20, height: 20, borderRadius: "50%", marginTop: 1 }} />
+                <span>{slide.answer}</span>
+              </div>
+            )}
+          </>
+        )}
+
+        <div
+          style={{
+            padding: 18,
+            borderRadius: 18,
+            background: "#FFFFFF",
+            boxShadow: "0 10px 30px -15px rgba(0,0,0,0.15)",
+          }}
+        >
+          <p className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: "#8C8C8C" }}>
+            Campaign progress
+          </p>
+          <div style={{ marginTop: 10, height: 8, borderRadius: 999, background: "#EDECE8", overflow: "hidden" }}>
+            <div style={{ width: `${pct}%`, height: "100%", borderRadius: 999, background: "#5D4387" }} />
+          </div>
+          <p className="text-[14px]" style={{ marginTop: 8, fontWeight: 600, color: "#111" }}>
+            {demo.raised} / {demo.goal}
+          </p>
+        </div>
+
+        <div
+          className="flex items-center justify-center text-[13px] font-medium"
+          style={{ height: 44, borderRadius: 999, background: "#5D4387", color: "#fff" }}
+        >
+          {demo.ctaLabel}
+        </div>
       </div>
     </div>
   )
@@ -131,12 +164,21 @@ export function PersonaPhoneDemo({
   const persona = personaId ? PERSONAS.find(p => p.id === personaId) : undefined
   const name = contact ?? persona?.contact ?? PERSONAS[0].contact
   const photo = avatar ?? persona?.avatar ?? PERSONAS[0].avatar
-  const script = messages ?? persona?.messages ?? PERSONAS[0].messages
   const campaignDemo = persona?.campaignDemo
 
   const [stage, setStage] = useState<Stage>("call")
   const [messagesShown, setMessagesShown] = useState(0)
   const [cycle, setCycle] = useState(0)
+
+  // Hero autoplay rotation (Hope Angel) — one campaignSlides entry per full call loop, cycling
+  // through the same `cycle` counter that already drives the loop restart below. Its question/
+  // answer pair reuses the same staggered-reveal timers as a normal 2-line script.
+  const activeSlide = persona?.campaignSlides?.length
+    ? persona.campaignSlides[cycle % persona.campaignSlides.length]
+    : undefined
+  const script = activeSlide
+    ? ([["in", activeSlide.question], ["out", activeSlide.answer]] as ScriptLine[])
+    : messages ?? persona?.messages ?? PERSONAS[0].messages
 
   useEffect(() => {
     if (!active) return
@@ -249,7 +291,7 @@ export function PersonaPhoneDemo({
           )}
 
           {stage === "messages" && campaignDemo && (
-            <CampaignDemoScreen photo={photo} name={name} demo={campaignDemo} />
+            <CampaignDemoScreen photo={photo} name={name} demo={campaignDemo} slide={activeSlide} revealedCount={messagesShown} />
           )}
 
           {stage === "messages" && !campaignDemo && (

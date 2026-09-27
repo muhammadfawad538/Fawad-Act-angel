@@ -458,3 +458,13 @@ body[data-scroll-locked] {
 .themed-scrollbar::-webkit-scrollbar-thumb:hover {
   background-color: rgba(0, 0, 0, 0.32);
 }
+
+/* Hides the scrollbar on an overflow-x-auto row (persona tab bar on narrow viewports) while
+   keeping it scrollable — matches the reference's single-line, no-wrap tab row on mobile. */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

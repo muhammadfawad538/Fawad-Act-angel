@@ -26,7 +26,6 @@ export interface Faq {
 // strings, raisedValue/goalValue the numbers the progress bar's fill % is computed from.
 export interface CampaignDemo {
   tagline: string
-  scenarioTag: string
   raised: string
   goal: string
   raisedValue: number
@@ -44,6 +43,16 @@ export interface CampaignScenario {
   answer: string
   progressValueText: string
   progressPct: number
+}
+
+// One entry per rotation of the HERO phone's "messages" stage (components/persona-phone-demo.tsx) —
+// a separate, independently-worded set from CampaignScenario above (the hero autoplays through
+// these regardless of the Live Preview's own Scenario picker). PersonaPhoneDemo cycles through
+// them one per full call loop, indexed by its existing `cycle` counter.
+export interface CampaignSlide {
+  scenarioTag: string
+  question: string
+  answer: string
 }
 
 export interface Persona {
@@ -108,6 +117,8 @@ export interface Persona {
   // Live Preview's reactive overlay — see CampaignScenario above. Falls back to campaignDemo's
   // fixed values for every scenario when not set.
   campaignScenarios?: CampaignScenario[]
+  // Hero phone's autoplay rotation — see CampaignSlide above.
+  campaignSlides?: CampaignSlide[]
 
   // "Hire an Angel" nav mega-menu card (requirements/Hire_an_angel_dropdown.png) — a short role
   // subtitle under the name, and 4 use-case bullets. Reuses the `avatar` photo above rather than
@@ -282,13 +293,31 @@ export const PERSONAS: Persona[] = [
     ],
     campaignDemo: {
       tagline: "Here to help your mission",
-      scenarioTag: "Purposeful fundraising",
       raised: "$1.7M",
       goal: "$2.1M",
       raisedValue: 1.7,
       goalValue: 2.1,
       ctaLabel: "Message Hope Angel",
     },
+    // Hero phone's autoplay rotation — one full call loop per slide, captured verbatim from
+    // watching https://hope-angel.vercel.app/hire-an-angel/hope-angel's hero widget cycle.
+    campaignSlides: [
+      {
+        scenarioTag: "Purposeful fundraising",
+        question: "How close are we to the campaign goal?",
+        answer: "We have raised $1.7M toward $2.1M. I can show you how a gift moves the mission forward.",
+      },
+      {
+        scenarioTag: "Volunteer welcome",
+        question: "I can help this weekend. Where am I needed?",
+        answer: "Thank you! Tell me your interests and availability, and I will connect you with the right team.",
+      },
+      {
+        scenarioTag: "Funding applications",
+        question: "Could I apply for vocational training support?",
+        answer: "I can explain the criteria and gather your application. The NPO team will review and decide.",
+      },
+    ],
     // Aligned by index with the `scenarios` array below (Purposeful Fundraising, Goal Progress,
     // Funding Application, Volunteer Sign-Up) — captured verbatim from clicking each pill on
     // https://hope-angel.vercel.app/hire-an-angel/hope-angel.
