@@ -12,7 +12,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   return (
     <section className="mt-12">
       <h2 className="text-2xl md:text-3xl font-light tracking-tight leading-[1.15] text-[#111]">{title}</h2>
-      <div className="mt-4 flex flex-col gap-4 text-[15px] leading-relaxed text-black/60">{children}</div>
+      <div className="mt-4 flex flex-col gap-4 text-[15px] leading-relaxed text-black/60 text-justify">{children}</div>
     </section>
   )
 }
@@ -26,16 +26,16 @@ export default function BehindTheAngelsPage() {
 
       {/* flex-1: keeps the footer pinned to the bottom of the screen on short-content pages
           instead of stranded right after the content. */}
-      <div className="flex-1 px-6 md:px-12 lg:px-20 py-24 md:py-32">
+      <div className="flex-1 px-6 md:px-12 lg:px-20 pt-28 md:pt-32 pb-16 md:pb-32">
       <main className="max-w-6xl mx-auto">
-        <h1 className="text-4xl md:text-5xl font-light tracking-tight leading-[1.1] max-w-3xl mx-auto text-center">
-          We Don&rsquo;t Build More Software.<br/>We Build AI Employees.
+        <h1 className="text-3xl md:text-5xl font-light tracking-tight leading-[1.15] md:leading-[1.1] max-w-3xl mx-auto text-center">
+          We Don&rsquo;t Build More Software.<br className="hidden md:block"/>We Build AI Employees.
         </h1>
         <p className="mt-4 text-lg md:text-xl text-black/55 text-center">
           Scale your business — not your headcount.
         </p>
 
-        <p className="mt-8 text-[15px] leading-relaxed text-black/60 max-w-3xl">
+        <p className="mt-8 text-[15px] leading-relaxed text-black/60 text-center max-w-3xl mx-auto">
           Act Angel AI is a <strong className="font-medium text-[#111]">Boston-headquartered AI
           company</strong> bringing together industry veterans with three decades of enterprise technology, SaaS, and business process expertise and a new generation of{" "}
           <strong className="font-medium text-[#111]">AI-native talent—fresh, fast, innovative, and agile.</strong>{" "}
