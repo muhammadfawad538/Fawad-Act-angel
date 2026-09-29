@@ -76,6 +76,13 @@ export function MeetYourAngelForm({ resetOn, onDone }: MeetYourAngelFormProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [resendCooldown, setResendCooldown] = useState(0)
+  // Twilio Verify hands back the SAME pending verification (same code) if you
+  // create one again for a `To` that already has one outstanding - confirmed
+  // live, this is why "Resend" used to send the identical OTP (AAA-SA-002).
+  // Tracking the last verification sid per channel lets /api/otp/send cancel
+  // it first, which forces Twilio to actually generate a fresh code.
+  const [phoneSid, setPhoneSid] = useState<string | undefined>(undefined)
+  const [emailSid, setEmailSid] = useState<string | undefined>(undefined)
   const cooldownTimer = useRef<ReturnType<typeof setInterval> | null>(null)
 
   function reset() {
@@ -90,6 +97,8 @@ export function MeetYourAngelForm({ resetOn, onDone }: MeetYourAngelFormProps) {
     setLoading(false)
     setError("")
     setResendCooldown(0)
+    setPhoneSid(undefined)
+    setEmailSid(undefined)
     if (cooldownTimer.current) clearInterval(cooldownTimer.current)
   }
 
@@ -125,10 +134,17 @@ export function MeetYourAngelForm({ resetOn, onDone }: MeetYourAngelFormProps) {
         "Content-Type": "application/json",
         "X-Partner-Api-Key": process.env.NEXT_PUBLIC_PARTNER_API_KEY ?? "",
       },
-      body: JSON.stringify({ phone: phoneNumber, email: emailAddress }),
+      body: JSON.stringify({
+        phone: phoneNumber,
+        email: emailAddress,
+        previousPhoneSid: phoneSid,
+        previousEmailSid: emailSid,
+      }),
     })
     const data = await res.json()
     if (!res.ok) throw new Error(data.error ?? "Couldn't send the verification codes.")
+    setPhoneSid(data.phoneSid)
+    setEmailSid(data.emailSid)
   }
 
   async function handleDetailsSubmit(e: React.FormEvent) {
@@ -402,6 +418,8 @@ export function MeetYourAngelForm({ resetOn, onDone }: MeetYourAngelFormProps) {
               setPhoneCode("")
               setEmailCode("")
               setResendCooldown(0)
+              setPhoneSid(undefined)
+              setEmailSid(undefined)
               if (cooldownTimer.current) clearInterval(cooldownTimer.current)
             }}
             className="text-center text-xs text-black/45 hover:text-black/70 transition-colors"
