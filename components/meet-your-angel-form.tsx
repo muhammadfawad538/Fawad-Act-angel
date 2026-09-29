@@ -53,6 +53,12 @@ export interface MeetYourAngelFormProps {
   resetOn?: boolean
   /** Called when the visitor dismisses the success screen. The modal closes itself with this. */
   onDone?: () => void
+  /**
+   * Referral tag from the originating page's CTA (e.g. "hope-angel"), forwarded to
+   * /api/otp/verify so the intake dispatch can open the call/WhatsApp in the right voice
+   * from the first word. Undefined for the plain "Meet Your Angel" flow.
+   */
+  source?: string
 }
 
 /**
@@ -63,7 +69,7 @@ export interface MeetYourAngelFormProps {
  * The modal is left fully intact and still works if reactivated — it just delegates its
  * content to this component now.
  */
-export function MeetYourAngelForm({ resetOn, onDone }: MeetYourAngelFormProps) {
+export function MeetYourAngelForm({ resetOn, onDone, source }: MeetYourAngelFormProps) {
   const router = useRouter()
   const [step, setStep] = useState<Step>("details")
   const [channel, setChannel] = useState<Channel>("Call")
@@ -228,6 +234,7 @@ export function MeetYourAngelForm({ resetOn, onDone }: MeetYourAngelFormProps) {
           email: email.trim(),
           phoneCode: phoneCode.trim(),
           emailCode: emailCode.trim(),
+          source,
           channel,
         }),
       })

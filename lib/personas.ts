@@ -396,7 +396,10 @@ export const PERSONAS: Persona[] = [
       },
     ],
     ctaHireLabel: "Meet Hope Angel",
-    ctaHref: "https://www.actangel.ai/get-started/",
+    // The ?source=hope-angel tag lets get-started thread this through to the intake
+    // webhook, so the outbound call/WhatsApp can open in the right voice from the
+    // first word instead of the model having to infer it mid-conversation.
+    ctaHref: "https://www.actangel.ai/get-started/?source=hope-angel",
     scenarios: ["Purposeful Fundraising", "Goal Progress", "Funding Application", "Volunteer Sign-Up"],
     channels: ["Voice", "Chat", "WhatsApp", "Email", "SMS", "iMessage"],
     liveDemoHeadline: "See Hope Angel handle it.",
