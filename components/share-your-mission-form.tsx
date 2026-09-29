@@ -29,17 +29,15 @@ const optionalLabelClass =
 const primaryButtonClass =
   "w-full px-6 py-3 bg-[#5D4387] text-white text-[12px] font-semibold uppercase rounded-full hover:bg-[#7168A0] transition-colors tracking-wide disabled:opacity-50 disabled:cursor-not-allowed";
 
-const MISSION_EMAIL = "Hello@ActAngel.com";
-
 /**
  * The nonprofit application form from https://hope-angel.vercel.app/hire-an-angel/hope-angel's
- * "Share Your Mission" flow: no backend submission — it just prepares a mailto: brief for the
- * NPO to send, since eligibility/authenticity review is a manual, human step on Act Angel's side
- * before an Angel is offered.
+ * "Share Your Mission" flow. Submits to /api/hope-angel/mission, which proxies it into the WEB
+ * backend's registration-requests queue for a SAD to review, since eligibility/authenticity
+ * review is a manual, human step on Act Angel's side before an Angel is offered.
  */
 export function ShareYourMissionForm() {
   const [ready, setReady] = useState(false);
-  const [mailtoHref, setMailtoHref] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const [orgName, setOrgName] = useState("");
   const [orgWebsite, setOrgWebsite] = useState("");
@@ -70,7 +68,7 @@ export function ShareYourMissionForm() {
     workEmail.trim() &&
     authorized;
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
 
@@ -90,35 +88,41 @@ export function ShareYourMissionForm() {
       );
     }
 
-    const lines = [
-      `Organization name: ${orgName.trim()}`,
-      `Organization website: ${orgWebsite.trim() || "—"}`,
-      `Registration country or region: ${registrationRegion.trim() || "—"}`,
-      `Registration number, registry link, or reason for exemption: ${registrationNumber.trim() || "—"}`,
-      "",
-      `Mission and who you serve: ${mission.trim()}`,
-      `Where you work: ${whereYouWork.trim() || "—"}`,
-      `Public annual report or impact page: ${annualReport.trim() || "—"}`,
-      `Leadership or governance page: ${governancePage.trim() || "—"}`,
-      "",
-      `First priority for Hope Angel: ${priority || "—"}`,
-      `Donation or campaign page: ${campaignPage.trim() || "—"}`,
-      `What you'd like Hope Angel to help with first: ${helpFirst.trim() || "—"}`,
-      `Current tools or communication channels: ${currentTools.trim() || "—"}`,
-      "",
-      `Contact name: ${contactName.trim()}`,
-      `Role at the NPO: ${contactRole.trim() || "—"}`,
-      `Work email: ${workEmail.trim()}`,
-      `Phone: ${phone.trim() || "—"}`,
-    ];
-
-    const subject = `Share Your Mission: ${orgName.trim()}`;
-    const href = `mailto:${MISSION_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join("\n"))}`;
-    setMailtoHref(href);
-    setReady(true);
-    // Opened synchronously within this click handler (not a useEffect) so browsers treat it as
-    // a direct result of the user's action instead of an unrequested popup.
-    window.location.href = href;
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/hope-angel/mission", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orgName: orgName.trim(),
+          orgWebsite: orgWebsite.trim(),
+          registrationRegion: registrationRegion.trim(),
+          registrationNumber: registrationNumber.trim(),
+          mission: mission.trim(),
+          whereYouWork: whereYouWork.trim(),
+          annualReport: annualReport.trim(),
+          governancePage: governancePage.trim(),
+          priority,
+          campaignPage: campaignPage.trim(),
+          helpFirst: helpFirst.trim(),
+          currentTools: currentTools.trim(),
+          contactName: contactName.trim(),
+          contactRole: contactRole.trim(),
+          workEmail: workEmail.trim(),
+          phone: phone.trim(),
+        }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        setError(data?.error || "Something went wrong. Please try again.");
+        return;
+      }
+      setReady(true);
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   if (ready) {
@@ -127,28 +131,16 @@ export function ShareYourMissionForm() {
         <div className="w-12 h-12 rounded-full bg-emerald-50 border border-emerald-600/20 text-emerald-600 flex items-center justify-center text-xl">
           ✓
         </div>
-        <h3 className="text-lg font-medium">Your brief is ready to send.</h3>
+        <h3 className="text-lg font-medium">Your mission brief was submitted.</h3>
         <p className="text-sm text-black/55 max-w-sm">
-          Please send the prepared email to{" "}
-          <a
-            href={`mailto:${MISSION_EMAIL}`}
-            className="underline hover:text-black/70"
-          >
-            {MISSION_EMAIL}
-          </a>
-          . Once sent, you may meet an Angel through our{" "}
+          Our team will review your organization for eligibility, authenticity,
+          and ethical fit before offering Hope Angel. You can also meet an Angel
+          through our{" "}
           <Link href="/get-started" className="underline hover:text-black/70">
             Get Started
           </Link>{" "}
-          page. Our team will review your organization before offering Hope
-          Angel.
+          page in the meantime.
         </p>
-        <a
-          href={mailtoHref}
-          className={`${primaryButtonClass} inline-flex items-center justify-center gap-1`}
-        >
-          Didn&rsquo;t open? Open your email app →
-        </a>
       </div>
     );
   }
@@ -375,16 +367,11 @@ export function ShareYourMissionForm() {
         </p>
         <button
           type="submit"
-          disabled={!canSubmit}
+          disabled={!canSubmit || submitting}
           className={primaryButtonClass}
         >
-          Prepare My Mission Brief
+          {submitting ? "Submitting…" : "Share My Mission"}
         </button>
-
-        <p className="text-[10.5px] leading-tight text-black/60 text-center">
-          Your email app will open with this brief addressed to Act Angel AI.
-          Send the email to complete your enquiry.
-        </p>
       </div>
     </form>
   );
