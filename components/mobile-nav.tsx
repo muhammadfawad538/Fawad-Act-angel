@@ -338,13 +338,16 @@ export function MobileNav() {
               className="w-full rounded-2xl border border-black/[0.06] overflow-hidden"
               style={NAV_DROPDOWN_STYLE}
             >
-              <div className="grid grid-cols-4 gap-2.5 p-3">
+              {/* 5 columns from 1222px up; below that (down to this panel's own lg/1024px
+                  floor) a single row is too cramped, so it drops to 3 columns — 3 cards on
+                  the first row, the remaining 2 wrapping to a second. */}
+              <div className="grid grid-cols-3 [@media(min-width:1222px)]:grid-cols-5 gap-2.5 p-3">
                 {PERSONAS.map((p) => (
                   <Link
                     key={p.id}
                     href={`/hire-an-angel/${p.slug}`}
                     onClick={() => setHireOpen(false)}
-                    className="flex flex-col rounded-xl border border-black/[0.08] px-4 py-5 cursor-pointer hover:border-black/20 hover:bg-black/[0.02] transition-colors [font-family:system-ui,-apple-system,sans-serif]"
+                    className="flex flex-col rounded-xl border border-black/[0.08] px-[10px] py-5 cursor-pointer hover:border-black/20 hover:bg-black/[0.02] transition-colors [font-family:system-ui,-apple-system,sans-serif]"
                   >
                     {/* Header as one rounded pill/capsule (not a plain row) — avatar inset at
                         its left edge, chevron at its right edge, matching requirements/image.png. */}
@@ -357,9 +360,8 @@ export function MobileNav() {
                       />
                       <div className="min-w-0 flex-1">
                         <p title={p.label} className="text-[15px] font-semibold text-[#111] truncate">{p.label}</p>
-                        <p className="text-[12.5px] text-black/50 truncate">{p.dropdownRole}</p>
+                        <p title={p.dropdownRole} className="text-[12.5px] text-black/50 truncate">{p.dropdownRole}</p>
                       </div>
-                      <span className="text-black/30 text-sm shrink-0">›</span>
                     </div>
 
                     <div className="mt-4 pt-4 border-t border-black/[0.06]">
@@ -438,9 +440,8 @@ export function MobileNav() {
                       />
                       <div className="min-w-0 flex-1">
                         <p title={p.label} className="text-[13.5px] font-semibold text-[#111] truncate">{p.label}</p>
-                        <p className="text-[11px] text-black/50 truncate">{p.dropdownRole}</p>
+                        <p title={p.dropdownRole} className="text-[11px] text-black/50 truncate">{p.dropdownRole}</p>
                       </div>
-                      <span className="text-black/30 text-sm shrink-0">›</span>
                     </div>
 
                     <div className="mt-3 pt-3 border-t border-black/[0.06]">
