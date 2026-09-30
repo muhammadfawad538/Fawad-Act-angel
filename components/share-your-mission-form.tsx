@@ -231,6 +231,36 @@ export function ShareYourMissionForm() {
       `Phone: ${phone.trim() || "—"}`,
     ];
 
+    // Best-effort structured capture alongside the mailto brief below. Fire-and-forget and
+    // non-blocking on purpose: the mailto is still the real, working submission path, so a
+    // failure here (e.g. while the receiving backend isn't wired up yet) must never delay or
+    // interrupt it, and never surfaces an error to the applicant.
+    fetch("/api/hope-angel/intake", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Partner-Api-Key": process.env.NEXT_PUBLIC_PARTNER_API_KEY ?? "",
+      },
+      body: JSON.stringify({
+        orgName: orgName.trim(),
+        orgWebsite: orgWebsite.trim(),
+        registrationRegion: registrationRegion.trim(),
+        registrationNumber: registrationNumber.trim(),
+        mission: mission.trim(),
+        whereYouWork: whereYouWork.trim(),
+        annualReport: annualReport.trim(),
+        governancePage: governancePage.trim(),
+        priority,
+        campaignPage: campaignPage.trim(),
+        helpFirst: helpFirst.trim(),
+        currentTools: currentTools.trim(),
+        contactName: contactName.trim(),
+        contactRole: contactRole.trim(),
+        workEmail: workEmail.trim(),
+        phone: phone.trim(),
+      }),
+    }).catch(() => {});
+
     const subject = `Share Your Mission: ${orgName.trim()}`;
     const href = `mailto:${MISSION_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join("\n"))}`;
     setMailtoHref(href);
