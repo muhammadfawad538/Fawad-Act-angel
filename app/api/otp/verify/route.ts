@@ -22,6 +22,7 @@ export async function POST(request: NextRequest) {
     phoneCode?: string;
     emailCode?: string;
     channel?: string;
+    source?: string;
   };
   try {
     body = await request.json();
@@ -35,6 +36,12 @@ export async function POST(request: NextRequest) {
   const phoneCode = body.phoneCode?.trim();
   const emailCode = body.emailCode?.trim();
   const channel = body.channel?.trim() || undefined;
+  // Validated server-side too, not just trusted from the client - this ends up in an AI
+  // agent's spoken opening line via the n8n intake dispatch, so an unrecognized value is
+  // dropped rather than forwarded.
+  const KNOWN_SOURCES = ["hope-angel"];
+  const rawSource = body.source?.trim();
+  const source = rawSource && KNOWN_SOURCES.includes(rawSource) ? rawSource : undefined;
 
   if (!name) {
     return NextResponse.json({ error: "name is required" }, { status: 400 });
@@ -148,7 +155,7 @@ export async function POST(request: NextRequest) {
       const intakeRes = await fetch(intakeUrl!, {
         method: "POST",
         headers: { "Content-Type": "application/json", "X-Intake-Api-Key": intakeApiKey! },
-        body: JSON.stringify({ name, phone, email, otp_status: "verified", channel }),
+        body: JSON.stringify({ name, phone, email, otp_status: "verified", channel, source }),
       });
       intakeData = await intakeRes.json().catch(() => null);
       intakeOk = intakeRes.ok;

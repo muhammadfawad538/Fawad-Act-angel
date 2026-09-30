@@ -12,7 +12,21 @@ export const metadata: Metadata = {
 // The same lead-capture flow that used to live only in a popup (components/meet-your-angel-popup.tsx,
 // still intact for later reactivation) — every "Get Started" CTA on the site now links here
 // instead of opening that modal.
-export default function GetStartedPage() {
+// ?source=<tag> (currently only "hope-angel", set by the Hope Angel page's CTA) is threaded
+// through to the intake webhook, so the outbound call/WhatsApp opens in the right voice from
+// the first word instead of the model having to infer it mid-conversation. Any other/missing
+// value is dropped rather than forwarded, so this can't be used to inject arbitrary text.
+const KNOWN_SOURCES = ["hope-angel"]
+
+export default async function GetStartedPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
+  const params = await searchParams
+  const rawSource = params.source
+  const source = typeof rawSource === "string" && KNOWN_SOURCES.includes(rawSource) ? rawSource : undefined
+
   // flex-1 + flex flex-col justify-center on the content div: flex-1 keeps the footer pinned
   // to the bottom of the screen on short-content pages, and justify-center distributes the
   // leftover space evenly above/below the form instead of dumping all of it below the form
@@ -30,7 +44,7 @@ export default function GetStartedPage() {
           </h1>
 
           <div className="mt-10 bg-white border border-black/[0.08] rounded-2xl p-6">
-            <MeetYourAngelForm />
+            <MeetYourAngelForm source={source} />
           </div>
         </main>
       </div>
