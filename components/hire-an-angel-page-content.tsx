@@ -428,8 +428,8 @@ export function HireAnAngelPageContent({
                   paragraph makes it taller than the other 4), and centering the phone against
                   that height shifted its top position — and thus its gap from the nav — per
                   persona. Top-aligning keeps that gap identical everywhere. */}
-              <div className="mt-10 md:mt-14 grid md:grid-cols-2 gap-12 md:gap-16 items-start">
-                <div>
+              <div className="mt-10 md:mt-14 grid md:grid-cols-[minmax(0,1.72fr)_minmax(260px,1fr)] gap-12 md:gap-16 items-start">
+                <div className="min-w-0">
                   {persona.eyebrow && (
                     <span className="inline-block px-4 py-1.5 rounded-full bg-[#EDE9F7] text-[#5D4387] text-[11px] font-semibold uppercase tracking-widest">
                       {persona.eyebrow}
@@ -438,11 +438,11 @@ export function HireAnAngelPageContent({
                   <h1 className="mt-5 text-4xl md:text-5xl font-bold tracking-tight leading-[1.08]">
                     {persona.heroHeadline}
                   </h1>
-                  <p className="mt-5 text-[15px] text-black/55 leading-relaxed max-w-md">
+                  <p className="mt-5 text-[15px] text-black/55 leading-relaxed max-w-2xl">
                     {persona.heroSubtext}
                   </p>
                   {persona.heroSubtext2 && (
-                    <p className="mt-3 text-[15px] text-black/55 leading-relaxed max-w-md">
+                    <p className="mt-3 text-[15px] text-black/55 leading-relaxed max-w-2xl">
                       {persona.heroSubtext2}
                     </p>
                   )}
@@ -488,7 +488,7 @@ export function HireAnAngelPageContent({
                     with it) specifically to close the gap between this column and the shorter
                     text column on the left — at 300 the phone ran noticeably taller than the
                     copy, leaving dead space beneath the text. */}
-                <div className="flex flex-col items-center md:items-end md:sticky md:top-28">
+                <div className="flex flex-col items-center md:items-end md:sticky md:top-28 min-w-0">
                   <div id="demo" className="scroll-mt-24">
                     <PersonaPhoneDemo
                       personaId={personaId}

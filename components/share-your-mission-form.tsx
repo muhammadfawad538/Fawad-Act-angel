@@ -219,41 +219,65 @@ export function ShareYourMissionForm() {
       );
     }
 
-    setSubmitting(true);
-    try {
-      const res = await fetch("/api/hope-angel/mission", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          orgName: orgName.trim(),
-          orgWebsite: orgWebsite.trim(),
-          registrationRegion: registrationRegion.trim(),
-          registrationNumber: registrationNumber.trim(),
-          mission: mission.trim(),
-          whereYouWork: whereYouWork.trim(),
-          annualReport: annualReport.trim(),
-          governancePage: governancePage.trim(),
-          priority,
-          campaignPage: campaignPage.trim(),
-          helpFirst: helpFirst.trim(),
-          currentTools: currentTools.trim(),
-          contactName: contactName.trim(),
-          contactRole: contactRole.trim(),
-          workEmail: workEmail.trim(),
-          phone: phone.trim(),
-        }),
-      });
-      const data = await res.json().catch(() => null);
-      if (!res.ok) {
-        setError(data?.error || "Something went wrong. Please try again.");
-        return;
-      }
-      setReady(true);
-    } catch {
-      setError("Something went wrong. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
+    const lines = [
+      `Organization name: ${orgName.trim()}`,
+      `Organization website: ${orgWebsite.trim() || "—"}`,
+      `Registration country or region: ${registrationRegion.trim() || "—"}`,
+      `Registration number, registry link, or reason for exemption: ${registrationNumber.trim() || "—"}`,
+      "",
+      `Mission and who you serve: ${mission.trim()}`,
+      `Where you work: ${whereYouWork.trim() || "—"}`,
+      `Public annual report or impact page: ${annualReport.trim() || "—"}`,
+      `Leadership or governance page: ${governancePage.trim() || "—"}`,
+      "",
+      `First priority for Hope Angel: ${priority || "—"}`,
+      `Donation or campaign page: ${campaignPage.trim() || "—"}`,
+      `What you'd like Hope Angel to help with first: ${helpFirst.trim() || "—"}`,
+      `Current tools or communication channels: ${currentTools.trim() || "—"}`,
+      "",
+      `Contact name: ${contactName.trim()}`,
+      `Role at the NPO: ${contactRole.trim() || "—"}`,
+      `Work email: ${workEmail.trim()}`,
+      `Phone: ${phone.trim() || "—"}`,
+    ];
+
+    // Best-effort structured capture alongside the mailto brief below. Fire-and-forget and
+    // non-blocking on purpose: the mailto is still the real, working submission path, so a
+    // failure here (e.g. while the receiving backend isn't wired up yet) must never delay or
+    // interrupt it, and never surfaces an error to the applicant.
+    fetch("/api/hope-angel/intake", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Partner-Api-Key": process.env.NEXT_PUBLIC_PARTNER_API_KEY ?? "",
+      },
+      body: JSON.stringify({
+        orgName: orgName.trim(),
+        orgWebsite: orgWebsite.trim(),
+        registrationRegion: registrationRegion.trim(),
+        registrationNumber: registrationNumber.trim(),
+        mission: mission.trim(),
+        whereYouWork: whereYouWork.trim(),
+        annualReport: annualReport.trim(),
+        governancePage: governancePage.trim(),
+        priority,
+        campaignPage: campaignPage.trim(),
+        helpFirst: helpFirst.trim(),
+        currentTools: currentTools.trim(),
+        contactName: contactName.trim(),
+        contactRole: contactRole.trim(),
+        workEmail: workEmail.trim(),
+        phone: phone.trim(),
+      }),
+    }).catch(() => {});
+
+    const subject = `Share Your Mission: ${orgName.trim()}`;
+    const href = `mailto:${MISSION_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join("\n"))}`;
+    setMailtoHref(href);
+    setReady(true);
+    // Opened synchronously within this click handler (not a useEffect) so browsers treat it as
+    // a direct result of the user's action instead of an unrequested popup.
+    window.location.href = href;
   }
 
   if (ready) {

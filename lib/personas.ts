@@ -351,7 +351,9 @@ export const PERSONAS: Persona[] = [
     eyebrow: "Devoted AI Volunteer Employee for Nonprofits",
     heroHeadline: "Hope Angel: More Good, Done Every Day.",
     heroSubtext:
-      "Hope Angel serves your nonprofit's purpose without taking a salary. It helps raise funds for clear goals, welcome donors and volunteers, and guide people applying for support. As your mission grows, Hope Angel helps you reach more people and act quickly, with consistent follow-up so opportunities to help are less likely to be missed.",
+      "Your virtual AI volunteer employee raises funds, welcomes donors and volunteers, and guides applicants across your nonprofit's connected systems.",
+      // "Hope Angel serves your nonprofit's purpose without taking a salary. It helps raise funds for clear goals, welcome donors and volunteers, and guide people applying for support. As your mission grows, Hope Angel helps you reach more people and act quickly, with consistent follow-up so opportunities to help are less likely to be missed.",
+      // "Hope Angel serves your nonprofit's purpose without taking a salary. It helps raise funds for clear goals, welcome donors and volunteers, and guide people applying for support. As your mission grows, Hope Angel helps you reach more people and act quickly, with consistent follow-up so opportunities to help are less likely to be missed.",
     // heroSubtext2:
     //   "As your mission grows, Hope Angel helps you reach more people and act quickly, with consistent follow-up so opportunities to help are less likely to be missed.",
     trustSubtext:
@@ -396,7 +398,10 @@ export const PERSONAS: Persona[] = [
       },
     ],
     ctaHireLabel: "Meet Hope Angel",
-    ctaHref: "https://www.actangel.ai/get-started/",
+    // The ?source=hope-angel tag lets get-started thread this through to the intake
+    // webhook, so the outbound call/WhatsApp can open in the right voice from the
+    // first word instead of the model having to infer it mid-conversation.
+    ctaHref: "https://www.actangel.ai/get-started/?source=hope-angel",
     scenarios: ["Purposeful Fundraising", "Goal Progress", "Funding Application", "Volunteer Sign-Up"],
     channels: ["Voice", "Chat", "WhatsApp", "Email", "SMS", "iMessage"],
     liveDemoHeadline: "See Hope Angel handle it.",
@@ -419,7 +424,9 @@ export const PERSONAS: Persona[] = [
     closingQuoteTag: "Revenue. Angels. Time.",
     showMissionForm: true,
     dropdownRole: "Serves Nonprofits",
-    useCases: ["Purposeful Fundraising", "Donor & Volunteer Engagement", "Funding Applications", "Campaign Progress"],
+    useCases: ["Purposeful Fundraising", "Donor Engagement", 
+      // "Donor & Volunteer Engagement", 
+      "Funding Applications", "Campaign Progress"],
   },
 ]
 
