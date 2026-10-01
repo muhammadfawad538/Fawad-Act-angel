@@ -229,7 +229,14 @@ function LiveDemoSection({ persona }: { persona: Persona }) {
           {/* Content half — its own padding now that it's inside the shared card instead of
               being a bare grid cell in the page's own gutter. */}
           <div className="p-6 md:p-12 lg:p-8">
-            <span className="inline-block px-4 py-1.5 rounded-full bg-[#EDE9F7] text-[#5D4387] text-[11px] font-semibold uppercase tracking-widest">
+            {/* Background matches the "Hire a [X] Angel" button below exactly — same
+                liveDemoCtaVariant switch, so the pair always stays in sync per persona
+                (black/white for the default variant, purple/white for Hope Angel). */}
+            <span
+              className={`inline-block px-4 py-1.5 rounded-full text-white text-[11px] font-semibold uppercase tracking-widest ${
+                persona.liveDemoCtaVariant === "purple" ? "bg-[#5D4387]" : "bg-[#111]"
+              }`}
+            >
               Live Preview
             </span>
             <h2 className="mt-4 md:mt-6 text-2xl md:text-4xl font-bold tracking-tight leading-[1.15]">
