@@ -121,7 +121,7 @@ function FieldError({ message }: { message?: string }) {
  */
 export function ShareYourMissionForm() {
   const [ready, setReady] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+  const [mailtoHref, setMailtoHref] = useState("");
 
   const [orgName, setOrgName] = useState("");
   const [orgWebsite, setOrgWebsite] = useState("");
@@ -286,18 +286,28 @@ export function ShareYourMissionForm() {
         <div className="w-12 h-12 rounded-full bg-emerald-50 border border-emerald-600/20 text-emerald-600 flex items-center justify-center text-xl">
           ✓
         </div>
-        <h3 className="text-lg font-medium">
-          Your mission brief was submitted.
-        </h3>
+        <h3 className="text-lg font-medium">Your brief is ready to send.</h3>
         <p className="text-sm text-black/55 max-w-sm">
-          Our team will review your organization for eligibility, authenticity,
-          and ethical fit before offering Hope Angel. You can also meet an Angel
-          through our{" "}
+          Please send the prepared email to{" "}
+          <a
+            href={`mailto:${MISSION_EMAIL}`}
+            className="underline hover:text-black/70"
+          >
+            {MISSION_EMAIL}
+          </a>
+          . Once sent, you may meet an Angel through our{" "}
           <Link href="/get-started" className="underline hover:text-black/70">
             Get Started
           </Link>{" "}
-          page in the meantime.
+          page. Our team will review your organization before offering Hope
+          Angel.
         </p>
+        <a
+          href={mailtoHref}
+          className={`${primaryButtonClass} inline-flex items-center justify-center gap-1`}
+        >
+          Didn&rsquo;t open? Open your email app →
+        </a>
       </div>
     );
   }
@@ -600,11 +610,16 @@ export function ShareYourMissionForm() {
         </p>
         <button
           type="submit"
-          disabled={!canSubmit || submitting}
+          disabled={!canSubmit}
           className={primaryButtonClass}
         >
-          {submitting ? "Submitting…" : "Share My Mission"}
+          Prepare My Mission Brief
         </button>
+
+        <p className="text-[10.5px] leading-tight text-black/60 text-center">
+          Your email app will open with this brief addressed to Act Angel AI.
+          Send the email to complete your enquiry.
+        </p>
       </div>
     </form>
   );
