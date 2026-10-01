@@ -326,13 +326,14 @@ export function MobileNav() {
                     key={p.id}
                     href={`/hire-an-angel/${p.slug}`}
                     onClick={() => setHireOpen(false)}
-                    className="group flex flex-col rounded-xl border border-black/[0.08] px-5 py-6 cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:border-[#5D4387]/40 hover:shadow-[0_16px_32px_-16px_rgba(93,67,135,0.4)] [font-family:system-ui,-apple-system,sans-serif]"
+                    className="group flex flex-col rounded-xl border border-[#5D4387]/20 px-5 py-6 cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:border-[#5D4387]/50 hover:shadow-[0_16px_32px_-16px_rgba(93,67,135,0.4)] [font-family:system-ui,-apple-system,sans-serif]"
                   >
                     {/* Header as one rounded pill/capsule (not a plain row) — avatar inset at
                         its left edge, matching requirements/image.png. The avatar's own slight
                         scale-up on hover (independent of the card's own lift) is the "2 user
-                        cards" interaction cue referenced from 11x.ai's nav. */}
-                    <div className="flex items-center gap-3 rounded-full bg-black/[0.035] pl-2 pr-5 py-2">
+                        cards" interaction cue referenced from 11x.ai's nav. border-transparent
+                        at rest (not no border) so the hover border doesn't shift the pill's size. */}
+                    <div className="flex items-center gap-3 rounded-full bg-black/[0.035] border border-transparent transition-colors duration-200 group-hover:bg-[#EDE9F7] group-hover:border-[#5D4387]/40 pl-2 pr-5 py-2">
                       <img
                         src={p.avatar}
                         alt=""
@@ -410,9 +411,9 @@ export function MobileNav() {
                     key={p.id}
                     href={`/hire-an-angel/${p.slug}`}
                     onClick={close}
-                    className="flex flex-col rounded-xl border border-black/[0.08] px-3 py-3 hover:border-black/20 hover:bg-black/[0.02] transition-colors [font-family:system-ui,-apple-system,sans-serif]"
+                    className="group flex flex-col rounded-xl border border-[#5D4387]/20 px-3 py-3 hover:border-[#5D4387]/50 hover:bg-black/[0.02] transition-colors [font-family:system-ui,-apple-system,sans-serif]"
                   >
-                    <div className="flex items-center gap-2.5 rounded-full bg-black/[0.035] pl-1 pr-3 py-1">
+                    <div className="flex items-center gap-2.5 rounded-full bg-black/[0.035] border border-transparent transition-colors duration-200 group-hover:bg-[#EDE9F7] group-hover:border-[#5D4387]/40 pl-1 pr-3 py-1">
                       <img
                         src={p.avatar}
                         alt=""
