@@ -338,7 +338,7 @@ export function MobileNav() {
               className="w-full rounded-2xl border border-black/[0.06] overflow-hidden"
               style={NAV_DROPDOWN_STYLE}
             >
-              <div className="grid grid-cols-5 gap-2.5 p-3">
+              <div className="grid grid-cols-4 gap-2.5 p-3">
                 {PERSONAS.map((p) => (
                   <Link
                     key={p.id}
@@ -356,7 +356,7 @@ export function MobileNav() {
                         className="w-11 h-11 rounded-full object-cover shrink-0"
                       />
                       <div className="min-w-0 flex-1">
-                        <p className="text-[15px] font-semibold text-[#111] truncate">{p.label}</p>
+                        <p title={p.label} className="text-[15px] font-semibold text-[#111] truncate">{p.label}</p>
                         <p className="text-[12.5px] text-black/50 truncate">{p.dropdownRole}</p>
                       </div>
                       <span className="text-black/30 text-sm shrink-0">›</span>
@@ -368,8 +368,8 @@ export function MobileNav() {
                       </p>
                       <ul className="mt-2.5 flex flex-col gap-1.5">
                         {p.useCases?.map((uc) => (
-                          <li key={uc} className="flex items-center gap-2 text-[13px] font-medium text-[#333]">
-                            <span className="w-1 h-1 rounded-full bg-[#5D4387] shrink-0" />
+                          <li key={uc} className="flex items-start gap-2 text-[13px] font-medium leading-5 text-[#333]">
+                            <span className="w-1 h-1 rounded-full bg-[#5D4387] shrink-0 mt-2" />
                             {uc}
                           </li>
                         ))}
@@ -437,7 +437,7 @@ export function MobileNav() {
                         className="w-9 h-9 rounded-full object-cover shrink-0"
                       />
                       <div className="min-w-0 flex-1">
-                        <p className="text-[13.5px] font-semibold text-[#111] truncate">{p.label}</p>
+                        <p title={p.label} className="text-[13.5px] font-semibold text-[#111] truncate">{p.label}</p>
                         <p className="text-[11px] text-black/50 truncate">{p.dropdownRole}</p>
                       </div>
                       <span className="text-black/30 text-sm shrink-0">›</span>

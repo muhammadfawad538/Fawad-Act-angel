@@ -34,6 +34,27 @@ const PHOTO_FEATHER =
 // pill, plus a hover lift/press animation, matching 11x.ai's own scenario/voice picker: on
 // 11x the pill shifts slightly upward on hover rather than growing, so this uses a translateY
 // instead of a scale.
+// Same chevron used by the nav's dropdown triggers (components/mobile-nav.tsx) — duplicated
+// locally (rather than imported) since it's a small, self-contained SVG and this file has no
+// other dependency on nav internals.
+function ChevronIcon({ open }: { open: boolean }) {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={`shrink-0 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+    >
+      <path d="M6 9l6 6 6-6" />
+    </svg>
+  );
+}
+
 // Collapsed-by-default Q&A row for the FAQ section's accordion entries (everything past the
 // first faqs[] item, which renders as a plain headline+paragraph instead — see the "What is
 // Hope Angel?" explainer section below).
@@ -56,8 +77,8 @@ function FaqAccordionItem({
         <span className="text-[15px] font-semibold text-[#111]">
           {question}
         </span>
-        <span className="text-[#5D4387] text-xl leading-none shrink-0">
-          {open ? "−" : "+"}
+        <span className="text-[#5D4387]">
+          <ChevronIcon open={open} />
         </span>
       </button>
       {open && (
@@ -68,7 +89,7 @@ function FaqAccordionItem({
 }
 
 function pillClass(active: boolean) {
-  return `px-5 py-2.5 rounded-full text-[13px] font-medium border cursor-pointer transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 ${
+  return `px-4 py-2 md:px-5 md:py-2.5 rounded-full text-[13px] font-medium border cursor-pointer transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 ${
     active
       ? "bg-[#EDE9F7] border-[#5D4387]/30 text-[#5D4387]"
       : "border-black/15 text-black/60 hover:border-[#5D4387]/30 hover:bg-[#5D4387]/[0.05] hover:text-[#5D4387]"
@@ -126,8 +147,17 @@ function LiveDemoSection({ persona }: { persona: Persona }) {
 
             <div className="absolute top-4 left-4 px-3 py-1.5 rounded-full bg-black/45 backdrop-blur-sm">
               <span className="text-[11px] font-medium text-white">
-                {persona.contact} ·{" "}
-                {persona.livePreviewPillLabel ?? persona.label}
+                {persona.livePreviewPillReversed ? (
+                  <>
+                    {persona.livePreviewPillLabel ?? persona.label} ·{" "}
+                    {persona.contact}
+                  </>
+                ) : (
+                  <>
+                    {persona.contact} ·{" "}
+                    {persona.livePreviewPillLabel ?? persona.label}
+                  </>
+                )}
               </span>
             </div>
             <div className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/45 backdrop-blur-sm">
@@ -142,7 +172,7 @@ function LiveDemoSection({ persona }: { persona: Persona }) {
                 whichever Scenario pill is selected (persona.campaignScenarios, aligned by index
                 with `scenarios`); falls back to the static campaignDemo text when a persona
                 hasn't got per-scenario data. */}
-            {(persona.campaignScenarios || persona.campaignDemo) &&
+            {false && (persona.campaignScenarios || persona.campaignDemo) &&
               (() => {
                 const fallback = persona.campaignDemo;
                 const active = persona.campaignScenarios?.[scenario] ?? {
@@ -198,24 +228,24 @@ function LiveDemoSection({ persona }: { persona: Persona }) {
 
           {/* Content half — its own padding now that it's inside the shared card instead of
               being a bare grid cell in the page's own gutter. */}
-          <div className="p-10 md:p-12 lg:p-8">
+          <div className="p-6 md:p-12 lg:p-8">
             <span className="inline-block px-4 py-1.5 rounded-full bg-[#EDE9F7] text-[#5D4387] text-[11px] font-semibold uppercase tracking-widest">
               Live Preview
             </span>
-            <h2 className="mt-6 text-3xl md:text-4xl font-bold tracking-tight leading-[1.15]">
+            <h2 className="mt-4 md:mt-6 text-2xl md:text-4xl font-bold tracking-tight leading-[1.15]">
               {persona.liveDemoHeadline ??
                 `See a ${persona.label} handle it, live.`}
             </h2>
-            <p className="mt-5 text-[15px] text-black/55 leading-relaxed max-w-md">
+            <p className="mt-3 md:mt-5 text-[15px] text-black/55 leading-relaxed max-w-md">
               {persona.liveDemoSubtext ??
                 `Pick a scenario and a channel, then watch ${persona.contact} — your ${persona.label} — take it from first message to next step.`}
             </p>
 
-            <div className="mt-10">
+            <div className="mt-6 md:mt-10">
               <p className="text-[11px] font-semibold uppercase tracking-widest text-black/40">
                 Scenario
               </p>
-              <div className="mt-3 flex flex-wrap gap-2.5">
+              <div className="mt-3 flex flex-wrap gap-2">
                 {scenarios.map((uc, i) => (
                   <button
                     key={uc}
@@ -229,7 +259,7 @@ function LiveDemoSection({ persona }: { persona: Persona }) {
               </div>
             </div>
 
-            <div className="mt-10 flex flex-wrap items-center gap-5">
+            <div className="mt-6 md:mt-10 flex flex-wrap items-center gap-5">
               {(() => {
                 const href =
                   persona.liveDemoCtaHref ?? persona.ctaHref ?? "/get-started";
@@ -254,11 +284,11 @@ function LiveDemoSection({ persona }: { persona: Persona }) {
               })()}
             </div>
 
-            <div className="mt-8">
+            <div className="mt-6 md:mt-8">
               <p className="text-[11px] font-semibold uppercase tracking-widest text-black/40">
                 Channel
               </p>
-              <div className="mt-3 flex flex-wrap gap-2.5">
+              <div className="mt-3 flex flex-wrap gap-2">
                 {channels.map((c, i) => (
                   <button
                     key={c}
@@ -478,38 +508,25 @@ export function HireAnAngelPageContent({
               {/* Capabilities — 3-column bordered cards with a small icon swatch, bold title
                   and description each, straight from the content doc. */}
               <section className="mt-12">
-                <h2
-                  className={
-                    persona.capabilitiesNumbered
-                      ? "text-2xl md:text-3xl font-bold tracking-tight text-[#111] uppercase"
-                      : "text-xs font-medium uppercase tracking-widest text-black/40"
-                  }
-                >
+                <h2 className="text-xs font-medium uppercase tracking-widest text-black/40">
                   Capabilities
                 </h2>
                 <div className="mt-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                  {persona.capabilities!.map((c, i) => (
+                  {persona.capabilities!.map((c) => (
                     <div
                       key={c.title}
                       tabIndex={0}
                       className="rounded-2xl border-2 border-black/[0.08] bg-white px-6 py-6 transition-colors cursor-pointer hover:border-[#5D4387] focus:outline-none focus:border-[#5D4387] active:border-[#5D4387]"
                     >
-                      {persona.capabilitiesNumbered ? (
-                        <span className="text-[13px] font-semibold text-[#5D4387]">
-                          {String(i + 1).padStart(2, "0")}
-                        </span>
-                      ) : (
-                        // Layered icon swatch — light-purple square with a smaller solid-purple
-                        // square (60% of the outer size, not a circle) centered inside it,
-                        // matching the design mockup (angelpageslight.vercel.app); previously
-                        // just a single flat purple square.
-                        <span
-                          className="inline-flex items-center justify-center w-[25px] h-[25px] rounded-md bg-[#EDE9F7]"
-                          aria-hidden="true"
-                        >
-                          <span className="w-[40%] h-[40%] rounded-[3px] bg-[#5D4387]" />
-                        </span>
-                      )}
+                      {/* Layered icon swatch — light-purple square with a smaller solid-purple
+                          square (60% of the outer size, not a circle) centered inside it,
+                          matching the design mockup (angelpageslight.vercel.app). */}
+                      <span
+                        className="inline-flex items-center justify-center w-[25px] h-[25px] rounded-md bg-[#EDE9F7]"
+                        aria-hidden="true"
+                      >
+                        <span className="w-[40%] h-[40%] rounded-[3px] bg-[#5D4387]" />
+                      </span>
                       <p className="mt-4 font-semibold text-[#111]">
                         {c.title}
                       </p>
@@ -526,15 +543,15 @@ export function HireAnAngelPageContent({
               {/* Business outcome — full-bleed gradient banner, reusing the same
                   outcomeTitle/outcomeDescription already teased in the hero's floating card. */}
               <section
-                className="mt-8 rounded-2xl px-8 py-12 md:px-12 md:py-14"
+                className="mt-8 rounded-2xl px-6 py-8 md:px-12 md:py-14"
                 style={{
                   background: "linear-gradient(135deg, #5D4387, #7168A0)",
                 }}
               >
-                <p className="text-3xl md:text-4xl font-bold text-white tracking-tight">
+                <p className="text-2xl md:text-4xl font-bold text-white tracking-tight leading-[1.2] md:leading-tight">
                   {persona.outcomeTitle}
                 </p>
-                <p className="mt-4 text-base text-white/90 leading-relaxed max-w-4xl">
+                <p className="mt-3 md:mt-4 text-sm md:text-base text-white/90 leading-relaxed max-w-4xl">
                   {persona.outcomeDescription}
                 </p>
               </section>

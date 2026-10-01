@@ -193,48 +193,28 @@ export default function ProgressWithPurposePage() {
             >
               Revenue. Angels. Time.
             </h2>
-            <div className="grid sm:grid-cols-3 gap-[14px]">
+            {/* Card style matches the site's standard capability-card pattern (Angel pages'
+                Capabilities section) rather than this page's original reference-matched
+                treatment — an explicit, deliberate override of that reference brief, requested
+                to bring this section in line with the rest of the site. */}
+            <div className="grid sm:grid-cols-3 gap-5">
               {COMMITMENTS.map((c) => (
-                <article
+                <div
                   key={c.number}
-                  className="bg-white rounded-[14px]"
-                  style={{ border: `1px solid ${LINE}`, padding: "17px 20px" }}
+                  tabIndex={0}
+                  className="rounded-2xl border-2 border-black/[0.08] bg-white px-6 py-6 transition-colors cursor-pointer hover:border-[#5D4387] focus:outline-none focus:border-[#5D4387] active:border-[#5D4387]"
                 >
                   <span
+                    className="inline-flex items-center justify-center w-[25px] h-[25px] rounded-md bg-[#EDE9F7]"
                     aria-hidden="true"
-                    className="block"
-                    style={{
-                      fontSize: 11,
-                      color: PURPLE,
-                      letterSpacing: 2,
-                      marginBottom: 9,
-                    }}
                   >
-                    {c.number}
+                    <span className="w-[40%] h-[40%] rounded-[3px] bg-[#5D4387]" />
                   </span>
-                  <h3
-                    style={{
-                      fontSize: 21,
-                      fontWeight: 400,
-                      lineHeight: 1.2,
-                      letterSpacing: "-0.5px",
-                      margin: "0 0 10px",
-                      color: INK,
-                    }}
-                  >
-                    {c.title}
-                  </h3>
-                  <p
-                    style={{
-                      margin: 0,
-                      fontSize: 15,
-                      color: MUTED,
-                      lineHeight: 1.5,
-                    }}
-                  >
+                  <p className="mt-4 font-semibold text-[#111]">{c.title}</p>
+                  <p className="mt-1.5 text-sm text-black/50 leading-relaxed">
                     {c.body}
                   </p>
-                </article>
+                </div>
               ))}
             </div>
           </section>

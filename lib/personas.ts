@@ -98,6 +98,7 @@ export interface Persona {
   liveDemoCtaVariant?: "dark" | "purple" // default "dark" (matches the other 4 personas)
   liveDemoCaption?: string // falls back to "Don't Take Our Word for It. Meet Your Angel."
   livePreviewPillLabel?: string // photo's top-left "{contact} · {label}" pill; falls back to label
+  livePreviewPillReversed?: boolean // shows "{label} · {contact}" instead, for personas whose contact is the persona name itself (not a person)
   liveDemoBadgeLabel?: string // photo's top-right pulsing badge, default "Live"
 
   // Closing section — set closingHeadline to opt into the richer Hope Angel-style closer
@@ -350,9 +351,9 @@ export const PERSONAS: Persona[] = [
     eyebrow: "Devoted AI Volunteer Employee for Nonprofits",
     heroHeadline: "Hope Angel: More Good, Done Every Day.",
     heroSubtext:
-      "Hope Angel serves your nonprofit's purpose without taking a salary. It helps raise funds for clear goals, welcome donors and volunteers, and guide people applying for support.",
-    heroSubtext2:
-      "As your mission grows, Hope Angel helps you reach more people and act quickly, with consistent follow-up so opportunities to help are less likely to be missed.",
+      "Hope Angel serves your nonprofit's purpose without taking a salary. It helps raise funds for clear goals, welcome donors and volunteers, and guide people applying for support. As your mission grows, Hope Angel helps you reach more people and act quickly, with consistent follow-up so opportunities to help are less likely to be missed.",
+    // heroSubtext2:
+    //   "As your mission grows, Hope Angel helps you reach more people and act quickly, with consistent follow-up so opportunities to help are less likely to be missed.",
     trustSubtext:
       "Steady, multilingual service, 24 hours a day, 365 days a year. Your team sets the purpose, eligibility rules, permissions, and points where a person should step in.",
     capabilitiesNumbered: true,
@@ -406,7 +407,8 @@ export const PERSONAS: Persona[] = [
     liveDemoCtaVariant: "purple",
     liveDemoCaption: "See what service could look like for your NPO.",
     livePreviewPillLabel: "Devoted Volunteer",
-    liveDemoBadgeLabel: "Preview",
+    livePreviewPillReversed: true,
+    // liveDemoBadgeLabel: "Preview",
     closingEyebrow: "Progress with Purpose",
     closingHeadline: "Let's help your mission reach further.",
     closingDescription:
