@@ -22,7 +22,8 @@ const PRIORITIES: Priority[] = [
 
 const baseFieldClass =
   "bg-white border rounded-xl px-4 py-3 text-sm text-[#111] placeholder:text-black/25 focus:outline-none focus:ring-2 transition-colors w-full";
-const okBorder = "border-black/10 focus:border-[#5D4387] focus:ring-[#5D4387]/20";
+const okBorder =
+  "border-black/10 focus:border-[#5D4387] focus:ring-[#5D4387]/20";
 const errorBorder = "border-red-400 focus:border-red-500 focus:ring-red-500/20";
 function fieldClass(hasError: boolean) {
   return `${baseFieldClass} ${hasError ? errorBorder : okBorder}`;
@@ -114,9 +115,9 @@ function FieldError({ message }: { message?: string }) {
 
 /**
  * The nonprofit application form from https://hope-angel.vercel.app/hire-an-angel/hope-angel's
- * "Share Your Mission" flow: no backend submission — it just prepares a mailto: brief for the
- * NPO to send, since eligibility/authenticity review is a manual, human step on Act Angel's side
- * before an Angel is offered.
+ * "Share Your Mission" flow. Submits to /api/hope-angel/mission, which proxies it into the WEB
+ * backend's registration-requests queue for a SAD to review, since eligibility/authenticity
+ * review is a manual, human step on Act Angel's side before an Angel is offered.
  */
 export function ShareYourMissionForm() {
   const [ready, setReady] = useState(false);
@@ -143,7 +144,9 @@ export function ShareYourMissionForm() {
 
   const [authorized, setAuthorized] = useState(false);
   const [error, setError] = useState("");
-  const [fieldErrors, setFieldErrors] = useState<Partial<Record<FieldName, string>>>({});
+  const [fieldErrors, setFieldErrors] = useState<
+    Partial<Record<FieldName, string>>
+  >({});
 
   const fieldValues: Record<FieldName, string> = {
     orgName,
@@ -166,9 +169,16 @@ export function ShareYourMissionForm() {
   // typing it the first time), and live once a field already has an error showing, so it clears
   // the moment the value is fixed instead of waiting for another blur.
   function handleBlur(name: FieldName) {
-    setFieldErrors((prev) => ({ ...prev, [name]: validateField(name, fieldValues[name]) }));
+    setFieldErrors((prev) => ({
+      ...prev,
+      [name]: validateField(name, fieldValues[name]),
+    }));
   }
-  function handleChange(name: FieldName, value: string, setter: (v: string) => void) {
+  function handleChange(
+    name: FieldName,
+    value: string,
+    setter: (v: string) => void,
+  ) {
     setter(value);
     setFieldErrors((prev) =>
       prev[name] ? { ...prev, [name]: validateField(name, value) } : prev,
@@ -189,7 +199,7 @@ export function ShareYourMissionForm() {
     workEmail.trim() &&
     authorized;
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
 
@@ -230,6 +240,36 @@ export function ShareYourMissionForm() {
       `Work email: ${workEmail.trim()}`,
       `Phone: ${phone.trim() || "—"}`,
     ];
+
+    // Best-effort structured capture alongside the mailto brief below. Fire-and-forget and
+    // non-blocking on purpose: the mailto is still the real, working submission path, so a
+    // failure here (e.g. while the receiving backend isn't wired up yet) must never delay or
+    // interrupt it, and never surfaces an error to the applicant.
+    fetch("/api/hope-angel/intake", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Partner-Api-Key": process.env.NEXT_PUBLIC_PARTNER_API_KEY ?? "",
+      },
+      body: JSON.stringify({
+        orgName: orgName.trim(),
+        orgWebsite: orgWebsite.trim(),
+        registrationRegion: registrationRegion.trim(),
+        registrationNumber: registrationNumber.trim(),
+        mission: mission.trim(),
+        whereYouWork: whereYouWork.trim(),
+        annualReport: annualReport.trim(),
+        governancePage: governancePage.trim(),
+        priority,
+        campaignPage: campaignPage.trim(),
+        helpFirst: helpFirst.trim(),
+        currentTools: currentTools.trim(),
+        contactName: contactName.trim(),
+        contactRole: contactRole.trim(),
+        workEmail: workEmail.trim(),
+        phone: phone.trim(),
+      }),
+    }).catch(() => {});
 
     const subject = `Share Your Mission: ${orgName.trim()}`;
     const href = `mailto:${MISSION_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join("\n"))}`;
@@ -283,7 +323,9 @@ export function ShareYourMissionForm() {
             <label className={requiredLabelClass}>Organization name</label>
             <input
               value={orgName}
-              onChange={(e) => handleChange("orgName", e.target.value, setOrgName)}
+              onChange={(e) =>
+                handleChange("orgName", e.target.value, setOrgName)
+              }
               onBlur={() => handleBlur("orgName")}
               className={`${fieldClass(!!fieldErrors.orgName)} mt-2`}
             />
@@ -293,7 +335,9 @@ export function ShareYourMissionForm() {
             <label className={requiredLabelClass}>Organization website</label>
             <input
               value={orgWebsite}
-              onChange={(e) => handleChange("orgWebsite", e.target.value, setOrgWebsite)}
+              onChange={(e) =>
+                handleChange("orgWebsite", e.target.value, setOrgWebsite)
+              }
               onBlur={() => handleBlur("orgWebsite")}
               type="url"
               placeholder="https://"
@@ -302,10 +346,18 @@ export function ShareYourMissionForm() {
             <FieldError message={fieldErrors.orgWebsite} />
           </div>
           <div>
-            <label className={requiredLabelClass}>Registration country or region</label>
+            <label className={requiredLabelClass}>
+              Registration country or region
+            </label>
             <input
               value={registrationRegion}
-              onChange={(e) => handleChange("registrationRegion", e.target.value, setRegistrationRegion)}
+              onChange={(e) =>
+                handleChange(
+                  "registrationRegion",
+                  e.target.value,
+                  setRegistrationRegion,
+                )
+              }
               onBlur={() => handleBlur("registrationRegion")}
               className={`${fieldClass(!!fieldErrors.registrationRegion)} mt-2`}
             />
@@ -315,7 +367,9 @@ export function ShareYourMissionForm() {
             <label className={requiredLabelClass}>Where do you work?</label>
             <input
               value={whereYouWork}
-              onChange={(e) => handleChange("whereYouWork", e.target.value, setWhereYouWork)}
+              onChange={(e) =>
+                handleChange("whereYouWork", e.target.value, setWhereYouWork)
+              }
               onBlur={() => handleBlur("whereYouWork")}
               placeholder="City, region, or countries"
               className={`${fieldClass(!!fieldErrors.whereYouWork)} mt-2`}
@@ -328,7 +382,13 @@ export function ShareYourMissionForm() {
             </label>
             <input
               value={registrationNumber}
-              onChange={(e) => handleChange("registrationNumber", e.target.value, setRegistrationNumber)}
+              onChange={(e) =>
+                handleChange(
+                  "registrationNumber",
+                  e.target.value,
+                  setRegistrationNumber,
+                )
+              }
               onBlur={() => handleBlur("registrationNumber")}
               placeholder="Include the public record if available"
               className={`${fieldClass(!!fieldErrors.registrationNumber)} mt-2`}
@@ -341,7 +401,9 @@ export function ShareYourMissionForm() {
             </label>
             <textarea
               value={mission}
-              onChange={(e) => handleChange("mission", e.target.value, setMission)}
+              onChange={(e) =>
+                handleChange("mission", e.target.value, setMission)
+              }
               onBlur={() => handleBlur("mission")}
               rows={3}
               placeholder="A brief description is enough to begin."
@@ -355,7 +417,9 @@ export function ShareYourMissionForm() {
             </label>
             <input
               value={annualReport}
-              onChange={(e) => handleChange("annualReport", e.target.value, setAnnualReport)}
+              onChange={(e) =>
+                handleChange("annualReport", e.target.value, setAnnualReport)
+              }
               onBlur={() => handleBlur("annualReport")}
               type="url"
               placeholder="https://"
@@ -369,7 +433,13 @@ export function ShareYourMissionForm() {
             </label>
             <input
               value={governancePage}
-              onChange={(e) => handleChange("governancePage", e.target.value, setGovernancePage)}
+              onChange={(e) =>
+                handleChange(
+                  "governancePage",
+                  e.target.value,
+                  setGovernancePage,
+                )
+              }
               onBlur={() => handleBlur("governancePage")}
               type="url"
               placeholder="https://"
@@ -393,7 +463,9 @@ export function ShareYourMissionForm() {
                 const value = e.target.value as Priority | "";
                 setPriority(value);
                 setFieldErrors((prev) =>
-                  prev.priority ? { ...prev, priority: validateField("priority", value) } : prev,
+                  prev.priority
+                    ? { ...prev, priority: validateField("priority", value) }
+                    : prev,
                 );
               }}
               onBlur={() => handleBlur("priority")}
@@ -414,7 +486,9 @@ export function ShareYourMissionForm() {
             </label>
             <input
               value={campaignPage}
-              onChange={(e) => handleChange("campaignPage", e.target.value, setCampaignPage)}
+              onChange={(e) =>
+                handleChange("campaignPage", e.target.value, setCampaignPage)
+              }
               onBlur={() => handleBlur("campaignPage")}
               type="url"
               placeholder="https://"
@@ -428,7 +502,9 @@ export function ShareYourMissionForm() {
             </label>
             <textarea
               value={helpFirst}
-              onChange={(e) => handleChange("helpFirst", e.target.value, setHelpFirst)}
+              onChange={(e) =>
+                handleChange("helpFirst", e.target.value, setHelpFirst)
+              }
               onBlur={() => handleBlur("helpFirst")}
               rows={3}
               placeholder="For example, welcome new volunteers or follow up with donors."
@@ -459,7 +535,9 @@ export function ShareYourMissionForm() {
             <label className={requiredLabelClass}>Your name</label>
             <input
               value={contactName}
-              onChange={(e) => handleChange("contactName", e.target.value, setContactName)}
+              onChange={(e) =>
+                handleChange("contactName", e.target.value, setContactName)
+              }
               onBlur={() => handleBlur("contactName")}
               className={`${fieldClass(!!fieldErrors.contactName)} mt-2`}
             />
@@ -469,7 +547,9 @@ export function ShareYourMissionForm() {
             <label className={requiredLabelClass}>Your role at the NPO</label>
             <input
               value={contactRole}
-              onChange={(e) => handleChange("contactRole", e.target.value, setContactRole)}
+              onChange={(e) =>
+                handleChange("contactRole", e.target.value, setContactRole)
+              }
               onBlur={() => handleBlur("contactRole")}
               className={`${fieldClass(!!fieldErrors.contactRole)} mt-2`}
             />
@@ -479,7 +559,9 @@ export function ShareYourMissionForm() {
             <label className={requiredLabelClass}>Work email</label>
             <input
               value={workEmail}
-              onChange={(e) => handleChange("workEmail", e.target.value, setWorkEmail)}
+              onChange={(e) =>
+                handleChange("workEmail", e.target.value, setWorkEmail)
+              }
               onBlur={() => handleBlur("workEmail")}
               type="email"
               className={`${fieldClass(!!fieldErrors.workEmail)} mt-2`}
