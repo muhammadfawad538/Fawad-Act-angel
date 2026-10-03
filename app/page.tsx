@@ -134,7 +134,7 @@ export default function AgenticPage() {
 
       {/* ── HIRE AN ANGEL DROPDOWN — DESIGN EXPLORATION (homepage-only, see
           components/mobile-nav-lab.tsx) ───────────────────────────────────── */}
-      <MobileNavLab />
+      {/* <MobileNavLab /> */}
 
       {/* ── HERO ──────────────────────────────────────────────────────────── */}
       <section className="relative min-h-screen overflow-hidden flex flex-col">
