@@ -162,6 +162,13 @@ export const PERSONAS: Persona[] = [
       "A Sales Angel is a virtual AI sales employee from Act Angel AI that autonomously qualifies deals, follows up, schedules meetings, and updates connected sales systems within your defined rules and permissions.",
     ctaLine: "Put your next opportunity in motion.",
     ctaHireLabel: "Hire a Sales Angel",
+    // ?source=sales — same mechanism as Hope Angel's ctaHref below. The trailing slash before
+    // the "?" is required here: next.config.ts has trailingSlash: true, and its redirect from
+    // "/get-started?source=sales" (no slash) to "/get-started/" drops the query string entirely
+    // (confirmed via Playwright — every relative link without the slash lost its param on
+    // click, while Hope Angel's absolute, slash-inclusive URL didn't).
+    ctaHref: "/get-started/?source=sales",
+    closingCtaHref: "/get-started/?source=sales",
     dropdownRole: "Drives Sales",
     useCases: ["Lead Qualification", "Discovery Calls", "Meeting Scheduling", "Pipeline Follow-Up"],
   },
@@ -198,6 +205,8 @@ export const PERSONAS: Persona[] = [
       "A Service Angel is a virtual AI customer service employee from Act Angel AI that answers questions and autonomously completes routine service workflows across connected systems, with escalation when human judgement is needed.",
     ctaLine: "Make every service interaction count.",
     ctaHireLabel: "Hire a Service Angel",
+    ctaHref: "/get-started/?source=service",
+    closingCtaHref: "/get-started/?source=service",
     dropdownRole: "Supports Customers",
     useCases: ["Ticket Triage & Resolution", "Order & Account Support", "Renewals & Upsell", "After-Hours Coverage"],
   },
@@ -236,6 +245,8 @@ export const PERSONAS: Persona[] = [
       "An HR Angel is a virtual AI employee from Act Angel AI that autonomously coordinates routine HR workflows across connected systems and approved data. Sensitive cases and employment decisions remain with authorised people.",
     ctaLine: "Give your people team more capacity.",
     ctaHireLabel: "Hire an HR Angel",
+    ctaHref: "/get-started/?source=hr",
+    closingCtaHref: "/get-started/?source=hr",
     dropdownRole: "Talent Management",
     useCases: ["Candidate Sourcing", "Resume Screening", "Interview Scheduling", "Candidate Follow-Up"],
   },
@@ -275,6 +286,8 @@ export const PERSONAS: Persona[] = [
       "An Assistant Angel is a virtual AI assistant employee from Act Angel AI that autonomously coordinates administrative work across connected calendars, communication tools, data, and processes, following your permissions and approval rules.",
     ctaLine: "Make space for your highest-value work.",
     ctaHireLabel: "Hire an Assistant Angel",
+    ctaHref: "/get-started/?source=assistance",
+    closingCtaHref: "/get-started/?source=assistance",
     dropdownRole: "Organizes Work",
     useCases: ["Calendar Management", "Inbox Triage", "Travel & Expense", "Meeting Prep & Notes"],
   },

@@ -12,11 +12,12 @@ export const metadata: Metadata = {
 // The same lead-capture flow that used to live only in a popup (components/meet-your-angel-popup.tsx,
 // still intact for later reactivation) — every "Get Started" CTA on the site now links here
 // instead of opening that modal.
-// ?source=<tag> (currently only "hope-angel", set by the Hope Angel page's CTA) is threaded
-// through to the intake webhook, so the outbound call/WhatsApp opens in the right voice from
-// the first word instead of the model having to infer it mid-conversation. Any other/missing
-// value is dropped rather than forwarded, so this can't be used to inject arbitrary text.
-const KNOWN_SOURCES = ["hope-angel"]
+// ?source=<tag>, set by each of the 5 Hire-an-Angel persona pages' own CTA buttons
+// (lib/personas.ts's ctaHref/closingCtaHref), is threaded through to the intake webhook, so the
+// outbound call/WhatsApp opens in the right voice from the first word instead of the model
+// having to infer it mid-conversation. Any other/missing value is dropped rather than forwarded,
+// so this can't be used to inject arbitrary text.
+const KNOWN_SOURCES = ["sales", "service", "hr", "assistance", "hope-angel"]
 
 export default async function GetStartedPage({
   searchParams,
