@@ -257,7 +257,7 @@ export function MobileNav() {
                               whole stack) is what anchors this to that specific row. */}
                           <div className="pointer-events-none absolute left-full top-4 ml-3 w-[240px] origin-left scale-95 rounded-xl border border-black/[0.06] bg-[#EDE9F7] p-4 opacity-0 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.35)] transition-all duration-200 group-hover:scale-100 group-hover:opacity-100 z-10">
                             <p className="text-[10.5px] font-medium uppercase tracking-widest text-black/40">
-                              Use Cases
+                              Business Functions
                             </p>
                             <ul className="mt-2 flex flex-col gap-1.5">
                               {p.useCases?.map((uc) => (
@@ -426,7 +426,7 @@ export function MobileNav() {
                         <div className="flex items-start gap-2 mb-3">
                           <div className="flex-1 min-w-0 rounded-xl bg-[#EDE9F7] p-4">
                             <p className="text-[10.5px] font-medium uppercase tracking-widest text-black/40">
-                              Use Cases
+                              Business Functions
                             </p>
                             <ul className="mt-2 flex flex-col gap-1.5">
                               {p.useCases?.map((uc) => (
