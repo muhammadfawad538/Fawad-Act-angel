@@ -115,7 +115,7 @@ function FieldError({ message }: { message?: string }) {
 
 /**
  * The nonprofit application form from https://hope-angel.vercel.app/hire-an-angel/hope-angel's
- * "Share Your Mission" flow. Submits to /api/hope-angel/mission, which proxies it into the WEB
+ * "Share Your Mission" flow. Submits to /api/hope-angel/intake, which proxies it into the WEB
  * backend's registration-requests queue for a SAD to review, since eligibility/authenticity
  * review is a manual, human step on Act Angel's side before an Angel is offered.
  */

@@ -77,44 +77,44 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Mirrors the intake pattern in /api/otp/verify/route.ts: this route's only job is to
-  // validate and forward to n8n, which owns storage (the AAA back-end). Not yet
-  // configured - the receiving n8n workflow doesn't exist yet (see the Hope Angel
-  // implementation plan) - so this correctly 500s with a clear reason until it is,
-  // rather than silently pretending to succeed.
-  const intakeUrl = process.env.N8N_HOPE_ANGEL_INTAKE_WEBHOOK_URL;
-  const intakeApiKey = process.env.N8N_HOPE_ANGEL_INTAKE_WEBHOOK_API_KEY;
-  if (!intakeUrl || !intakeApiKey) {
+  // Forwards into the ACT Angel AI WEB backend's registration-requests queue (the same
+  // public endpoint the WEB "Get Started" form uses, with formType "hope_angel_mission"),
+  // where a SAD reviews it. Mission goes in `message`; the remaining fields live in `details`.
+  const webApiUrl = process.env.ACTANGEL_WEB_API_URL;
+  if (!webApiUrl) {
     return NextResponse.json(
-      { error: "Server is misconfigured: missing Hope Angel intake webhook config" },
+      { error: "Server is misconfigured: missing ACTANGEL_WEB_API_URL" },
       { status: 500 }
     );
   }
 
   try {
-    const intakeRes = await fetch(intakeUrl, {
+    const res = await fetch(`${webApiUrl.replace(/\/+$/, "")}/api/registration-requests`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "X-Intake-Api-Key": intakeApiKey },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        orgName,
-        orgWebsite,
-        registrationRegion,
-        registrationNumber,
-        mission,
-        whereYouWork,
-        annualReport,
-        governancePage,
-        priority,
-        campaignPage,
-        helpFirst,
-        currentTools,
-        contactName,
-        contactRole,
-        workEmail,
-        phone,
+        name: contactName,
+        email: workEmail,
+        organizationName: orgName,
+        phone: phone || undefined,
+        message: mission,
+        formType: "hope_angel_mission",
+        details: {
+          organizationWebsite: orgWebsite,
+          registrationRegion,
+          registrationNumber,
+          whereYouWork,
+          annualReport,
+          governancePage,
+          priority,
+          campaignPage,
+          helpFirst,
+          currentTools,
+          contactRole,
+        },
       }),
     });
-    if (!intakeRes.ok) {
+    if (!res.ok) {
       return NextResponse.json({ error: "Intake submission failed" }, { status: 502 });
     }
   } catch {
