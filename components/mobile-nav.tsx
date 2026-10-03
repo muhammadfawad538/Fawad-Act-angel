@@ -91,27 +91,27 @@ const NAV_CTA =
 // anything here anymore.
 export function MobileNav() {
   const [open, setOpen] = useState(false);
+  // Which persona's Use Cases is expanded in the mobile "Hire an Angel" list — touch has no
+  // hover, so this plays the role the desktop version's group-hover does, toggled by tapping a
+  // row's chevron instead.
   const [personasOpen, setPersonasOpen] = useState(false);
+  const [expandedPersonaId, setExpandedPersonaId] = useState<string | null>(null);
   const [behindAccordionOpen, setBehindAccordionOpen] = useState(false);
-  // Desktop "Hire an Angel" mega-menu: hand-rolled instead of Radix's DropdownMenu, because
-  // DropdownMenuContent anchors/aligns itself to the trigger button — fine for a small popover,
-  // but this panel needs to sit centered under the whole nav bar regardless of where the
-  // trigger pill happens to sit in it (it's off to the right, not centered, since the
-  // Buttons_update_header.png redesign right-aligned the nav group).
+  // Desktop "Hire an Angel" dropdown: a vertical hover-reveal stack of all 5 personas (client-
+  // approved over the earlier grid mega-menu) — anchored to its own trigger (hireRef), like
+  // Behind the Angels, rather than centered under the whole bar.
   const [hireOpen, setHireOpen] = useState(false);
   const hireRef = useRef<HTMLDivElement>(null);
   // Desktop "Behind the Angels" dropdown — a plain 2-item list (About Us / Our Social Impact),
-  // so unlike Hire an Angel's mega-menu it's anchored to its own trigger (behindRef) rather than
-  // centered under the whole bar.
+  // anchored to its own trigger (behindRef) the same way.
   const [behindOpen, setBehindOpen] = useState(false);
   const behindRef = useRef<HTMLDivElement>(null);
 
   // Both desktop dropdowns open on hover rather than click. A short delay on close (instead of
   // closing the instant the pointer leaves) is what stops them snapping shut while the mouse is
-  // still travelling from the trigger down to the panel — Hire an Angel's panel in particular
-  // sits centered under the whole bar, not directly under its own trigger, so there's real
-  // distance to cover. The timer is shared between the trigger and the panel (both call
-  // openHire/scheduleCloseHire), so entering either cancels a pending close from the other.
+  // still travelling from the trigger down to the panel. The timer is shared between the trigger
+  // and the panel (both call openHire/scheduleCloseHire), so entering either cancels a pending
+  // close from the other.
   const hireCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const behindCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -167,12 +167,13 @@ export function MobileNav() {
   const close = () => {
     setOpen(false);
     setPersonasOpen(false);
+    setExpandedPersonaId(null);
     setBehindAccordionOpen(false);
   };
 
   return (
     <div className="fixed top-4 inset-x-0 z-50 flex justify-center px-6 md:px-12 lg:px-20 pointer-events-none">
-      <div ref={hireRef} className="pointer-events-auto w-full max-w-6xl mx-auto relative">
+      <div className="pointer-events-auto w-full max-w-6xl mx-auto relative">
         {/* Main bar */}
         <nav
           className="flex items-center justify-between px-5 py-3 rounded-2xl border border-black/[0.06]"
@@ -197,16 +198,83 @@ export function MobileNav() {
               enough room for all 4 pills and was squeezing/wrapping their labels — the burger
               menu handles that whole range instead. */}
           <div className="hidden lg:flex items-center gap-3">
-            <button
-              onClick={openHire}
+            <div
+              ref={hireRef}
+              className="relative"
               onMouseEnter={openHire}
               onMouseLeave={scheduleCloseHire}
-              aria-expanded={hireOpen}
-              className={`group outline-none cursor-pointer ${NAV_PILL}`}
             >
-              Hire an Angel
-              <ChevronIcon open={hireOpen} />
-            </button>
+              <button
+                onClick={openHire}
+                aria-expanded={hireOpen}
+                className={`group outline-none cursor-pointer ${NAV_PILL}`}
+              >
+                Hire an Angel
+                <ChevronIcon open={hireOpen} />
+              </button>
+
+              {/* Anchored directly under its own trigger (left-aligned to it), not centered
+                  under the whole bar. mt-5 (not mt-2): hireRef wraps just this trigger button,
+                  so top-full lands at the button's own bottom edge — 12px (the nav's own py-3
+                  bottom padding) short of the bar's actual bottom edge. Same fix, same reason,
+                  as Behind the Angels' panel below. */}
+              {hireOpen && (
+                <div
+                  className="hidden lg:block absolute left-0 top-full mt-5 z-50"
+                  onMouseEnter={openHire}
+                  onMouseLeave={scheduleCloseHire}
+                >
+                  <div
+                    className="w-[410px] rounded-2xl border border-black/[0.06]"
+                    style={NAV_DROPDOWN_STYLE}
+                  >
+                    <div className="flex flex-col">
+                      {PERSONAS.map((p) => (
+                        <Link
+                          key={p.id}
+                          href={`/hire-an-angel/${p.slug}`}
+                          onClick={() => setHireOpen(false)}
+                          className="group relative flex flex-col border-b border-black/[0.06] last:border-b-0 px-3 transition-colors duration-200 hover:bg-[#EDE9F7]/70 [font-family:system-ui,-apple-system,sans-serif]"
+                        >
+                          <div className="my-4 flex items-center gap-3 rounded-lg bg-[#5D4387]/10 pl-3 pr-3 py-2.5 transition-[background-color,padding] duration-200 group-hover:bg-[#5D4387]/30 group-hover:pl-[18px]">
+                            <img
+                              src={p.avatar}
+                              alt=""
+                              aria-hidden="true"
+                              className="w-[75px] h-[75px] rounded-lg object-cover shrink-0"
+                            />
+                            <div className="min-w-0 flex-1">
+                              <p title={p.label} className="text-[16px] font-semibold text-[#111] truncate">{p.label}</p>
+                              <p title={p.dropdownRole} className="text-[13px] text-black/50 truncate">{p.dropdownRole}</p>
+                            </div>
+                            <span className="text-black/30 text-sm shrink-0">›</span>
+                          </div>
+
+                          {/* Use Cases — pops out to the right of the row as a floating card
+                              (tooltip-like: fade + scale in) instead of expanding inline below
+                              it. pointer-events-none since it's pure display, no interactive
+                              content of its own; position:relative on the row above (not the
+                              whole stack) is what anchors this to that specific row. */}
+                          <div className="pointer-events-none absolute left-full top-4 ml-3 w-[240px] origin-left scale-95 rounded-xl border border-black/[0.06] bg-[#EDE9F7] p-4 opacity-0 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.35)] transition-all duration-200 group-hover:scale-100 group-hover:opacity-100 z-10">
+                            <p className="text-[10.5px] font-medium uppercase tracking-widest text-black/40">
+                              Use Cases
+                            </p>
+                            <ul className="mt-2 flex flex-col gap-1.5">
+                              {p.useCases?.map((uc) => (
+                                <li key={uc} className="flex items-center gap-2 text-[13px] font-medium text-[#333]">
+                                  <span className="w-1 h-1 rounded-full bg-[#5D4387] shrink-0" />
+                                  {uc}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
 
             <div
               ref={behindRef}
@@ -223,13 +291,10 @@ export function MobileNav() {
                 <ChevronIcon open={behindOpen} />
               </button>
 
-              {/* mt-5 (not mt-2, like Hire an Angel's panel): this panel is anchored to
-                  behindRef, which wraps just the button — top-full lands at the button's own
+              {/* mt-5: behindRef wraps just the button — top-full lands at the button's own
                   bottom edge, 12px (the nav's own py-3 bottom padding) short of the nav bar's
-                  actual bottom edge. Hire an Angel's panel is anchored to hireRef, which wraps
-                  the whole nav bar, so its top-full already includes that 12px. The extra 12px
-                  here (on top of the same 8px/mt-2 gap) makes both panels open at the same depth
-                  below the bar instead of Behind the Angels opening 12px shallower. */}
+                  actual bottom edge. The extra 12px (on top of the same 8px/mt-2 gap) makes both
+                  this panel and Hire an Angel's open at the same depth below the bar. */}
               {behindOpen && (
                 <div
                   className="absolute top-full left-1/2 -translate-x-1/2 mt-5 w-[440px] rounded-2xl border border-black/[0.06] overflow-hidden z-50 p-3"
@@ -294,90 +359,6 @@ export function MobileNav() {
           </button>
         </nav>
 
-        {/* Mega-menu panel (requirements/Hire_an_angel_dropdown.png) — a sibling of <nav>,
-            absolutely positioned and centered under the whole nav bar via the outer wrapper's
-            `relative` + this panel's `inset-x-0 flex justify-center`, rather than anchored to
-            the trigger pill's own position (which sits off to the right, not centered). Hidden
-            below lg as a defensive guard: hireOpen can only be set true by the desktop trigger
-            above, which is itself only reachable at lg+, but this covers resizing the window
-            down while the menu is still open. */}
-        {hireOpen && (
-          <div
-            className="hidden lg:flex absolute inset-x-0 top-full mt-2 justify-center z-50"
-            onMouseEnter={openHire}
-            onMouseLeave={scheduleCloseHire}
-          >
-            {/* w-full (not a fixed/capped width): this panel sits inside the same max-w-6xl,
-                mx-auto wrapper as the nav bar itself (the outer hireRef div), so w-full makes it
-                exactly as wide as the navbar at every screen size — the previous 980px cap left
-                too little room per column on wide screens, truncating names/roles ("Assistant
-                An...", "Talent Managem..."). */}
-            <div
-              className="w-full rounded-2xl border border-black/[0.06] overflow-hidden"
-              style={NAV_DROPDOWN_STYLE}
-            >
-              {/* 3 columns, always — 5 cards now run 2 rows (3 + 2) at every desktop width
-                  rather than squeezing a 5th column, now that the cards themselves (avatar,
-                  title, role) are sized up to read as more prominent/"crisp" per the client's
-                  increased-size + 2-row request. */}
-              <div className="grid grid-cols-3 gap-3 p-3">
-                {PERSONAS.map((p) => (
-                  <Link
-                    key={p.id}
-                    href={`/hire-an-angel/${p.slug}`}
-                    onClick={() => setHireOpen(false)}
-                    className="group flex flex-col rounded-xl border border-black/[0.08] px-5 py-6 cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:border-[#5D4387]/40 hover:shadow-[0_16px_32px_-16px_rgba(93,67,135,0.4)] [font-family:system-ui,-apple-system,sans-serif]"
-                  >
-                    {/* Header as one rounded pill/capsule (not a plain row) — avatar inset at
-                        its left edge, matching requirements/image.png. The avatar's own slight
-                        scale-up on hover (independent of the card's own lift) is the "2 user
-                        cards" interaction cue referenced from 11x.ai's nav. */}
-                    <div className="flex items-center gap-3 rounded-full bg-black/[0.035] pl-2 pr-5 py-2">
-                      <img
-                        src={p.avatar}
-                        alt=""
-                        aria-hidden="true"
-                        className="w-14 h-14 rounded-full object-cover shrink-0 transition-transform duration-200 group-hover:scale-110"
-                      />
-                      <div className="min-w-0 flex-1">
-                        <p title={p.label} className="text-[17px] font-semibold text-[#111] truncate">{p.label}</p>
-                        <p title={p.dropdownRole} className="text-[14px] text-black/50 truncate">{p.dropdownRole}</p>
-                      </div>
-                    </div>
-
-                    <div className="mt-4 pt-4 border-t border-black/[0.06]">
-                      <p className="text-[10.5px] font-medium uppercase tracking-widest text-black/40">
-                        Use Cases
-                      </p>
-                      <ul className="mt-2.5 flex flex-col gap-1.5">
-                        {p.useCases?.map((uc) => (
-                          <li key={uc} className="flex items-start gap-2 text-[13px] font-medium leading-5 text-[#333]">
-                            <span className="w-1 h-1 rounded-full bg-[#5D4387] shrink-0 mt-2" />
-                            {uc}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-
-              <div className="flex items-center justify-between px-5 py-4 border-t border-black/[0.06] text-[13px]">
-                <span className="text-black/50">
-                  Not sure which Angel fits? <span className="font-semibold text-[#111]">We&apos;ll help you pick.</span>
-                </span>
-                <Link
-                  href="/contact"
-                  onClick={() => setHireOpen(false)}
-                  className="font-medium text-[#5D4387] hover:text-[#7168A0] cursor-pointer transition-colors"
-                >
-                  Talk to us ›
-                </Link>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Mobile dropdown — same lg threshold as the burger that opens it */}
         <div
           className="lg:hidden mt-2 max-h-[80vh] overflow-y-auto transition-all duration-300 ease-in-out"
@@ -387,7 +368,11 @@ export function MobileNav() {
             className="rounded-2xl border border-black/[0.06] px-2 py-2 flex flex-col"
             style={NAV_DROPDOWN_STYLE}
           >
-            {/* "Hire an Angel" — inline expandable list, not a flyout (flyouts don't work well nested in an open mobile sheet) */}
+            {/* "Hire an Angel" — mirrors the desktop version's vertical stack/pill-card look: a
+                single column, rounded-lg (not circular) avatar, pill-card with the same purple
+                tint. Touch has no hover, so Use Cases is revealed by tapping a row's own chevron
+                (expandedPersonaId) instead, and shown inline below the row rather than as a side
+                flyout — there isn't room to pop one out to the right on a phone screen. */}
             <button
               onClick={() => setPersonasOpen((v) => !v)}
               className={`flex items-center justify-between px-4 py-3 hover:bg-black/[0.03] rounded-xl ${NAV_ITEM}`}
@@ -399,47 +384,65 @@ export function MobileNav() {
               className="overflow-hidden transition-all duration-200 ease-in-out"
               style={{ maxHeight: personasOpen ? "1400px" : "0px" }}
             >
-              {/* Same card content as the desktop mega-menu (photo, name, role, use cases,
-                  pill-shaped header) — 1 per row below sm (640px), 2-up from sm up to the lg
-                  breakpoint where this whole mobile panel gives way to the desktop mega-menu.
-                  Each persona is its own bordered card with a gap between them (matching
-                  desktop), not flush columns separated by border-r/border-b lines. */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
-                {PERSONAS.map((p) => (
-                  <Link
-                    key={p.id}
-                    href={`/hire-an-angel/${p.slug}`}
-                    onClick={close}
-                    className="flex flex-col rounded-xl border border-black/[0.08] px-3 py-3 hover:border-black/20 hover:bg-black/[0.02] transition-colors [font-family:system-ui,-apple-system,sans-serif]"
-                  >
-                    <div className="flex items-center gap-2.5 rounded-full bg-black/[0.035] pl-1 pr-3 py-1">
-                      <img
-                        src={p.avatar}
-                        alt=""
-                        aria-hidden="true"
-                        className="w-9 h-9 rounded-full object-cover shrink-0"
-                      />
-                      <div className="min-w-0 flex-1">
-                        <p title={p.label} className="text-[13.5px] font-semibold text-[#111] truncate">{p.label}</p>
-                        <p title={p.dropdownRole} className="text-[11px] text-black/50 truncate">{p.dropdownRole}</p>
+              <div className="flex flex-col pt-2">
+                {PERSONAS.map((p) => {
+                  const isExpanded = expandedPersonaId === p.id;
+                  return (
+                    <div key={p.id} className="border-b border-black/[0.06] last:border-b-0">
+                      <div className="flex items-center gap-2 py-2">
+                        <Link
+                          href={`/hire-an-angel/${p.slug}`}
+                          onClick={close}
+                          className="flex flex-1 min-w-0 items-center gap-3 rounded-lg bg-[#5D4387]/10 pl-3 pr-3 py-2.5 [font-family:system-ui,-apple-system,sans-serif]"
+                        >
+                          <img
+                            src={p.avatar}
+                            alt=""
+                            aria-hidden="true"
+                            className="w-[75px] h-[75px] rounded-lg object-cover shrink-0"
+                          />
+                          <div className="min-w-0 flex-1">
+                            <p title={p.label} className="text-[16px] font-semibold text-[#111] truncate">{p.label}</p>
+                            <p title={p.dropdownRole} className="text-[13px] text-black/50 truncate">{p.dropdownRole}</p>
+                          </div>
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={() => setExpandedPersonaId(isExpanded ? null : p.id)}
+                          aria-expanded={isExpanded}
+                          aria-label={`Toggle ${p.label} use cases`}
+                          className="p-2 -m-2 shrink-0 text-black/40"
+                        >
+                          <ChevronIcon open={isExpanded} />
+                        </button>
+                      </div>
+                      <div
+                        className="overflow-hidden transition-all duration-200 ease-in-out"
+                        style={{ maxHeight: isExpanded ? "260px" : "0px" }}
+                      >
+                        {/* flex + matching gap-2 + a spacer the same width as the chevron button
+                            above: that's what makes this card's rendered width equal the
+                            image/title Link's width instead of the whole row's. */}
+                        <div className="flex items-start gap-2 mb-3">
+                          <div className="flex-1 min-w-0 rounded-xl bg-[#EDE9F7] p-4">
+                            <p className="text-[10.5px] font-medium uppercase tracking-widest text-black/40">
+                              Use Cases
+                            </p>
+                            <ul className="mt-2 flex flex-col gap-1.5">
+                              {p.useCases?.map((uc) => (
+                                <li key={uc} className="flex items-center gap-2 text-[13px] font-medium text-[#333]">
+                                  <span className="w-1 h-1 rounded-full bg-[#5D4387] shrink-0" />
+                                  {uc}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                          <div className="w-[14px] shrink-0" aria-hidden="true" />
+                        </div>
                       </div>
                     </div>
-
-                    <div className="mt-3 pt-3 border-t border-black/[0.06]">
-                      <p className="text-[9.5px] font-medium uppercase tracking-widest text-black/40">
-                        Use Cases
-                      </p>
-                      <ul className="mt-1.5 flex flex-col gap-1">
-                        {p.useCases?.map((uc) => (
-                          <li key={uc} className="flex items-center gap-2 text-[12px] font-medium text-[#333]">
-                            <span className="w-1 h-1 rounded-full bg-[#5D4387] shrink-0" />
-                            {uc}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </Link>
-                ))}
+                  );
+                })}
               </div>
             </div>
 

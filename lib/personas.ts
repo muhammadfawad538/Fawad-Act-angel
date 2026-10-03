@@ -142,10 +142,10 @@ export const PERSONAS: Persona[] = [
       ["in", "Saturday works"],
       ["out", "Booked — Sat, 11:00 AM"],
     ],
-    eyebrow: "Virtual AI Sales Employee",
+    eyebrow: "AI Sales Specialist",
     heroHeadline: "Turn Every Deal Into Action.",
     heroSubtext:
-      "Your virtual AI sales employee engages deals, qualifies interest, books meetings, and moves opportunities forward across your connected sales systems.",
+      "Your AI sales Specialist engages deals, qualifies interest, books meetings, and moves opportunities forward across your connected sales systems.",
     capabilities: [
       { title: "Engage new deals.", description: "Respond to inbound enquiries with relevant, timely conversations." },
       { title: "Qualify interest.", description: "Capture needs, timing, and fit against your sales criteria." },
@@ -178,10 +178,10 @@ export const PERSONAS: Persona[] = [
       ["in", "Great, thank you!"],
       ["out", "You're welcome. I'll text you once it's delivered."],
     ],
-    eyebrow: "Virtual AI Customer Service Employee",
+    eyebrow: "AI Customer Service Specialist",
     heroHeadline: "From Customer Request to Resolution.",
     heroSubtext:
-      "Your virtual AI service employee answers questions, acts on routine requests, and keeps customers informed across your connected support systems.",
+      "Your AI service Specialist answers questions, acts on routine requests, and keeps customers informed across your connected support systems.",
     capabilities: [
       { title: "Answer with context.", description: "Use approved knowledge and customer records to deliver relevant answers." },
       { title: "Resolve routine requests.", description: "Complete permitted account and service updates in connected systems." },
@@ -216,10 +216,10 @@ export const PERSONAS: Persona[] = [
     ],
     // Content doc's "HR Angel" section, used verbatim — displayed under the "HR Angel" label
     // above while the URL stays /hire-an-angel/recruitment-angel (route intentionally unchanged).
-    eyebrow: "Virtual AI HR Employee",
+    eyebrow: "AI HR Specialist",
     heroHeadline: "Less HR Admin. More Human Impact.",
     heroSubtext:
-      "Your virtual AI HR employee coordinates people processes, handles routine employee requests, and keeps work moving across your connected HR systems.",
+      "Your AI HR Specialist coordinates people processes, handles routine employee requests, and keeps work moving across your connected HR systems.",
     capabilities: [
       { title: "Coordinate recruitment.", description: "Schedule interviews and keep candidates informed of next steps." },
       { title: "Orchestrate onboarding.", description: "Launch checklists, request documents, and track assigned tasks." },
@@ -255,10 +255,10 @@ export const PERSONAS: Persona[] = [
     // Content doc's "Assistant Angel" section, used verbatim — displayed under the "Assistant
     // Angel" label above while the URL stays /hire-an-angel/executive-assistant-angel (route
     // intentionally unchanged).
-    eyebrow: "Virtual AI Assistant Employee",
+    eyebrow: "AI Assistant Specialist",
     heroHeadline: "Give Your Priorities Room to Move.",
     heroSubtext:
-      "Your virtual AI assistant coordinates schedules, prepares information, and follows through on everyday work across your connected tools and workflows.",
+      "Your AI assistant Specialist coordinates schedules, prepares information, and follows through on everyday work across your connected tools and workflows.",
     capabilities: [
       { title: "Coordinate calendars.", description: "Arrange meetings, resolve scheduling clashes, and send reminders." },
       { title: "Organise the inbox.", description: "Prioritise messages, draft replies, and route requests for action." },
@@ -348,10 +348,10 @@ export const PERSONAS: Persona[] = [
         progressPct: 0,
       },
     ],
-    eyebrow: "Devoted AI Volunteer Employee for Nonprofits",
+    eyebrow: "Devoted AI Workforce for Nonprofits",
     heroHeadline: "Hope Angel: More Good, Done Every Day.",
     heroSubtext:
-      "Your virtual AI volunteer employee raises funds, welcomes donors and volunteers, and guides applicants across your nonprofit's connected systems.",
+      "Your AI volunteer Workforce raises funds, welcomes donors and volunteers, and guides applicants across your nonprofit's connected systems.",
       // "Hope Angel serves your nonprofit's purpose without taking a salary. It helps raise funds for clear goals, welcome donors and volunteers, and guide people applying for support. As your mission grows, Hope Angel helps you reach more people and act quickly, with consistent follow-up so opportunities to help are less likely to be missed.",
       // "Hope Angel serves your nonprofit's purpose without taking a salary. It helps raise funds for clear goals, welcome donors and volunteers, and guide people applying for support. As your mission grows, Hope Angel helps you reach more people and act quickly, with consistent follow-up so opportunities to help are less likely to be missed.",
     // heroSubtext2:
