@@ -12,6 +12,7 @@ import {
 import { RevealText } from "@/components/reveal-text";
 import { StackingAgentCards } from "@/components/stacking-agent-cards";
 import { MobileNav } from "@/components/mobile-nav";
+import { MobileNavLab } from "@/components/mobile-nav-lab";
 import { DevExSection } from "@/components/devex-section";
 import { PersonaPhoneDemo } from "@/components/persona-phone-demo";
 import { HERO_CONTACT, HERO_AVATAR, HERO_MESSAGES } from "@/lib/personas";
@@ -130,6 +131,10 @@ export default function AgenticPage() {
 
       {/* ── STICKY NAV ────────────────────────────────────────────────────── */}
       <MobileNav />
+
+      {/* ── HIRE AN ANGEL DROPDOWN — DESIGN EXPLORATION (homepage-only, see
+          components/mobile-nav-lab.tsx) ───────────────────────────────────── */}
+      <MobileNavLab />
 
       {/* ── HERO ──────────────────────────────────────────────────────────── */}
       <section className="relative min-h-screen overflow-hidden flex flex-col">
