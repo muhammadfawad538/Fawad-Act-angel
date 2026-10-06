@@ -113,6 +113,14 @@ export function MobileNav() {
   const [tooltip, setTooltip] = useState<{ id: string; style: React.CSSProperties } | null>(null);
   const pillRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const panelScrollRef = useRef<HTMLDivElement>(null);
+  // Scrolling moves rows under a cursor that hasn't itself moved, but a wheel scroll alone
+  // doesn't fire mouseenter/mouseleave on whatever's now underneath it — browsers only
+  // recompute hover state from actual pointer movement. Without tracking the cursor separately,
+  // the onScroll handler below would just keep re-positioning the tooltip for whichever persona
+  // was hovered *before* the scroll, even once a different row has scrolled in under it. This
+  // tracks the last known cursor position so the scroll handler can look up which row is
+  // actually there now, the same hit-testing a real mouseenter would have done.
+  const lastMouseRef = useRef<{ x: number; y: number } | null>(null);
   // Generous estimate of the tooltip's rendered height (heading + up to ~5 lines + padding) —
   // used only to decide top- vs bottom-anchoring, so it doesn't need to be exact, just safely
   // on the high side.
@@ -142,6 +150,23 @@ export function MobileNav() {
         : { left, top: rect.top },
     });
   }
+
+  // Scroll-driven re-check: finds whichever row's pill now actually contains the last known
+  // cursor position (not just "wherever the originally-hovered persona's row scrolled to"), and
+  // switches the tooltip to that persona — or hides it if the cursor isn't over any row anymore
+  // (e.g. it's now over a gap, or the panel scrolled enough that nothing is under it).
+  function updateTooltipAtCursor() {
+    const pos = lastMouseRef.current;
+    if (!pos) return;
+    const match = Object.entries(pillRefs.current).find(([, el]) => {
+      if (!el) return false;
+      const r = el.getBoundingClientRect();
+      return pos.x >= r.left && pos.x <= r.right && pos.y >= r.top && pos.y <= r.bottom;
+    });
+    if (match) positionTooltip(match[0]);
+    else setTooltip(null);
+  }
+
   // Desktop "Behind the Angels" dropdown — a plain 2-item list (About Us / Our Social Impact),
   // anchored to its own trigger (behindRef) the same way.
   const [behindOpen, setBehindOpen] = useState(false);
@@ -279,7 +304,8 @@ export function MobileNav() {
                       including the tooltip's sideways pop-out. */}
                   <div
                     ref={panelScrollRef}
-                    onScroll={() => tooltip && positionTooltip(tooltip.id)}
+                    onScroll={() => tooltip && updateTooltipAtCursor()}
+                    onMouseMove={(e) => { lastMouseRef.current = { x: e.clientX, y: e.clientY }; }}
                     className="themed-scrollbar w-[410px] max-h-[calc(100vh-160px)] overflow-y-auto rounded-2xl border border-black/[0.06]"
                     style={NAV_DROPDOWN_STYLE}
                   >
@@ -289,7 +315,10 @@ export function MobileNav() {
                           key={p.id}
                           href={`/hire-an-angel/${p.slug}`}
                           onClick={() => setHireOpen(false)}
-                          onMouseEnter={() => positionTooltip(p.id)}
+                          onMouseEnter={(e) => {
+                            lastMouseRef.current = { x: e.clientX, y: e.clientY };
+                            positionTooltip(p.id);
+                          }}
                           onMouseLeave={() => setTooltip(null)}
                           className="group relative flex flex-col border-b border-black/[0.06] last:border-b-0 px-3 transition-colors duration-200 hover:bg-[#EDE9F7]/70 [font-family:system-ui,-apple-system,sans-serif]"
                         >
