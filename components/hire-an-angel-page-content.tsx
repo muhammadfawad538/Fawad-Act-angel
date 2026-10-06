@@ -668,8 +668,8 @@ export function HireAnAngelPageContent({
                   className="mt-20 pb-4 scroll-mt-24"
                 >
                   <div className="rounded-3xl bg-[#EDE9F7] p-8 md:p-12">
-                    <div className="grid md:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] gap-10 md:gap-14 items-start">
-                      <div className="md:sticky md:top-28">
+                    <div className="grid [@media(min-width:1280px)]:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] gap-10 md:gap-14 items-start">
+                      <div className="[@media(min-width:1280px)]:sticky [@media(min-width:1280px)]:top-28">
                         <span className="inline-block px-4 py-1.5 rounded-full bg-white text-[#5D4387] text-[11px] font-semibold uppercase tracking-widest">
                           Share Your Mission
                         </span>

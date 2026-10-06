@@ -277,6 +277,16 @@
   100% { opacity: 1; transform: translateY(0); }
 }
 
+/* Nav "Business Functions" tooltip (components/mobile-nav.tsx) — this card is React
+   mount/unmount driven (position:fixed, coordinates computed in JS), not a CSS group-hover
+   child, so a plain `transition` has no "from" state to animate from on mount. An `animation`
+   plays automatically when the element is created, which a transition can't do here — this
+   replicates the fade+scale-in the old group-hover version had. */
+@keyframes tooltip-in {
+  0%   { opacity: 0; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
 /* "Connecting…" label on the call-answered stage — the theme pulses it while it waits. */
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; }
@@ -457,6 +467,34 @@ body[data-scroll-locked] {
 }
 .themed-scrollbar::-webkit-scrollbar-thumb:hover {
   background-color: rgba(0, 0, 0, 0.32);
+}
+
+/* Nav "Hire an Angel" dropdown's own scrollbar (components/mobile-nav.tsx) — lighter, thinner,
+   and brand-purple-tinted rather than the grey .themed-scrollbar used in modals; the thumb has
+   no border, and the up/down arrow buttons some browsers draw on a styled webkit scrollbar are
+   explicitly hidden. */
+.nav-dropdown-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(93, 67, 135, 0.3) transparent;
+}
+.nav-dropdown-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.nav-dropdown-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.nav-dropdown-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(93, 67, 135, 0.3);
+  border: none;
+  border-radius: 999px;
+}
+.nav-dropdown-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(93, 67, 135, 0.45);
+}
+.nav-dropdown-scrollbar::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 /* Hides the scrollbar on an overflow-x-auto row (persona tab bar on narrow viewports) while

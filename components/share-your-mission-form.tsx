@@ -318,7 +318,7 @@ export function ShareYourMissionForm() {
         <h2 className="text-base font-semibold text-[#111]">
           Your organization
         </h2>
-        <div className="mt-5 grid sm:grid-cols-2 gap-x-4 gap-y-4">
+        <div className="mt-5 grid [@media(min-width:1180px)]:grid-cols-2 gap-x-4 gap-y-4">
           <div>
             <label className={requiredLabelClass}>Organization name</label>
             <input
@@ -454,7 +454,7 @@ export function ShareYourMissionForm() {
         <h2 className="text-base font-semibold text-[#111]">
           How Hope Angel could help
         </h2>
-        <div className="mt-5 grid sm:grid-cols-2 gap-x-4 gap-y-4">
+        <div className="mt-5 grid [@media(min-width:1180px)]:grid-cols-2 gap-x-4 gap-y-4">
           <div>
             <label className={requiredLabelClass}>Your first priority</label>
             <select
@@ -530,7 +530,7 @@ export function ShareYourMissionForm() {
         <h2 className="text-base font-semibold text-[#111]">
           Who we can contact
         </h2>
-        <div className="mt-5 grid sm:grid-cols-2 gap-x-4 gap-y-4">
+        <div className="mt-5 grid [@media(min-width:1180px)]:grid-cols-2 gap-x-4 gap-y-4">
           <div>
             <label className={requiredLabelClass}>Your name</label>
             <input

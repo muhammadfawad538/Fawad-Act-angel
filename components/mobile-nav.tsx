@@ -102,6 +102,46 @@ export function MobileNav() {
   // Behind the Angels, rather than centered under the whole bar.
   const [hireOpen, setHireOpen] = useState(false);
   const hireRef = useRef<HTMLDivElement>(null);
+  // The panel scrolls internally on short screens (max-h + overflow-y-auto below), which means
+  // the Business Functions tooltip can no longer be a plain CSS absolute child of its row — a
+  // scrollable ancestor clips anything that tries to overflow it on any axis, including
+  // sideways. So the tooltip is positioned with real coordinates instead (measured from the
+  // hovered row's own DOM rect) and rendered as a `position: fixed` sibling outside the
+  // scrolling container, where that clipping can't reach it. positionTooltip recomputes those
+  // coordinates — called on hover, and again on every scroll of the panel so the tooltip tracks
+  // the row instead of drifting as the list scrolls underneath it.
+  const [tooltip, setTooltip] = useState<{ id: string; style: React.CSSProperties } | null>(null);
+  const pillRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const panelScrollRef = useRef<HTMLDivElement>(null);
+  // Generous estimate of the tooltip's rendered height (heading + up to ~5 lines + padding) —
+  // used only to decide top- vs bottom-anchoring, so it doesn't need to be exact, just safely
+  // on the high side.
+  const TOOLTIP_HEIGHT_ESTIMATE = 190;
+
+  function positionTooltip(personaId: string) {
+    const pill = pillRefs.current[personaId];
+    const panel = panelScrollRef.current;
+    if (!pill || !panel) return;
+    const rect = pill.getBoundingClientRect();
+    const panelRect = panel.getBoundingClientRect();
+    // Row has scrolled out of the panel's own visible area — hide rather than show a tooltip
+    // floating next to nothing.
+    if (rect.bottom <= panelRect.top || rect.top >= panelRect.bottom) {
+      setTooltip(null);
+      return;
+    }
+    // Measured from the panel's own right edge (not the pill's), which sits inset from it by
+    // the row's own padding — so this is an exact 6px gap from the dropdown card itself, not an
+    // incidental one that happens to shrink/grow with the row's padding.
+    const left = panelRect.right + 6;
+    const overflowsBottom = rect.top + TOOLTIP_HEIGHT_ESTIMATE > window.innerHeight;
+    setTooltip({
+      id: personaId,
+      style: overflowsBottom
+        ? { left, bottom: window.innerHeight - rect.bottom }
+        : { left, top: rect.top },
+    });
+  }
   // Desktop "Behind the Angels" dropdown — a plain 2-item list (About Us / Our Social Impact),
   // anchored to its own trigger (behindRef) the same way.
   const [behindOpen, setBehindOpen] = useState(false);
@@ -139,6 +179,13 @@ export function MobileNav() {
       if (behindCloseTimer.current) clearTimeout(behindCloseTimer.current);
     };
   }, []);
+
+  // Covers every way hireOpen can become false (hover-delay timeout, switching to Behind the
+  // Angels, outside click, Escape) in one place, rather than remembering to clear the tooltip
+  // at each of those call sites individually.
+  useEffect(() => {
+    if (!hireOpen) setTooltip(null);
+  }, [hireOpen]);
 
   useEffect(() => {
     if (!hireOpen && !behindOpen) return;
@@ -194,10 +241,11 @@ export function MobileNav() {
 
           {/* Desktop group — all 4 buttons (3 outlined pills + filled Get Started) right-aligned
               as one cluster next to the logo, per requirements/Buttons_update_header.png.
-              Switches in at lg (1024px), not md (768px): below that, the row doesn't have
-              enough room for all 4 pills and was squeezing/wrapping their labels — the burger
-              menu handles that whole range instead. */}
-          <div className="hidden lg:flex items-center gap-3">
+              Switches in at a custom 1180px (not Tailwind's lg/1024px): below that, screens are
+              realistically tablet-sized, where there's no real hover to drive these dropdowns —
+              the burger menu's accordion is click-based natively, so it's used for that whole
+              range instead rather than making the hover-pills click-togglable there too. */}
+          <div className="hidden [@media(min-width:1180px)]:flex items-center gap-3">
             <div
               ref={hireRef}
               className="relative"
@@ -220,12 +268,19 @@ export function MobileNav() {
                   as Behind the Angels' panel below. */}
               {hireOpen && (
                 <div
-                  className="hidden lg:block absolute left-0 top-full mt-5 z-50"
+                  className="hidden [@media(min-width:1180px)]:block absolute left-0 top-full mt-5 z-50"
                   onMouseEnter={openHire}
                   onMouseLeave={scheduleCloseHire}
                 >
+                  {/* max-h + overflow-y-auto: on a short viewport this scrolls internally
+                      instead of running off the bottom of the screen. That's also why the
+                      Business Functions tooltip below is no longer a CSS absolute child in here
+                      — a scrolling ancestor clips anything that overflows it on any axis,
+                      including the tooltip's sideways pop-out. */}
                   <div
-                    className="w-[410px] rounded-2xl border border-black/[0.06]"
+                    ref={panelScrollRef}
+                    onScroll={() => tooltip && positionTooltip(tooltip.id)}
+                    className="themed-scrollbar w-[410px] max-h-[calc(100vh-160px)] overflow-y-auto rounded-2xl border border-black/[0.06]"
                     style={NAV_DROPDOWN_STYLE}
                   >
                     <div className="flex flex-col">
@@ -234,9 +289,14 @@ export function MobileNav() {
                           key={p.id}
                           href={`/hire-an-angel/${p.slug}`}
                           onClick={() => setHireOpen(false)}
+                          onMouseEnter={() => positionTooltip(p.id)}
+                          onMouseLeave={() => setTooltip(null)}
                           className="group relative flex flex-col border-b border-black/[0.06] last:border-b-0 px-3 transition-colors duration-200 hover:bg-[#EDE9F7]/70 [font-family:system-ui,-apple-system,sans-serif]"
                         >
-                          <div className="my-4 flex items-center gap-3 rounded-lg bg-[#5D4387]/10 pl-3 pr-3 py-2.5 transition-[background-color,padding] duration-200 group-hover:bg-[#5D4387]/30 group-hover:pl-[18px]">
+                          <div
+                            ref={(el) => { pillRefs.current[p.id] = el; }}
+                            className="my-4 flex items-center gap-3 rounded-lg bg-[#5D4387]/10 pl-3 pr-3 py-2.5 transition-[background-color,padding] duration-200 group-hover:bg-[#5D4387]/30 group-hover:pl-[18px]"
+                          >
                             <img
                               src={p.avatar}
                               alt=""
@@ -248,25 +308,6 @@ export function MobileNav() {
                               <p title={p.dropdownRole} className="text-[13px] text-black/50 truncate">{p.dropdownRole}</p>
                             </div>
                             <span className="text-black/30 text-sm shrink-0">›</span>
-                          </div>
-
-                          {/* Use Cases — pops out to the right of the row as a floating card
-                              (tooltip-like: fade + scale in) instead of expanding inline below
-                              it. pointer-events-none since it's pure display, no interactive
-                              content of its own; position:relative on the row above (not the
-                              whole stack) is what anchors this to that specific row. */}
-                          <div className="pointer-events-none absolute left-full top-4 ml-3 w-[240px] origin-left scale-95 rounded-xl border border-black/[0.06] bg-[#EDE9F7] p-4 opacity-0 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.35)] transition-all duration-200 group-hover:scale-100 group-hover:opacity-100 z-10">
-                            <p className="text-[10.5px] font-medium uppercase tracking-widest text-black/40">
-                              Business Functions
-                            </p>
-                            <ul className="mt-2 flex flex-col gap-1.5">
-                              {p.useCases?.map((uc) => (
-                                <li key={uc} className="flex items-center gap-2 text-[13px] font-medium text-[#333]">
-                                  <span className="w-1 h-1 rounded-full bg-[#5D4387] shrink-0" />
-                                  {uc}
-                                </li>
-                              ))}
-                            </ul>
                           </div>
                         </Link>
                       ))}
@@ -309,7 +350,6 @@ export function MobileNav() {
                         className="flex items-center justify-between gap-2 rounded-xl border border-black/[0.08] p-4 cursor-pointer hover:border-black/20 hover:bg-black/[0.02] transition-colors [font-family:system-ui,-apple-system,sans-serif]"
                       >
                         <p className="text-[14px] font-semibold text-[#111]">{item.title}</p>
-                        <span className="text-black/30 text-sm shrink-0">›</span>
                       </Link>
                     ))}
                   </div>
@@ -328,10 +368,10 @@ export function MobileNav() {
             </Link>
           </div>
 
-          {/* Burger — shown below lg (1024px), same threshold as the desktop group above */}
+          {/* Burger — shown below 1180px, same threshold as the desktop group above */}
           <button
             onClick={() => setOpen((v) => !v)}
-            className="lg:hidden flex flex-col justify-center items-center w-8 h-8 gap-[5px] rounded-lg hover:bg-black/[0.04] transition-colors"
+            className="[@media(min-width:1180px)]:hidden flex flex-col justify-center items-center w-8 h-8 gap-[5px] rounded-lg hover:bg-black/[0.04] transition-colors"
             aria-label={open ? "Close menu" : "Open menu"}
           >
             <span
@@ -359,9 +399,43 @@ export function MobileNav() {
           </button>
         </nav>
 
-        {/* Mobile dropdown — same lg threshold as the burger that opens it */}
+        {/* Business Functions tooltip — a position:fixed sibling of <nav> (not a descendant of
+            it, and not nested inside the scrollable panel either), positioned from the hovered
+            row's real getBoundingClientRect() via positionTooltip(). It has to sit outside
+            <nav> specifically: NAV_STYLE applies backdropFilter to <nav> itself, and a
+            backdrop-filter establishes a new containing block for position:fixed descendants —
+            so a fixed element nested inside <nav> is positioned relative to <nav>'s own box,
+            not the true viewport, which is what caused the tooltip to render far off from
+            where it should've appeared. top- or bottom-anchored depending on whether it would
+            otherwise run off the bottom of the viewport; pointer-events-none since it's pure
+            display, nothing inside it to interact with. */}
+        {hireOpen && tooltip && (() => {
+          const p = PERSONAS.find((x) => x.id === tooltip.id);
+          if (!p) return null;
+          return (
+            <div
+              key={tooltip.id}
+              className="hidden [@media(min-width:1180px)]:block fixed w-[240px] rounded-xl border border-black/[0.06] bg-[#EDE9F7] p-4 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.35)] z-50 pointer-events-none"
+              style={{ ...tooltip.style, transformOrigin: "left center", animation: "tooltip-in 180ms ease" }}
+            >
+              <p className="text-[10.5px] font-medium uppercase tracking-widest text-black/40">
+                Business Functions
+              </p>
+              <ul className="mt-2 flex flex-col gap-1.5">
+                {p.useCases?.map((uc) => (
+                  <li key={uc} className="flex items-center gap-2 text-[13px] font-medium text-[#333]">
+                    <span className="w-1 h-1 rounded-full bg-[#5D4387] shrink-0" />
+                    {uc}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          );
+        })()}
+
+        {/* Mobile dropdown — same 1180px threshold as the burger that opens it */}
         <div
-          className="lg:hidden mt-2 max-h-[80vh] overflow-y-auto transition-all duration-300 ease-in-out"
+          className="[@media(min-width:1180px)]:hidden mt-2 max-h-[80vh] overflow-y-auto transition-all duration-300 ease-in-out"
           style={{ maxHeight: open ? "min(2000px, 80vh)" : "0px", opacity: open ? 1 : 0 }}
         >
           <div
@@ -468,7 +542,6 @@ export function MobileNav() {
                     className="flex items-center justify-between gap-2 rounded-xl border border-black/[0.08] p-3 hover:border-black/20 hover:bg-black/[0.03] transition-colors [font-family:system-ui,-apple-system,sans-serif]"
                   >
                     <p className="text-[13px] font-semibold text-[#111]">{item.title}</p>
-                    <span className="text-black/30 text-sm shrink-0">›</span>
                   </Link>
                 ))}
               </div>
