@@ -197,6 +197,41 @@ export function MobileNav() {
     behindCloseTimer.current = setTimeout(() => setBehindOpen(false), 150);
   };
 
+  // Chrome's device-emulation ("responsive") mode, and real touch devices, synthesize
+  // mouseenter/mouseleave around a tap so hover-reliant sites still sort of work — a single tap
+  // on the trigger can fire enter (opens) immediately followed by leave (schedules a close),
+  // racing against the click handler. That's what testers saw: Hire an Angel getting stuck open
+  // (a later synthetic enter on the panel itself cancels the scheduled close) and Behind the
+  // Angels flickering shut (nothing cancels its close, so the scheduled 150ms close just fires).
+  // e.pointerType reliably distinguishes a real mouse from touch/pen even when the browser also
+  // emits legacy mouse events for compatibility — these wrappers use it to skip the hover
+  // open/close logic entirely for touch, so only the click/tap toggle below drives it there,
+  // while real mouse users keep the existing hover behavior untouched.
+  const onHirePointerEnter = (e: React.PointerEvent) => { if (e.pointerType === "mouse") openHire(); };
+  const onHirePointerLeave = (e: React.PointerEvent) => { if (e.pointerType === "mouse") scheduleCloseHire(); };
+  const onBehindPointerEnter = (e: React.PointerEvent) => { if (e.pointerType === "mouse") openBehind(); };
+  const onBehindPointerLeave = (e: React.PointerEvent) => { if (e.pointerType === "mouse") scheduleCloseBehind(); };
+
+  // Click is now a true toggle rather than "always open" — on mouse this is just a harmless
+  // bonus (hover already opens/closes it), but on touch it's the only way to close a trigger
+  // that's already open, since there's no hover-out to rely on.
+  const toggleHire = () => {
+    if (hireOpen) {
+      if (hireCloseTimer.current) { clearTimeout(hireCloseTimer.current); hireCloseTimer.current = null; }
+      setHireOpen(false);
+    } else {
+      openHire();
+    }
+  };
+  const toggleBehind = () => {
+    if (behindOpen) {
+      if (behindCloseTimer.current) { clearTimeout(behindCloseTimer.current); behindCloseTimer.current = null; }
+      setBehindOpen(false);
+    } else {
+      openBehind();
+    }
+  };
+
   // Clears any pending close timer left running if the nav unmounts mid-delay.
   useEffect(() => {
     return () => {
@@ -274,11 +309,11 @@ export function MobileNav() {
             <div
               ref={hireRef}
               className="relative"
-              onMouseEnter={openHire}
-              onMouseLeave={scheduleCloseHire}
+              onPointerEnter={onHirePointerEnter}
+              onPointerLeave={onHirePointerLeave}
             >
               <button
-                onClick={openHire}
+                onClick={toggleHire}
                 aria-expanded={hireOpen}
                 className={`group outline-none cursor-pointer ${NAV_PILL}`}
               >
@@ -294,8 +329,8 @@ export function MobileNav() {
               {hireOpen && (
                 <div
                   className="hidden [@media(min-width:1180px)]:block absolute left-0 top-full mt-5 z-50"
-                  onMouseEnter={openHire}
-                  onMouseLeave={scheduleCloseHire}
+                  onPointerEnter={onHirePointerEnter}
+                  onPointerLeave={onHirePointerLeave}
                 >
                   {/* max-h + overflow-y-auto: on a short viewport this scrolls internally
                       instead of running off the bottom of the screen. That's also why the
@@ -349,11 +384,11 @@ export function MobileNav() {
             <div
               ref={behindRef}
               className="relative"
-              onMouseEnter={openBehind}
-              onMouseLeave={scheduleCloseBehind}
+              onPointerEnter={onBehindPointerEnter}
+              onPointerLeave={onBehindPointerLeave}
             >
               <button
-                onClick={openBehind}
+                onClick={toggleBehind}
                 aria-expanded={behindOpen}
                 className={`group outline-none cursor-pointer ${NAV_PILL}`}
               >
