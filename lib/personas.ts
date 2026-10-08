@@ -111,7 +111,7 @@ export interface Persona {
   closingCtaHref?: string
   closingQuote?: string // pull-quote banner between the closing CTA and the mission form
   closingQuoteTag?: string // small-caps label on the quote banner's right edge
-  showMissionForm?: boolean // embeds the nonprofit application form (Hope Angel) at #share-your-mission
+  showMissionForm?: boolean // shows the floating "Share Your Mission" widget (Hope Angel), linking to the standalone /share-your-mission page
 
   // Hope Angel's phone-demo override — see CampaignDemo above.
   campaignDemo?: CampaignDemo
@@ -408,7 +408,7 @@ export const PERSONAS: Persona[] = [
     liveDemoSubtext:
       "Choose a scenario and a channel to see an example of how Hope Angel moves a conversation toward a helpful next step.",
     liveDemoCtaLabel: "Share Your Mission",
-    liveDemoCtaHref: "#share-your-mission",
+    liveDemoCtaHref: "/share-your-mission",
     liveDemoCtaVariant: "purple",
     liveDemoCaption: "See what service could look like for your NPO.",
     livePreviewPillLabel: "Devoted Volunteer",
@@ -419,7 +419,7 @@ export const PERSONAS: Persona[] = [
     closingDescription:
       "We would be honored to learn about the good your organization does. As part of our Progress with Purpose commitment, Act Angel AI (AAA) invests in Hope Angel and extends its service on a complimentary basis to eligible NPOs. Before offering an Angel, we take time to understand each organization and verify its authenticity and ethical practices. Please tell us about your mission and how Hope Angel might serve it.",
     closingCtaLabel: "Share Your Mission",
-    closingCtaHref: "#share-your-mission",
+    closingCtaHref: "/share-your-mission",
     closingQuote: "We choose to measure success by the good we do with it.",
     closingQuoteTag: "Revenue. Angels. Time.",
     showMissionForm: true,
