@@ -350,11 +350,16 @@ export function MobileNav() {
                           key={p.id}
                           href={`/hire-an-angel/${p.slug}`}
                           onClick={() => setHireOpen(false)}
-                          onMouseEnter={(e) => {
+                          onPointerEnter={(e) => {
+                            // Same fix as the dropdown trigger's hover gating above — without
+                            // this, a tap on a row (which, under touch, still synthesizes a
+                            // mouseenter for hover-reliant sites) can pop the tooltip open with
+                            // no reliable "leave" event to ever clear it again.
+                            if (e.pointerType !== "mouse") return;
                             lastMouseRef.current = { x: e.clientX, y: e.clientY };
                             positionTooltip(p.id);
                           }}
-                          onMouseLeave={() => setTooltip(null)}
+                          onPointerLeave={(e) => { if (e.pointerType === "mouse") setTooltip(null); }}
                           className="group relative flex flex-col border-b border-black/[0.06] last:border-b-0 px-3 transition-colors duration-200 hover:bg-[#EDE9F7]/70 [font-family:system-ui,-apple-system,sans-serif]"
                         >
                           <div
