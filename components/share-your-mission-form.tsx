@@ -1,7 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
 
 type Priority =
   | "Purposeful fundraising"
@@ -108,6 +120,27 @@ function validateField(name: FieldName, value: string): string {
   }
 }
 
+// Truncates a dropdown option's label with an ellipsis once it no longer fits the (now
+// trigger-width-constrained) menu. Every option gets a tooltip showing its full text on hover,
+// not just the ones currently truncated, so it stays correct if the menu's width (and therefore
+// which options clip) changes later.
+//
+// line-clamp-1 (not `truncate`) — same mechanism SelectTrigger already uses for the closed
+// field's value (components/ui/select.tsx), which held up inside this component's nested flex
+// layout where plain `truncate`'s width-based ellipsis didn't reliably trigger.
+function TruncatedOptionText({ text }: { text: string }) {
+  const span = (
+    <span className="line-clamp-1 w-full min-w-0 max-w-full">{text}</span>
+  );
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{span}</TooltipTrigger>
+      <TooltipContent>{text}</TooltipContent>
+    </Tooltip>
+  );
+}
+
 function FieldError({ message }: { message?: string }) {
   if (!message) return null;
   return <p className="mt-1.5 text-xs text-red-600">{message}</p>;
@@ -133,6 +166,21 @@ export function ShareYourMissionForm() {
   const [governancePage, setGovernancePage] = useState("");
 
   const [priority, setPriority] = useState<Priority | "">("");
+  // Measured directly rather than left to Radix's own --radix-select-trigger-width CSS var:
+  // that var didn't reliably keep the open dropdown panel at exactly the trigger's width at
+  // small viewport sizes. A ResizeObserver on the trigger's wrapper gives us the real pixel
+  // width to set on SelectContent's own `style`, which always wins over any CSS-based sizing.
+  const priorityTriggerWrapperRef = useRef<HTMLDivElement>(null);
+  const [priorityTriggerWidth, setPriorityTriggerWidth] = useState<number>();
+  useEffect(() => {
+    const el = priorityTriggerWrapperRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(([entry]) => {
+      setPriorityTriggerWidth(entry.contentRect.width);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
   const [campaignPage, setCampaignPage] = useState("");
   const [helpFirst, setHelpFirst] = useState("");
   const [currentTools, setCurrentTools] = useState("");
@@ -376,7 +424,7 @@ export function ShareYourMissionForm() {
             />
             <FieldError message={fieldErrors.whereYouWork} />
           </div>
-          <div className="sm:col-span-2">
+          <div className="[@media(min-width:1180px)]:col-span-2">
             <label className={requiredLabelClass}>
               Registration number, registry link, or reason for exemption
             </label>
@@ -395,7 +443,7 @@ export function ShareYourMissionForm() {
             />
             <FieldError message={fieldErrors.registrationNumber} />
           </div>
-          <div className="sm:col-span-2">
+          <div className="[@media(min-width:1180px)]:col-span-2">
             <label className={requiredLabelClass}>
               What is your mission, and who do you serve?
             </label>
@@ -457,27 +505,60 @@ export function ShareYourMissionForm() {
         <div className="mt-5 grid [@media(min-width:1180px)]:grid-cols-2 gap-x-4 gap-y-4">
           <div>
             <label className={requiredLabelClass}>Your first priority</label>
-            <select
+            <Select
               value={priority}
-              onChange={(e) => {
-                const value = e.target.value as Priority | "";
-                setPriority(value);
+              onValueChange={(value) => {
+                setPriority(value as Priority);
                 setFieldErrors((prev) =>
                   prev.priority
                     ? { ...prev, priority: validateField("priority", value) }
                     : prev,
                 );
               }}
-              onBlur={() => handleBlur("priority")}
-              className={`${fieldClass(!!fieldErrors.priority)} mt-2`}
             >
-              <option value="">Select one</option>
-              {PRIORITIES.map((p) => (
-                <option key={p} value={p}>
-                  {p}
-                </option>
-              ))}
-            </select>
+              <div ref={priorityTriggerWrapperRef} className="mt-2">
+                {/* whitespace-normal overrides the base component's whitespace-nowrap — verified
+                    with Playwright (measuring the trigger's own boundingBox before/after
+                    selecting a long option) that nowrap was the actual cause of the field
+                    growing: below the 1180px breakpoint this grid has no explicit
+                    grid-template-columns, so its single column's width is driven by the widest
+                    max-content contribution among its children. With nowrap, the browser treats
+                    a long selected label as one unbreakable line when computing that
+                    max-content, which forced the whole column (not just this field — every
+                    field sharing it grows in lockstep) past the viewport width. line-clamp-1
+                    (on the value span) doesn't need nowrap to clip to one line; it just needs
+                    white-space to allow wrapping so intrinsic sizing stays sane, then clips
+                    visually once a real width is assigned.
+                    *:data-[slot=select-value]:min-w-0/max-w-full — Radix's Select.Value
+                    primitive silently drops any className passed directly to it (destructured
+                    out of props, never spread onto the rendered span — confirmed in
+                    @radix-ui/react-select's source), so it has to be targeted this way, the
+                    same descendant-selector mechanism the base component already uses for its
+                    other styling. */}
+                <SelectTrigger
+                  onBlur={() => handleBlur("priority")}
+                  className={`${fieldClass(!!fieldErrors.priority)} h-auto data-[size=default]:h-auto font-normal overflow-hidden whitespace-normal *:data-[slot=select-value]:min-w-0 *:data-[slot=select-value]:max-w-full focus-visible:border-[#5D4387] focus-visible:ring-[#5D4387]/20`}
+                >
+                  <SelectValue placeholder="Select one" />
+                </SelectTrigger>
+              </div>
+              <SelectContent
+                side="bottom"
+                avoidCollisions={false}
+                style={priorityTriggerWidth ? { width: priorityTriggerWidth } : undefined}
+                className="rounded-xl border-black/10 shadow-lg"
+              >
+                {PRIORITIES.map((p) => (
+                  <SelectItem
+                    key={p}
+                    value={p}
+                    className="cursor-pointer rounded-lg text-sm focus:bg-[#5D4387]/10 focus:text-[#5D4387] data-[state=checked]:font-medium data-[state=checked]:text-[#5D4387] [&_svg:not([class*='text-'])]:text-[#5D4387]"
+                  >
+                    <TruncatedOptionText text={p} />
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <FieldError message={fieldErrors.priority} />
           </div>
           <div>
@@ -496,7 +577,7 @@ export function ShareYourMissionForm() {
             />
             <FieldError message={fieldErrors.campaignPage} />
           </div>
-          <div className="sm:col-span-2">
+          <div className="[@media(min-width:1180px)]:col-span-2">
             <label className={requiredLabelClass}>
               What would you like Hope Angel to help with first?
             </label>
@@ -512,7 +593,7 @@ export function ShareYourMissionForm() {
             />
             <FieldError message={fieldErrors.helpFirst} />
           </div>
-          <div className="sm:col-span-2">
+          <div className="[@media(min-width:1180px)]:col-span-2">
             <label className={optionalLabelClass}>
               Current tools or communication channels
             </label>

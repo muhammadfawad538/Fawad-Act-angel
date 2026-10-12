@@ -104,6 +104,20 @@ export default function AgenticPage() {
     setHeroReady(true);
   }, []);
 
+  // Hero phone demo's width is a JS prop (PersonaPhoneDemo derives its own height from it), not
+  // a CSS size — a media query can't touch it directly, and a CSS transform:scale wouldn't
+  // actually shrink the layout box it reserves (which is the overflow problem in the first
+  // place), so this tracks the same 768-872px range in JS and passes a smaller width through
+  // instead. 306 is 10% below the normal 340.
+  const [heroPhoneWidth, setHeroPhoneWidth] = useState(340);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px) and (max-width: 872px)");
+    setHeroPhoneWidth(mq.matches ? 306 : 340);
+    const onChange = (e: MediaQueryListEvent) => setHeroPhoneWidth(e.matches ? 306 : 340);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
   // Start video zoom slightly before hero content reveals, for seamless overlap.
   // When the intro is skipped (already seen this session) there's nothing to overlap with,
   // so go straight to the zoomed state instead of holding it back for ~10s.
@@ -216,7 +230,13 @@ export default function AgenticPage() {
             {/* Text */}
             <div className="max-w-xl">
               <h1
-                className="text-6xl sm:text-7xl md:text-8xl font-light text-[#111] leading-[1.0] tracking-tight mb-6"
+                // [@media(768px<=width<=872px)]: md:text-8xl (96px) is too wide here — the
+                // phone demo beside it is a fixed 340px, and at this narrow a viewport the
+                // heading's own content (e.g. "employee") can't shrink below its intrinsic
+                // width, so the flex row overflows and pushes the phone off the right edge of
+                // the screen. 67px (~30% below the 96px original) just in this range; back to
+                // md:text-8xl above 872px where there's room for both.
+                className="text-6xl sm:text-7xl md:text-8xl [@media(768px<=width<=872px)]:text-[67px] font-light text-[#111] leading-[1.0] tracking-tight mb-6"
                 style={{
                   fontFamily: '"IBM Plex Sans", sans-serif',
                   opacity: heroReady ? 1 : 0,
@@ -295,8 +315,10 @@ export default function AgenticPage() {
                       transition: `opacity 0.8s cubic-bezier(0.16,1,0.3,1) ${280 + i * 80}ms, filter 0.8s cubic-bezier(0.16,1,0.3,1) ${280 + i * 80}ms, transform 0.8s cubic-bezier(0.16,1,0.3,1) ${280 + i * 80}ms`,
                     }}
                   >
+                    {/* [@media(768px<=width<=872px)]: same overflow issue/fix as the hero
+                        heading above — 29px is ~20% below the 36px (sm:text-4xl) original. */}
                     <div
-                      className="text-3xl sm:text-4xl text-[#111] font-light tracking-tight"
+                      className="text-3xl sm:text-4xl [@media(768px<=width<=872px)]:text-[23px] text-[#111] font-light tracking-tight"
                       style={{ fontFamily: '"IBM Plex Sans", sans-serif' }}
                     >
                       {stat.value}
@@ -340,7 +362,7 @@ export default function AgenticPage() {
                 contact={HERO_CONTACT}
                 avatar={HERO_AVATAR}
                 messages={HERO_MESSAGES}
-                width={340}
+                width={heroPhoneWidth}
                 active={heroReady}
               />
             </div>
@@ -541,11 +563,6 @@ export default function AgenticPage() {
               { name: "Spiral", logo: "/images/icons/spiral.png", pos: [106, 22] },                   
               { name: "Todoist", logo: "/images/icons/todoist.svg", pos: [222, 416] },
               { name: "monday.com", logo: "/images/icons/mondaydotcom.png", pos: [636, 412] },
-              // { name: "Email", logo: "/images/icons/email.png" },
-              // { name: "Video", logo: "/images/icons/video.png" },
-              // { name: "Notes", logo: "/images/icons/notes.png", pos: [227, 37] },
-              // { name: "Tasks", logo: "/images/icons/tasks.png", pos: [452, 109] },
-              // { name: "Marketing", logo: "/images/icons/marketing.png", pos: [558, 91] },
             ];
 
             return (
@@ -555,7 +572,22 @@ export default function AgenticPage() {
               // so widening the container (rather than re-deriving every position at a smaller
               // scale) is what buys back that lost breathing room — 78 units now maps to ~119px
               // of real separation instead of ~100px, comparable to the original spacing.
-              <div className="tools-orbit relative w-full max-w-[1100px] aspect-[720/420] mx-auto">
+              // [@media(992px<=width<=1098px)]: at this narrow a container, the fixed-72px
+              // node size eats proportionally more of the stage, exposing an asymmetry already
+              // latent in the hand-tuned positions — the rightmost icon (Googletv, x=698) was
+              // actually overflowing the 720-unit stage's right edge by ~44px of real margin
+              // while the leftmost (Asana/ClickUp, x=26) still had ~32px of clear margin.
+              // Computed via the actual node-size-at-this-scale math (not eyeballed): shifting
+              // the icon layer 39px left equalizes both sides instead of leaving one tight and
+              // one loose. A slightly taller aspect ratio in the same range (420->445) adds a
+              // bit more vertical breathing room between rows, as asked, without moving any
+              // icon's own position.
+              // [@media(768px<=width<=991px)]: same asymmetry, same fix — at this container
+              // width (viewport minus the md:px-12 96px gutters) the computed left/right
+              // margins come out to ~24-32px clear on the left vs. ~45-51px of overflow on the
+              // right across the whole range, a near-constant ~76-77px gap, so a single -38px
+              // shift (half the gap) equalizes both ends from 768px through 991px.
+              <div className="tools-orbit relative w-full max-w-[1100px] aspect-[720/420] [@media(992px<=width<=1098px)]:aspect-[720/445] mx-auto">
                 {/* Center hub — hidden below md: the hub gets cramped against the orbiting
                     tool nodes on small screens, so it's dropped rather than shrunk further.
                     display/alignItems/justifyContent removed from inline style (they used to
@@ -563,7 +595,12 @@ export default function AgenticPage() {
                     className) because an inline `display` can't be responsive and would have
                     overridden `hidden` at every breakpoint regardless of the md: prefix. */}
                 <div
-                  className="hidden md:flex absolute rounded-full bg-[#EDECE9] items-center justify-center z-10"
+                  // Width lives in className (not the inline style below) so the
+                  // [@media(768px<=width<=991px)]: override can win — inline styles beat
+                  // classes, so a responsive width can't be expressed there. The icon
+                  // img below is sized at 80% of this div, so shrinking this hub shrinks
+                  // the background circle and the icon inside it together.
+                  className="hidden md:flex absolute rounded-full bg-[#EDECE9] items-center justify-center z-10 w-[min(200px,26%)] [@media(768px<=width<=991px)]:w-[min(160px,20.8%)]"
                   style={{
                     position: "absolute",
                     left: "50%",
@@ -575,13 +612,6 @@ export default function AgenticPage() {
                     boxShadow: "0 12px 50px 8px rgba(93,67,135,0.45)",
                     zIndex: 2,
                     animation: "centerLevitate 5s ease-in-out infinite",
-                    // 200px, but never more than 26% of the stage width. The tool positions are
-                    // percentages of the stage while this hub was a fixed size, so on the
-                    // narrower desktop widths (the stage goes down to ~665px) a fixed 200px hub
-                    // runs into the nearest icons (Tasks, WhatsApp) — especially at the top of
-                    // its float. The cap keeps a clear gap there; from a ~770px-wide stage up
-                    // it's the full 200px.
-                    width: "min(200px, 26%)",
                     aspectRatio: "1",
                   }}
                 >
@@ -592,6 +622,13 @@ export default function AgenticPage() {
                   />
                 </div>
 
+                {/* Wraps just the icon layer (not the hub above) so the 992-1098px and
+                    768-991px shifts below can nudge the icons without re-centering the hub
+                    along with them. Below 760px, globals.css's `.tools-orbit-icon-layer`
+                    rule sets this to `display: contents` — otherwise this wrapper would sit
+                    between .tools-orbit and .tools-orbit-node, breaking the plain-grid
+                    layout that CSS applies there (it needs the nodes as direct children). */}
+                <div className="tools-orbit-icon-layer absolute inset-0 [@media(992px<=width<=1098px)]:translate-x-[-39px] [@media(768px<=width<=991px)]:translate-x-[-38px]">
                 {TOOLS.map((tool, i) => {
                   const [left, top] = tool.pos;
 
@@ -608,7 +645,57 @@ export default function AgenticPage() {
                     {/* {i===12 && <div className="tools-orbit-node absolute [@media(max-width:540px)]:hidden!" style={{ left: '50%', top: '50%' }} />} */}
                     {i===24 && <div className="tools-orbit-node absolute [@media(540px<width<=760px)]:hidden!" style={{ left: '50%', top: '50%' }} />}
                     <div
-                      className="tools-orbit-node absolute"
+                      // Top-row icons (pos[1] <= 130 — Docs, Spiral, Chat, Outlook, Salesforce,
+                      // SAP, Notion, WhatsApp, Maps, HubSpot) shift up an extra 30px at
+                      // 992-1098px (same range as the icon-layer/aspect-ratio tweaks above),
+                      // and 40px at 768-991px — this narrower range compresses row spacing
+                      // more (smaller container height via the same aspect ratio), so it
+                      // needs a bigger push to clear the row below it.
+                      // Within that top row, the topmost sub-tier (pos[1] <= 40 — Spiral,
+                      // Salesforce, SAP, Notion) still crowded the row below them at
+                      // 768-991px even after the 40px shift, so they get 30px more there —
+                      // 70px total (a single translate, not two stacked ones, since a second
+                      // translate-y utility would replace rather than add to the first).
+                      // Middle-row icons (130 < pos[1] < 400 — Otter, Calendar, Googletv, Asana,
+                      // Slack, Gmail, Cloud, Zoom, Fathom, Google Meet, ClickUp, Phone) shift
+                      // down 20px at 992-1098px, to restore the gap the top row's upward shift
+                      // closed. Bottom row (pos[1] >= 400 — Fireflies, Todoist, monday.com) is
+                      // left alone.
+                      // Outlook individually needed its own nudge at 768-991px on top of the
+                      // shared top-row shift, in two rounds (10px right/20px down, then 20px
+                      // more of each since it was still cluttered) — 30px right total, and the
+                      // two 20px-down corrections exactly cancel the shared -40px upward shift,
+                      // so no net vertical translate remains (single combined values, not
+                      // stacked translate-y utilities, since only one wins per element).
+                      // Calendar (middle row) gets its own 768-991px nudge too — 24px right,
+                      // 6px up — on top of its unchanged 992-1098px down-shift.
+                      // Google Meet and Gmail (middle row) shift down 60px total at 768-991px
+                      // (20px matching their shared 992-1098px down-shift, then 40px more since
+                      // they were still too close to the row above). Phone started in that same
+                      // group, then needed 16px more (76px total) individually. Todoist (bottom
+                      // row, otherwise left alone) started with that same 60px-down fix plus
+                      // 30px left, then came up 14px twice more (net 32px down) since it kept
+                      // moving too far; it has no 992-1098px treatment since it was never part
+                      // of that group.
+                      className={`tools-orbit-node absolute${
+                        top <= 40
+                          ? " [@media(992px<=width<=1098px)]:-translate-y-[30px] [@media(768px<=width<=991px)]:-translate-y-[70px]"
+                          : tool.name === "Outlook"
+                          ? " [@media(992px<=width<=1098px)]:-translate-y-[30px] [@media(768px<=width<=991px)]:translate-x-[30px]"
+                          : top <= 130
+                          ? " [@media(992px<=width<=1098px)]:-translate-y-[30px] [@media(768px<=width<=991px)]:-translate-y-[40px]"
+                          : tool.name === "Calendar"
+                          ? " [@media(992px<=width<=1098px)]:translate-y-[20px] [@media(768px<=width<=991px)]:translate-x-[24px] [@media(768px<=width<=991px)]:-translate-y-[6px]"
+                          : tool.name === "Todoist"
+                          ? " [@media(768px<=width<=991px)]:translate-y-[32px] [@media(768px<=width<=991px)]:-translate-x-[30px]"
+                          : tool.name === "Phone"
+                          ? " [@media(992px<=width<=1098px)]:translate-y-[20px] [@media(768px<=width<=991px)]:translate-y-[76px]"
+                          : ["Google Meet", "Gmail"].includes(tool.name)
+                          ? " [@media(992px<=width<=1098px)]:translate-y-[20px] [@media(768px<=width<=991px)]:translate-y-[60px]"
+                          : top < 400
+                          ? " [@media(992px<=width<=1098px)]:translate-y-[20px]"
+                          : ""
+                      }`}
                       style={{
                         left: `${(left / 720) * 100}%`,
                         top: `${(top / 460) * 100}%`,
@@ -637,6 +724,7 @@ export default function AgenticPage() {
                     </React.Fragment>
                   );
                 })}
+                </div>
               </div>
             );
           })()}

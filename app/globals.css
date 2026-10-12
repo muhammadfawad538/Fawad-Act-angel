@@ -1,6 +1,29 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
+/* Radix popovers (e.g. the Select on /share-your-mission) lock background scroll via
+   react-remove-scroll, which — while open — injects its own <style> tag with
+   `body[data-scroll-locked] { overflow: hidden !important; position: relative !important; ... }`
+   (confirmed by inspecting the live page, not just its docs; it's not a plain inline style).
+   Either of those two properties alone is enough to break a `position: sticky` descendant
+   elsewhere on the page: per spec, a sticky element sticks relative to its nearest ancestor with
+   a "scrolling mechanism", and ANY non-`visible` overflow value establishes one — not just
+   `position: relative`. With body suddenly acting as that ancestor (and body's own scrollTop
+   never actually changing, since real scrolling had moved to <html>), the sticky element
+   un-sticks and snaps to its normal, pre-scroll document position, which can be well above the
+   current viewport (verified via Playwright: a sticky sidebar heading at a normal y:112 jumped
+   to y:-298 the instant the dropdown opened). The selector has to at least match
+   `body[data-scroll-locked]`'s specificity to win the !important-vs-!important tie (a bare
+   `body { !important }` rule, tried first, lost to it regardless of source order); `html
+   body[data-scroll-locked]` is one level more specific, so it wins outright. This does give up
+   the scroll-lock's actual job (the page can scroll in the background while a dropdown is open)
+   — an acceptable trade for not breaking sticky positioning site-wide, and the same trade this
+   page's native <select> equivalent made implicitly, since native selects don't lock scroll. */
+html body[data-scroll-locked] {
+  position: static !important;
+  overflow: visible !important;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 :root {
@@ -160,6 +183,13 @@
 
   .tools-orbit > div:first-child {
     display: none;
+  }
+
+  /* The icon-layer wrapper (desktop-only horizontal shift, see app/page.tsx) sits between
+     .tools-orbit and the .tools-orbit-node icons. `display: contents` removes its own box so
+     the icons become direct grid children again, as this grid layout requires. */
+  .tools-orbit-icon-layer {
+    display: contents;
   }
 
   .tools-orbit-node {
