@@ -14,6 +14,7 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from "@/components/ui/tooltip";
+import { normalizePhone } from "@/lib/phone";
 
 type Priority =
   | "Purposeful fundraising"
@@ -65,7 +66,8 @@ type FieldName =
   | "workEmail"
   | "annualReport"
   | "governancePage"
-  | "campaignPage";
+  | "campaignPage"
+  | "phone";
 
 function isValidUrl(value: string): boolean {
   try {
@@ -117,6 +119,14 @@ function validateField(name: FieldName, value: string): string {
       return !trimmed || isValidUrl(trimmed)
         ? ""
         : "Please enter a valid URL (e.g. https://example.org).";
+    case "phone":
+      // Optional - only validated when non-empty. normalizePhone requires an explicit
+      // country code (leading '+'), which is what makes this work for any country without
+      // a country-specific regex; it also strips spaces/dashes/parens/dots before checking,
+      // so normal formatting is still allowed.
+      return !trimmed || normalizePhone(trimmed)
+        ? ""
+        : "Please enter a valid phone number including country code, e.g. +14155551234 or +919876543210.";
   }
 }
 
@@ -145,6 +155,15 @@ function FieldError({ message }: { message?: string }) {
   if (!message) return null;
   return <p className="mt-1.5 text-xs text-red-600">{message}</p>;
 }
+
+// AAA-HA-002: the form kept all entered values in plain component state only, so navigating
+// away (including via the browser Back button from the "ready" screen, which isn't a separate
+// route/history entry - see share-your-mission-form.tsx's handleSubmit) and reopening
+// /share-your-mission unmounted and remounted the component from scratch, losing everything
+// typed. Persisting to sessionStorage (tab-scoped, gone once the tab closes) survives that
+// without needing any routing changes.
+const DRAFT_STORAGE_KEY = "shareYourMissionForm:draft";
+type DraftFields = Record<FieldName, string> & { currentTools: string };
 
 /**
  * The nonprofit application form from https://hope-angel.vercel.app/hire-an-angel/hope-angel's
@@ -211,7 +230,85 @@ export function ShareYourMissionForm() {
     annualReport,
     governancePage,
     campaignPage,
+    phone,
   };
+
+  // Restores a previously saved draft on mount (e.g. after Back navigation, a reload, or
+  // reopening this page), so entered data survives rather than starting blank. Runs once,
+  // after mount rather than in a lazy useState initializer, since sessionStorage isn't
+  // available during server rendering and reading it there would cause a hydration mismatch.
+  useEffect(() => {
+    let raw: string | null = null;
+    try {
+      raw = sessionStorage.getItem(DRAFT_STORAGE_KEY);
+    } catch {
+      return;
+    }
+    if (!raw) return;
+
+    let draft: unknown;
+    try {
+      draft = JSON.parse(raw);
+    } catch {
+      return;
+    }
+    if (!draft || typeof draft !== "object") return;
+    const d = draft as Record<string, unknown>;
+
+    const restore = (value: unknown, setter: (v: string) => void) => {
+      if (typeof value === "string" && value) setter(value);
+    };
+    restore(d.orgName, setOrgName);
+    restore(d.orgWebsite, setOrgWebsite);
+    restore(d.registrationRegion, setRegistrationRegion);
+    restore(d.whereYouWork, setWhereYouWork);
+    restore(d.registrationNumber, setRegistrationNumber);
+    restore(d.mission, setMission);
+    if (typeof d.priority === "string" && (PRIORITIES as string[]).includes(d.priority)) {
+      setPriority(d.priority as Priority);
+    }
+    restore(d.helpFirst, setHelpFirst);
+    restore(d.currentTools, setCurrentTools);
+    restore(d.contactName, setContactName);
+    restore(d.contactRole, setContactRole);
+    restore(d.workEmail, setWorkEmail);
+    restore(d.annualReport, setAnnualReport);
+    restore(d.governancePage, setGovernancePage);
+    restore(d.campaignPage, setCampaignPage);
+    restore(d.phone, setPhone);
+  }, []);
+
+  // Keeps the draft above current as the user types. Not cleared on successful submission -
+  // this form's "success" is just reaching the "ready" screen (see handleSubmit), and that's
+  // exactly the point AAA-HA-002's Back-navigation repro happens from, so clearing here would
+  // immediately undo the fix. sessionStorage is tab-scoped and disappears once the tab closes,
+  // which is an acceptable natural cleanup point for a form with no explicit reset action.
+  useEffect(() => {
+    const draft: DraftFields = { ...fieldValues, currentTools };
+    try {
+      sessionStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(draft));
+    } catch {
+      // Storage unavailable (private browsing, quota, disabled) - form still works, it just
+      // won't survive navigation.
+    }
+  }, [
+    orgName,
+    orgWebsite,
+    registrationRegion,
+    whereYouWork,
+    registrationNumber,
+    mission,
+    priority,
+    helpFirst,
+    currentTools,
+    contactName,
+    contactRole,
+    workEmail,
+    annualReport,
+    governancePage,
+    campaignPage,
+    phone,
+  ]);
 
   // Validates on blur (so errors show once the user leaves a field, not while they're still
   // typing it the first time), and live once a field already has an error showing, so it clears
@@ -653,10 +750,13 @@ export function ShareYourMissionForm() {
             <label className={optionalLabelClass}>Phone</label>
             <input
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e) => handleChange("phone", e.target.value, setPhone)}
+              onBlur={() => handleBlur("phone")}
               type="tel"
-              className={`${fieldClass(false)} mt-2`}
+              placeholder="+1 415 555 1234"
+              className={`${fieldClass(!!fieldErrors.phone)} mt-2`}
             />
+            <FieldError message={fieldErrors.phone} />
           </div>
         </div>
       </div>
