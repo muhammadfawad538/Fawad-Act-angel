@@ -159,7 +159,7 @@ export const PERSONAS: Persona[] = [
       "Reduce manual follow-up, shorten the path from enquiry to meeting, and give sellers more time for relationships and closing.",
     whatIsTitle: "What is a Sales Angel?",
     whatIsDescription:
-      "A Sales Angel is a virtual AI sales employee from Act Angel AI that autonomously qualifies deals, follows up, schedules meetings, and updates connected sales systems within your defined rules and permissions.",
+      "A Sales Angel is a virtual AI sales specialist from Act Angel AI that autonomously qualifies deals, follows up, schedules meetings, and updates connected sales systems within your defined rules and permissions.",
     ctaLine: "Put your next opportunity in motion.",
     ctaHireLabel: "Hire a Sales Angel",
     dropdownRole: "Drives Sales",
@@ -195,7 +195,7 @@ export const PERSONAS: Persona[] = [
       "Reduce repetitive support work, improve response consistency, and give specialists more capacity for complex customer needs.",
     whatIsTitle: "What is a Service Angel?",
     whatIsDescription:
-      "A Service Angel is a virtual AI customer service employee from Act Angel AI that answers questions and autonomously completes routine service workflows across connected systems, with escalation when human judgement is needed.",
+      "A Service Angel is a virtual AI customer service specialist from Act Angel AI that answers questions and autonomously completes routine service workflows across connected systems, with escalation when human judgement is needed.",
     ctaLine: "Make every service interaction count.",
     ctaHireLabel: "Hire a Service Angel",
     dropdownRole: "Supports Customers",
@@ -233,7 +233,7 @@ export const PERSONAS: Persona[] = [
       "Reduce repetitive administration, improve follow-through across the employee lifecycle, and free HR teams to focus on people and organisational priorities.",
     whatIsTitle: "What is an HR Angel?",
     whatIsDescription:
-      "An HR Angel is a virtual AI employee from Act Angel AI that autonomously coordinates routine HR workflows across connected systems and approved data. Sensitive cases and employment decisions remain with authorised people.",
+      "An HR Angel is a virtual AI specialist from Act Angel AI that autonomously coordinates routine HR workflows across connected systems and approved data. Sensitive cases and employment decisions remain with authorised people.",
     ctaLine: "Give your people team more capacity.",
     ctaHireLabel: "Hire an HR Angel",
     dropdownRole: "Talent Management",
@@ -272,7 +272,7 @@ export const PERSONAS: Persona[] = [
       "Reduce coordination overhead, keep commitments visible, and give leaders and teams more time for decisions that move the business forward.",
     whatIsTitle: "What is an Assistant Angel?",
     whatIsDescription:
-      "An Assistant Angel is a virtual AI assistant employee from Act Angel AI that autonomously coordinates administrative work across connected calendars, communication tools, data, and processes, following your permissions and approval rules.",
+      "An Assistant Angel is a virtual AI assistant specialist from Act Angel AI that autonomously coordinates administrative work across connected calendars, communication tools, data, and processes, following your permissions and approval rules.",
     ctaLine: "Make space for your highest-value work.",
     ctaHireLabel: "Hire an Assistant Angel",
     dropdownRole: "Organizes Work",
@@ -379,7 +379,7 @@ export const PERSONAS: Persona[] = [
       {
         question: "What is Hope Angel?",
         answer:
-          "Hope Angel is a devoted virtual AI volunteer employee from Act Angel AI (AAA) for eligible nonprofit organizations. It helps with purposeful fundraising, donor and volunteer engagement, and applications for funds or grants raised by the NPO. It works within each organization's rules and human oversight.",
+          "Hope Angel is a devoted virtual AI volunteer specialist from Act Angel AI (AAA) for eligible nonprofit organizations. It helps with purposeful fundraising, donor and volunteer engagement, and applications for funds or grants raised by the NPO. It works within each organization's rules and human oversight.",
       },
       {
         question: "Can Hope Angel show fundraising progress in real time?",

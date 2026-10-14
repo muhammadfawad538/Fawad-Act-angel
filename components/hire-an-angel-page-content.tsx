@@ -469,7 +469,7 @@ export function HireAnAngelPageContent({
                     </p>
                     <p className="mt-1.5 text-[13px] text-black/50 leading-relaxed">
                       {persona.trustSubtext ??
-                        "Free from personal worries, emotional ups and downs, or self-interest. Your Virtual AI Employee stays focused on the work and your business goals—24/7."}
+                        "Free from personal worries, emotional ups and downs, or self-interest. Your Virtual AI Specialist stays focused on the work and your business goals—24/7."}
                     </p>
                   </div>
                   {/* inline-block (not w-full max-w-[240px]): the card now shrinks/grows to fit

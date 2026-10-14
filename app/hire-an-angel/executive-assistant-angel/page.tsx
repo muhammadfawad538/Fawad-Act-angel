@@ -6,7 +6,7 @@ import { HireAnAngelPageContent } from "@/components/hire-an-angel-page-content"
 export const metadata: Metadata = {
   title: "Assistant Angel | AI Executive Assistant | Act Angel AI",
   description:
-    "Meet Assistant Angel, your virtual AI employee for everyday coordination. Manage schedules, prepare briefs, and move tasks forward across connected tools.",
+    "Meet Assistant Angel, your virtual AI specialist for everyday coordination. Manage schedules, prepare briefs, and move tasks forward across connected tools.",
 }
 
 export default function ExecutiveAssistantAngelPage() {

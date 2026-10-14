@@ -6,7 +6,7 @@ import { HireAnAngelPageContent } from "@/components/hire-an-angel-page-content"
 export const metadata: Metadata = {
   title: "Sales Angel | AI Sales Agent for Qualification & Follow-Up",
   description:
-    "Meet Sales Angel, your virtual AI sales employee. Qualify deals, automate follow-ups, book meetings, and keep your CRM moving with Act Angel AI.",
+    "Meet Sales Angel, your virtual AI sales specialist. Qualify deals, automate follow-ups, book meetings, and keep your CRM moving with Act Angel AI.",
 }
 
 export default function SalesAngelPage() {

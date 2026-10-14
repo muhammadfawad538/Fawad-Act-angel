@@ -232,7 +232,7 @@ export default function AgenticPage() {
               <h1
                 // [@media(768px<=width<=872px)]: md:text-8xl (96px) is too wide here — the
                 // phone demo beside it is a fixed 340px, and at this narrow a viewport the
-                // heading's own content (e.g. "employee") can't shrink below its intrinsic
+                // heading's own content (e.g. "specialist") can't shrink below its intrinsic
                 // width, so the flex row overflows and pushes the phone off the right edge of
                 // the screen. 67px (~30% below the 96px original) just in this range; back to
                 // md:text-8xl above 872px where there's room for both.
@@ -248,7 +248,7 @@ export default function AgenticPage() {
               >
                 Meet your
                 <br />
-                best employee
+                best specialist
               </h1>
 
               <p
@@ -793,7 +793,7 @@ export default function AgenticPage() {
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tight leading-[1.05] mb-10">
             Hire your first
             <br />
-            AI employee
+            AI specialist
           </h2>
           <Link
             href="/get-started"

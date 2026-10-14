@@ -14,7 +14,7 @@ const _ibmPlexSans = IBM_Plex_Sans({ weight: ["300", "400", "500", "600"], subse
 export const metadata: Metadata = {
   title: 'AI That Acts. Work Gets Done - with What You Already Have.',
   description: 'Deploy an AI Workforce of Specialists across your existing systems and channels. Real work gets done—without adding more tools or hires.',
-  keywords: ['AI sales agent', 'AI customer service', 'AI employee', 'sales automation', 'conversational AI'],
+  keywords: ['AI sales agent', 'AI customer service', 'AI employee', 'AI specialist', 'sales automation', 'conversational AI'],
   authors: [{ name: 'Act Angel AI' }],
   openGraph: {
     title: 'AI That Acts. Work Gets Done - with What You Already Have.',

@@ -6,7 +6,7 @@ import { HireAnAngelPageContent } from "@/components/hire-an-angel-page-content"
 export const metadata: Metadata = {
   title: "Service Angel | AI Customer Service Agent | Act Angel AI",
   description:
-    "Meet Service Angel, your virtual AI customer service employee. Resolve routine requests, update records, and coordinate escalations across connected systems.",
+    "Meet Service Angel, your virtual AI customer service specialist. Resolve routine requests, update records, and coordinate escalations across connected systems.",
 }
 
 export default function ServiceAngelPage() {
