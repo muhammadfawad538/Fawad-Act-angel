@@ -246,9 +246,9 @@ export default function AgenticPage() {
                     "opacity 1s cubic-bezier(0.16,1,0.3,1) 0ms, filter 1s cubic-bezier(0.16,1,0.3,1) 0ms, transform 1s cubic-bezier(0.16,1,0.3,1) 0ms",
                 }}
               >
-                Meet your
+                Meet Your
                 <br />
-                best specialist
+                AI Specialist
               </h1>
 
               <p
