@@ -22,11 +22,17 @@ export const metadata: Metadata = {
     type: 'website',
     url: 'https://actangel.ai',
     siteName: 'Act Angel AI',
+    // Without an explicit og:image, link-preview crawlers (Slack, etc.) fell back to scraping
+    // a square favicon/app-icon asset and stretching it into the preview card's wide slot,
+    // rendering cropped and off-brand (AAA-UI-LW-001). This file is sized close enough to the
+    // 1200x630 OG standard (1733x907, same ~1.91:1 ratio) that platforms scale it cleanly.
+    images: [{ url: '/large_logo.png', width: 1733, height: 907, alt: 'Act Angel AI' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'AI That Acts. Work Gets Done - with What You Already Have.',
     description: 'Deploy an AI Workforce of Specialists across your existing systems and channels. Real work gets done—without adding more tools or hires.',
+    images: ['/large_logo.png'],
   },
   // All generated from public/icon.png (the Act Angel mark). The previous light/dark
   // 32x32 pair were leftovers from the template — still the old blue logo — and because
