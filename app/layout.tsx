@@ -12,6 +12,11 @@ const _courierPrime = Courier_Prime({ weight: ["400", "700"], subsets: ["latin"]
 const _ibmPlexSans = IBM_Plex_Sans({ weight: ["300", "400", "500", "600"], subsets: ["latin"] });
 
 export const metadata: Metadata = {
+  // Without this, Next.js can't resolve relative image paths (openGraph.images /
+  // twitter.images below) to an absolute URL and silently falls back to
+  // 'http://localhost:3000' — which is exactly what shipped to production and is unreachable
+  // by any external crawler (Slack, etc.), confirmed live at www.actangel.ai before this fix.
+  metadataBase: new URL('https://www.actangel.ai'),
   title: 'AI That Acts. Work Gets Done - with What You Already Have.',
   description: 'Deploy an AI Workforce of Specialists across your existing systems and channels. Real work gets done—without adding more tools or hires.',
   keywords: ['AI sales agent', 'AI customer service', 'AI employee', 'AI specialist', 'sales automation', 'conversational AI'],
@@ -29,7 +34,7 @@ export const metadata: Metadata = {
     images: [{ url: '/large_logo.png', width: 1733, height: 907, alt: 'Act Angel AI' }],
   },
   twitter: {
-    card: 'summary_large_image',
+    card: 'summary_large_image1',
     title: 'AI That Acts. Work Gets Done - with What You Already Have.',
     description: 'Deploy an AI Workforce of Specialists across your existing systems and channels. Real work gets done—without adding more tools or hires.',
     images: ['/large_logo.png'],
