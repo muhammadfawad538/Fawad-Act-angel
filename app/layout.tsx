@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     images: [{ url: '/large_logo.png', width: 1733, height: 907, alt: 'Act Angel AI' }],
   },
   twitter: {
-    card: 'summary_large_image1',
+    card: 'summary_large_image',
     title: 'AI That Acts. Work Gets Done - with What You Already Have.',
     description: 'Deploy an AI Workforce of Specialists across your existing systems and channels. Real work gets done—without adding more tools or hires.',
     images: ['/large_logo.png'],
