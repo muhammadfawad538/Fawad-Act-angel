@@ -15,16 +15,15 @@ import {
   TooltipContent,
 } from "@/components/ui/tooltip";
 import { normalizePhone } from "@/lib/phone";
+import { hasMeaningfulContent } from "@/lib/text-quality";
+import { saveDraft, loadDraft, clearDraft } from "@/lib/form-draft";
+import { isValidUrl } from "@/lib/url";
 
-type Priority =
-  | "Purposeful fundraising"
-  | "Donor engagement"
-  | "Volunteer outreach"
-  | "Funding applications and disbursement support"
-  | "Multilingual communications"
-  | "Several of these";
-
-const PRIORITIES: Priority[] = [
+// Used only until the /api/hope-angel/priority-options fetch below resolves, so the
+// dropdown isn't empty on first render or if that fetch fails - not the source of truth.
+// The actual list lives in data/hope-angel-priority-options.json (not hardcoded here)
+// since the client hasn't confirmed yet whether these six are final or who manages them.
+const FALLBACK_PRIORITIES = [
   "Purposeful fundraising",
   "Donor engagement",
   "Volunteer outreach",
@@ -69,40 +68,35 @@ type FieldName =
   | "campaignPage"
   | "phone";
 
-function isValidUrl(value: string): boolean {
-  try {
-    const url = new URL(value.trim());
-    return url.protocol === "http:" || url.protocol === "https:";
-  } catch {
-    return false;
-  }
-}
-
 function validateField(name: FieldName, value: string): string {
   const trimmed = value.trim();
   switch (name) {
     case "orgName":
-      return trimmed ? "" : "Please enter your organization's name.";
+      return hasMeaningfulContent(value) ? "" : "Please enter your organization's name.";
     case "registrationRegion":
-      return trimmed ? "" : "Please enter your registration country or region.";
+      return hasMeaningfulContent(value)
+        ? ""
+        : "Please enter your registration country or region.";
     case "whereYouWork":
-      return trimmed ? "" : "Please tell us where you work.";
+      return hasMeaningfulContent(value) ? "" : "Please tell us where you work.";
     case "registrationNumber":
-      return trimmed
+      return hasMeaningfulContent(value)
         ? ""
         : "Please provide a registration number, registry link, or reason for exemption.";
     case "mission":
-      return trimmed ? "" : "Please describe your mission and who you serve.";
+      return hasMeaningfulContent(value)
+        ? ""
+        : "Please describe your mission and who you serve.";
     case "priority":
       return trimmed ? "" : "Please select your first priority.";
     case "helpFirst":
-      return trimmed
+      return hasMeaningfulContent(value)
         ? ""
         : "Please tell us what you'd like Hope Angel to help with first.";
     case "contactName":
-      return trimmed ? "" : "Please enter your name.";
+      return hasMeaningfulContent(value) ? "" : "Please enter your name.";
     case "contactRole":
-      return trimmed ? "" : "Please enter your role at the NPO.";
+      return hasMeaningfulContent(value) ? "" : "Please enter your role at the NPO.";
     case "workEmail":
       if (!trimmed) return "Please enter your work email.";
       return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)
@@ -184,7 +178,24 @@ export function ShareYourMissionForm() {
   const [annualReport, setAnnualReport] = useState("");
   const [governancePage, setGovernancePage] = useState("");
 
-  const [priority, setPriority] = useState<Priority | "">("");
+  const [priority, setPriority] = useState("");
+  const [priorityOptions, setPriorityOptions] = useState<string[]>(FALLBACK_PRIORITIES);
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/hope-angel/priority-options")
+      .then((res) => (res.ok ? res.json() : Promise.reject()))
+      .then((data: { options?: unknown }) => {
+        if (!cancelled && Array.isArray(data.options) && data.options.length) {
+          setPriorityOptions(data.options as string[]);
+        }
+      })
+      .catch(() => {
+        // Keep FALLBACK_PRIORITIES - better to show something than block the form.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
   // Measured directly rather than left to Radix's own --radix-select-trigger-width CSS var:
   // that var didn't reliably keep the open dropdown panel at exactly the trigger's width at
   // small viewport sizes. A ResizeObserver on the trigger's wrapper gives us the real pixel
@@ -238,22 +249,8 @@ export function ShareYourMissionForm() {
   // after mount rather than in a lazy useState initializer, since sessionStorage isn't
   // available during server rendering and reading it there would cause a hydration mismatch.
   useEffect(() => {
-    let raw: string | null = null;
-    try {
-      raw = sessionStorage.getItem(DRAFT_STORAGE_KEY);
-    } catch {
-      return;
-    }
-    if (!raw) return;
-
-    let draft: unknown;
-    try {
-      draft = JSON.parse(raw);
-    } catch {
-      return;
-    }
-    if (!draft || typeof draft !== "object") return;
-    const d = draft as Record<string, unknown>;
+    const d = loadDraft(DRAFT_STORAGE_KEY);
+    if (!d) return;
 
     const restore = (value: unknown, setter: (v: string) => void) => {
       if (typeof value === "string" && value) setter(value);
@@ -264,9 +261,7 @@ export function ShareYourMissionForm() {
     restore(d.whereYouWork, setWhereYouWork);
     restore(d.registrationNumber, setRegistrationNumber);
     restore(d.mission, setMission);
-    if (typeof d.priority === "string" && (PRIORITIES as string[]).includes(d.priority)) {
-      setPriority(d.priority as Priority);
-    }
+    restore(d.priority, setPriority);
     restore(d.helpFirst, setHelpFirst);
     restore(d.currentTools, setCurrentTools);
     restore(d.contactName, setContactName);
@@ -278,19 +273,13 @@ export function ShareYourMissionForm() {
     restore(d.phone, setPhone);
   }, []);
 
-  // Keeps the draft above current as the user types. Not cleared on successful submission -
-  // this form's "success" is just reaching the "ready" screen (see handleSubmit), and that's
-  // exactly the point AAA-HA-002's Back-navigation repro happens from, so clearing here would
-  // immediately undo the fix. sessionStorage is tab-scoped and disappears once the tab closes,
-  // which is an acceptable natural cleanup point for a form with no explicit reset action.
+  // Keeps the draft above current as the user types, so in-progress work survives accidental
+  // navigation. Cleared separately in handleSubmit once a submission actually completes
+  // (AAA-HA-008) - this effect's job is only to persist while the user is still filling the
+  // form in, not to decide when a finished submission's data should stop reappearing.
   useEffect(() => {
     const draft: DraftFields = { ...fieldValues, currentTools };
-    try {
-      sessionStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(draft));
-    } catch {
-      // Storage unavailable (private browsing, quota, disabled) - form still works, it just
-      // won't survive navigation.
-    }
+    saveDraft(DRAFT_STORAGE_KEY, draft);
   }, [
     orgName,
     orgWebsite,
@@ -420,6 +409,11 @@ export function ShareYourMissionForm() {
     const href = `mailto:${MISSION_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join("\n"))}`;
     setMailtoHref(href);
     setReady(true);
+    // AAA-HA-008: a completed submission is done - the next time this form is opened, it
+    // should be a fresh one, not a resurrected copy of what was already sent. Clearing here
+    // (not earlier) means in-progress work is never lost while the user is still filling the
+    // form in or hasn't submitted yet - only a real, successful submission triggers this.
+    clearDraft(DRAFT_STORAGE_KEY);
     // Opened synchronously within this click handler (not a useEffect) so browsers treat it as
     // a direct result of the user's action instead of an unrequested popup.
     window.location.href = href;
@@ -605,7 +599,7 @@ export function ShareYourMissionForm() {
             <Select
               value={priority}
               onValueChange={(value) => {
-                setPriority(value as Priority);
+                setPriority(value);
                 setFieldErrors((prev) =>
                   prev.priority
                     ? { ...prev, priority: validateField("priority", value) }
@@ -645,7 +639,7 @@ export function ShareYourMissionForm() {
                 style={priorityTriggerWidth ? { width: priorityTriggerWidth } : undefined}
                 className="rounded-xl border-black/10 shadow-lg"
               >
-                {PRIORITIES.map((p) => (
+                {priorityOptions.map((p) => (
                   <SelectItem
                     key={p}
                     value={p}
