@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { hasMeaningfulContent } from "@/lib/text-quality";
+import { isValidUrl } from "@/lib/url";
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -49,9 +51,8 @@ export async function POST(request: NextRequest) {
   const contactName = body.contactName?.trim();
   const contactRole = body.contactRole?.trim();
   const workEmail = body.workEmail?.trim();
-  // Optional fields - the frontend form already validates their URL shape when present,
-  // so this route trusts that rather than re-validating syntax for fields that aren't
-  // required at all.
+  // Optional fields - AAA-HA-009: validated below (shape only, when present), since this
+  // route is reachable directly over HTTP and can't rely on the browser having checked.
   const annualReport = body.annualReport?.trim() ?? "";
   const governancePage = body.governancePage?.trim() ?? "";
   const campaignPage = body.campaignPage?.trim() ?? "";
@@ -59,16 +60,23 @@ export async function POST(request: NextRequest) {
   const phone = body.phone?.trim() ?? "";
 
   const missing: string[] = [];
-  if (!orgName) missing.push("organization name");
-  if (!orgWebsite) missing.push("organization website");
-  if (!registrationRegion) missing.push("registration country or region");
-  if (!registrationNumber) missing.push("registration number, registry link, or exemption reason");
-  if (!mission) missing.push("mission and who you serve");
-  if (!whereYouWork) missing.push("where you work");
+  if (!hasMeaningfulContent(orgName)) missing.push("organization name");
+  if (!orgWebsite || !isValidUrl(orgWebsite)) missing.push("a valid organization website URL");
+  if (annualReport && !isValidUrl(annualReport))
+    missing.push("a valid public annual report or impact page URL");
+  if (governancePage && !isValidUrl(governancePage))
+    missing.push("a valid leadership or governance page URL");
+  if (campaignPage && !isValidUrl(campaignPage))
+    missing.push("a valid donation or campaign page URL");
+  if (!hasMeaningfulContent(registrationRegion)) missing.push("registration country or region");
+  if (!hasMeaningfulContent(registrationNumber))
+    missing.push("registration number, registry link, or exemption reason");
+  if (!hasMeaningfulContent(mission)) missing.push("mission and who you serve");
+  if (!hasMeaningfulContent(whereYouWork)) missing.push("where you work");
   if (!priority) missing.push("first priority");
-  if (!helpFirst) missing.push("what to help with first");
-  if (!contactName) missing.push("contact name");
-  if (!contactRole) missing.push("contact role");
+  if (!hasMeaningfulContent(helpFirst)) missing.push("what to help with first");
+  if (!hasMeaningfulContent(contactName)) missing.push("contact name");
+  if (!hasMeaningfulContent(contactRole)) missing.push("contact role");
   if (!workEmail || !EMAIL.test(workEmail)) missing.push("a valid work email");
   if (missing.length) {
     return NextResponse.json(
