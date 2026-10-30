@@ -361,7 +361,7 @@ export function IntroAnimation({ onDone }: { onDone: () => void }) {
                 letterSpacing: "-0.01em",
               }}
             >
-              Scale Your Business — Not Your Headcount.
+              Work Gets Done—with What You Already Have.
             </span>
           </h1>
         </div>
