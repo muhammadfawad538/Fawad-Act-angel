@@ -376,7 +376,7 @@ export function MobileNav() {
                         >
                           <div
                             ref={(el) => { pillRefs.current[p.id] = el; }}
-                            className="my-4 flex items-center gap-3 rounded-lg bg-[#5D4387]/10 pl-3 pr-3 py-2.5 transition-[background-color,padding] duration-200 group-hover:bg-[#5D4387]/30 group-hover:pl-[18px] dark:bg-[#5D4387]/20 dark:group-hover:bg-[#5D4387]/40 purple:bg-[#5D4387]/30 purple:group-hover:bg-[#5D4387]/50"
+                            className="my-4 flex items-center gap-3 rounded-lg bg-[#5D4387]/10 pl-3 pr-3 py-2.5 transition-[background-color,padding] duration-200 group-hover:bg-[#5D4387]/30 group-hover:pl-[18px] dark:bg-white/[0.06] dark:group-hover:bg-white/[0.12] purple:bg-[#5D4387]/30 purple:group-hover:bg-[#5D4387]/50"
                           >
                             <img
                               src={p.avatar}
@@ -497,7 +497,7 @@ export function MobileNav() {
           return (
             <div
               key={tooltip.id}
-              className="hidden [@media(min-width:1180px)]:block fixed w-[240px] rounded-xl border border-black/[0.06] bg-[#EDE9F7] dark:bg-[#2D2140] dark:border-white/10 purple:bg-[#3D2E5C] purple:border-[#EDE9F7]/15 p-4 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.35)] z-50 pointer-events-none"
+              className="hidden [@media(min-width:1180px)]:block fixed w-[240px] rounded-xl border border-black/[0.06] bg-[#EDE9F7] dark:bg-[#1c1c1c] dark:border-white/10 purple:bg-[#3D2E5C] purple:border-[#EDE9F7]/15 p-4 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.35)] z-50 pointer-events-none"
               style={{ ...tooltip.style, transformOrigin: "left center", animation: "tooltip-in 180ms ease" }}
             >
               <p className="text-[10.5px] font-medium uppercase tracking-widest text-black/40 dark:text-white/45 purple:text-white/45">
@@ -506,7 +506,7 @@ export function MobileNav() {
               <ul className="mt-2 flex flex-col gap-1.5">
                 {p.useCases?.map((uc) => (
                   <li key={uc} className="flex items-center gap-2 text-[13px] font-medium text-[#333] dark:text-white/90 purple:text-white/90">
-                    <span className="w-1 h-1 rounded-full bg-[#5D4387] shrink-0" />
+                    <span className="w-1 h-1 rounded-full bg-[#5D4387] dark:bg-white/60 purple:bg-[#5D4387] shrink-0" />
                     {uc}
                   </li>
                 ))}
@@ -549,7 +549,7 @@ export function MobileNav() {
                         <Link
                           href={`/hire-an-angel/${p.slug}`}
                           onClick={close}
-                          className="flex flex-1 min-w-0 items-center gap-3 rounded-lg bg-[#5D4387]/10 dark:bg-[#5D4387]/20 purple:bg-[#5D4387]/30 pl-3 pr-3 py-2.5 [font-family:system-ui,-apple-system,sans-serif]"
+                          className="flex flex-1 min-w-0 items-center gap-3 rounded-lg bg-[#5D4387]/10 dark:bg-white/[0.06] purple:bg-[#5D4387]/30 pl-3 pr-3 py-2.5 [font-family:system-ui,-apple-system,sans-serif]"
                         >
                           <img
                             src={p.avatar}
@@ -580,14 +580,14 @@ export function MobileNav() {
                             above: that's what makes this card's rendered width equal the
                             image/title Link's width instead of the whole row's. */}
                         <div className="flex items-start gap-2 mb-3">
-                          <div className="flex-1 min-w-0 rounded-xl bg-[#EDE9F7] dark:bg-[#2D2140] purple:bg-[#3D2E5C] p-4">
+                          <div className="flex-1 min-w-0 rounded-xl bg-[#EDE9F7] dark:bg-[#1c1c1c] purple:bg-[#3D2E5C] p-4">
                             <p className="text-[10.5px] font-medium uppercase tracking-widest text-black/40 dark:text-white/45 purple:text-white/45">
                               Business Functions
                             </p>
                             <ul className="mt-2 flex flex-col gap-1.5">
                               {p.useCases?.map((uc) => (
                                 <li key={uc} className="flex items-center gap-2 text-[13px] font-medium text-[#333] dark:text-white/90 purple:text-white/90">
-                                  <span className="w-1 h-1 rounded-full bg-[#5D4387] shrink-0" />
+                                  <span className="w-1 h-1 rounded-full bg-[#5D4387] dark:bg-white/60 purple:bg-[#5D4387] shrink-0" />
                                   {uc}
                                 </li>
                               ))}

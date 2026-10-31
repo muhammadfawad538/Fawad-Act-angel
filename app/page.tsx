@@ -3,6 +3,7 @@
 import React, { useRef, useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import posthog from "posthog-js";
+import { useTheme } from "next-themes";
 import {
   IntroAnimation,
   INTRO_DURATION_MS,
@@ -101,6 +102,15 @@ function BentoCard({
 export default function AgenticPage() {
   const [heroReady, setHeroReady] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
+
+  // Gates which CTA background image is actually fetched (see id="pilot" below) — resolvedTheme
+  // is undefined until next-themes reads the real value client-side, so this falls back to
+  // "light" (matching SSR output) until mounted, same guard as ThemeToggle/DevExSection use.
+  const { resolvedTheme } = useTheme();
+  const [themeMounted, setThemeMounted] = useState(false);
+  useEffect(() => setThemeMounted(true), []);
+  const isDarkOrPurple =
+    themeMounted && (resolvedTheme === "dark" || resolvedTheme === "purple");
   const handleIntroDone = useCallback(() => {
     setHeroReady(true);
   }, []);
@@ -786,15 +796,19 @@ export default function AgenticPage() {
         id="pilot"
         className="relative py-32 px-6 md:px-12 lg:px-20 border-t border-black/[0.06] dark:border-white/10 purple:border-[#EDE9F7]/15 dark:bg-[#0a0a0a] purple:bg-[#1a1226] overflow-hidden"
       >
-        {/* Glass panels image — anchored to bottom center. Its own background is a very light
-            lavender/white (checked the actual file), so at the light theme's 0.85 opacity it'd
-            sit as a bright wash on a dark section — dropped much lower for dark/purple so it
-            reads as a subtle texture instead of fighting the section's own background. */}
+        {/* Glass panels image (light) vs. the crystal skyline (dark/purple) — swapped by theme
+            rather than just faded, since footer.png's light lavender/white background fights a
+            dark section at any opacity worth seeing. isDarkOrPurple gates which one actually
+            mounts (not just a dark:/purple: class toggle) so the page isn't fetching both a
+            ~1.2MB and a ~2MB image on every load regardless of theme. Full opacity on dark/purple
+            per explicit request — not faded down the way footer.png is on light. */}
         <img
-          src="/images/footer.png"
+          src={isDarkOrPurple ? "/dark_images/Iridescent_Crystal_Skyline.png" : "/images/footer.png"}
           alt=""
           aria-hidden="true"
-          className="absolute bottom-0 left-0 w-full object-cover object-bottom pointer-events-none select-none opacity-[0.85] dark:opacity-[0.15] purple:opacity-[0.18]"
+          className={`absolute bottom-0 left-0 w-full object-cover object-bottom pointer-events-none select-none ${
+            isDarkOrPurple ? "" : "opacity-[0.85]"
+          }`}
         />
         {/* Progressive blur from bottom — blends into site bg */}
         <div

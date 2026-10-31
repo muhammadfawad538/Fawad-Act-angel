@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { useTheme } from "next-themes"
 
 interface AgentCard {
   label?: string
@@ -8,25 +9,33 @@ interface AgentCard {
   desc: string
   stats?: { v: string; l: string }[]
   img?: string
+  darkImg?: string
 }
 
 // Act Angel's 3 traits (Always On / Consistently Great / Provably Honest) — heading +
-// description only, no label tag or stats row (see the conditional rendering below).
+// description only, no label tag or stats row (see the conditional rendering below). darkImg
+// (dark_images/) replaces img for both the dark and purple themes — same crystal image for
+// both. Assignment per explicit user request (rotated from an earlier by-theme pairing, not
+// derived from the trait copy): Always On → magnifier, Consistently Great → hourglass,
+// Provably Honest → cascade funnel (the 4th image, the skyline, went to the CTA section).
 const AGENTS: AgentCard[] = [
   {
     title: "Always On",
     desc: "No sick days, no shift changes",
     img: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/researcher-CvhqOuV6irGwBOnJoTGFlXdbyYBRjb.png",
+    darkImg: "/dark_images/Prismatic_Magnifier_and_Crystal_Still_Life.png",
   },
   {
     title: "Consistently Great",
     desc: "Same quality, every conversation",
     img: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/coder-9bItvCegU6TXUqbX3tUXGBAtvkBkXp.png",
+    darkImg: "/dark_images/Iridescent_Crystal_Hourglass_in_Prism_Light.png",
   },
   {
     title: "Provably Honest",
     desc: "Every outcome verified, not claimed",
     img: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/analyst-Ysxnqg7Fpy2cfA56PiIttv1KximMhT.png",
+    darkImg: "/dark_images/Iridescent_Crystal_Cascade_Funnel.png",
   },
 ]
 
@@ -47,6 +56,15 @@ export function StackingAgentCards() {
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
   // depth[i] = 0..N how many cards are currently stacked on top of card i
   const [depth, setDepth] = useState<number[]>(AGENTS.map(() => 0))
+
+  // Gates which image variant actually mounts per card (not just a dark:/purple: class toggle)
+  // so the page isn't fetching all 6 images — 3 original photos plus 3 ~2MB crystal renders —
+  // on every load regardless of theme. Same mounted-guard pattern as ThemeToggle/DevExSection.
+  const { resolvedTheme } = useTheme()
+  const [themeMounted, setThemeMounted] = useState(false)
+  useEffect(() => setThemeMounted(true), [])
+  const isDarkOrPurple =
+    themeMounted && (resolvedTheme === "dark" || resolvedTheme === "purple")
 
   useEffect(() => {
     function onScroll() {
@@ -102,7 +120,7 @@ export function StackingAgentCards() {
                 {agent.img && (
                   <div className="relative w-full h-52 pointer-events-none md:hidden">
                     <img
-                      src={agent.img}
+                      src={isDarkOrPurple && agent.darkImg ? agent.darkImg : agent.img}
                       alt={agent.title}
                       className="absolute inset-0 w-full h-full object-cover object-center"
                       style={{
@@ -117,7 +135,7 @@ export function StackingAgentCards() {
                 {agent.img && (
                   <div className="hidden md:block absolute inset-y-0 right-0 w-1/2 pointer-events-none">
                     <img
-                      src={agent.img}
+                      src={isDarkOrPurple && agent.darkImg ? agent.darkImg : agent.img}
                       alt={agent.title}
                       className="w-full h-full object-cover object-center"
                     />
