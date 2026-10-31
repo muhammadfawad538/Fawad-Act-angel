@@ -43,7 +43,7 @@ export function AnalyticsGate() {
     window.addEventListener("storage", sync)
     return () => {
       window.removeEventListener(CONSENT_EVENT, sync)
-      window.removeEventListener("storage", sync)1
+      window.removeEventListener("storage", sync)
     }
   }, [])
 
