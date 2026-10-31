@@ -105,6 +105,20 @@ export default function AgenticPage() {
     setHeroReady(true);
   }, []);
 
+  // Hero phone demo's width is a JS prop (PersonaPhoneDemo derives its own height from it), not
+  // a CSS size — a media query can't touch it directly, and a CSS transform:scale wouldn't
+  // actually shrink the layout box it reserves (which is the overflow problem in the first
+  // place), so this tracks the same 768-872px range in JS and passes a smaller width through
+  // instead. 306 is 10% below the normal 340.
+  const [heroPhoneWidth, setHeroPhoneWidth] = useState(340);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px) and (max-width: 872px)");
+    setHeroPhoneWidth(mq.matches ? 306 : 340);
+    const onChange = (e: MediaQueryListEvent) => setHeroPhoneWidth(e.matches ? 306 : 340);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
   // Start video zoom slightly before hero content reveals, for seamless overlap.
   // When the intro is skipped (already seen this session) there's nothing to overlap with,
   // so go straight to the zoomed state instead of holding it back for ~10s.
@@ -152,13 +166,15 @@ export default function AgenticPage() {
           }}
         />
 
-        {/* Progressive blur + light gradient rising from bottom */}
+        {/* Progressive blur + light gradient rising from bottom — the gradient itself comes
+            from a CSS variable (globals.css) rather than being hardcoded, so the three themes
+            can each fade to their own page-background color instead of always fading to the
+            light theme's #F5F4F0. */}
         <div
           className="absolute inset-x-0 bottom-0 z-10 pointer-events-none"
           style={{
             height: "65%",
-            background:
-              "linear-gradient(to top, #F5F4F0 0%, #F5F4F0 18%, rgba(245,244,240,0.85) 35%, rgba(245,244,240,0.5) 55%, rgba(245,244,240,0.15) 75%, transparent 100%)",
+            background: "var(--hero-fade-gradient)",
           }}
         />
         {/* Backdrop blur layers — progressively lighter toward top */}
@@ -221,7 +237,13 @@ export default function AgenticPage() {
             {/* Text */}
             <div className="max-w-xl">
               <h1
-                className="text-6xl sm:text-7xl md:text-8xl font-light text-[#111] leading-[1.0] tracking-tight mb-6"
+                // [@media(768px<=width<=872px)]: md:text-8xl (96px) is too wide here — the
+                // phone demo beside it is a fixed 340px, and at this narrow a viewport the
+                // heading's own content (e.g. "specialist") can't shrink below its intrinsic
+                // width, so the flex row overflows and pushes the phone off the right edge of
+                // the screen. 67px (~30% below the 96px original) just in this range; back to
+                // md:text-8xl above 872px where there's room for both.
+                className="text-6xl sm:text-7xl md:text-8xl [@media(768px<=width<=872px)]:text-[67px] font-light text-[#111] dark:text-white purple:text-white leading-[1.0] tracking-tight mb-6"
                 style={{
                   fontFamily: '"IBM Plex Sans", sans-serif',
                   opacity: heroReady ? 1 : 0,
@@ -231,13 +253,13 @@ export default function AgenticPage() {
                     "opacity 1s cubic-bezier(0.16,1,0.3,1) 0ms, filter 1s cubic-bezier(0.16,1,0.3,1) 0ms, transform 1s cubic-bezier(0.16,1,0.3,1) 0ms",
                 }}
               >
-                Meet your
+                Meet Your
                 <br />
-                best employee
+                AI Specialist
               </h1>
 
               <p
-                className="text-base sm:text-lg font-medium text-[#111]/70 max-w-sm mb-8"
+                className="text-base sm:text-lg font-medium text-[#111]/70 dark:text-white/75 purple:text-white/75 max-w-sm mb-8"
                 style={{
                   fontFamily: '"IBM Plex Sans", sans-serif',
                   opacity: heroReady ? 1 : 0,
@@ -263,13 +285,16 @@ export default function AgenticPage() {
               >
                 <Link
                   href="/get-started"
-                  className="px-6 py-3 bg-[#111] text-white text-sm rounded-xl hover:bg-[#333] transition-colors tracking-wide font-medium"
+                  // dark:/purple: invert to a white pill/black text — bg-[#111] is already
+                  // near-black, so on either dark theme it'd otherwise sit nearly invisible
+                  // against the hero's own now-dark fade background.
+                  className="px-6 py-3 bg-[#111] text-white text-sm rounded-xl hover:bg-[#333] dark:bg-white dark:text-black dark:hover:bg-white/85 purple:bg-white purple:text-black purple:hover:bg-white/85 transition-colors tracking-wide font-medium"
                 >
                   GET STARTED
                 </Link>
                 <Link
                   href="/hire-an-angel/sales-angel"
-                  className="px-6 py-3 border border-black/15 bg-white/40 text-[#111] text-sm rounded-xl hover:border-black/30 hover:bg-white/70 transition-colors tracking-wide font-medium"
+                  className="px-6 py-3 border border-black/15 bg-white/40 text-[#111] text-sm rounded-xl hover:border-black/30 hover:bg-white/70 dark:border-white/20 dark:bg-white/10 dark:text-white dark:hover:border-white/40 dark:hover:bg-white/20 purple:border-[#EDE9F7]/25 purple:bg-white/10 purple:text-[#EDE9F7] purple:hover:border-[#EDE9F7]/45 purple:hover:bg-white/20 transition-colors tracking-wide font-medium"
                   style={{
                     backdropFilter: "blur(8px)",
                     WebkitBackdropFilter: "blur(8px)",
@@ -300,14 +325,16 @@ export default function AgenticPage() {
                       transition: `opacity 0.8s cubic-bezier(0.16,1,0.3,1) ${280 + i * 80}ms, filter 0.8s cubic-bezier(0.16,1,0.3,1) ${280 + i * 80}ms, transform 0.8s cubic-bezier(0.16,1,0.3,1) ${280 + i * 80}ms`,
                     }}
                   >
+                    {/* [@media(768px<=width<=872px)]: same overflow issue/fix as the hero
+                        heading above — 29px is ~20% below the 36px (sm:text-4xl) original. */}
                     <div
-                      className="text-3xl sm:text-4xl text-[#111] font-light tracking-tight"
+                      className="text-3xl sm:text-4xl [@media(768px<=width<=872px)]:text-[23px] text-[#111] dark:text-white purple:text-white font-light tracking-tight"
                       style={{ fontFamily: '"IBM Plex Sans", sans-serif' }}
                     >
                       {stat.value}
                     </div>
                     <div
-                      className="text-xs text-black/40 tracking-widest uppercase mt-1"
+                      className="text-xs text-black/40 dark:text-white/45 purple:text-white/45 tracking-widest uppercase mt-1"
                       style={{ fontFamily: '"IBM Plex Sans", sans-serif' }}
                     >
                       {stat.label}
@@ -345,7 +372,7 @@ export default function AgenticPage() {
                 contact={HERO_CONTACT}
                 avatar={HERO_AVATAR}
                 messages={HERO_MESSAGES}
-                width={340}
+                width={heroPhoneWidth}
                 active={heroReady}
               />
             </div>
@@ -354,7 +381,12 @@ export default function AgenticPage() {
       </section>
 
       {/* ── ALWAYS ON / REACHABLE EVERYWHERE (trust bar + channels) ────────── */}
-      <section id="channels" className="py-32 px-6 md:px-12 lg:px-20">
+      {/* dark:/purple: bg here (not on the root page wrapper) — this section has no background
+          of its own in the light theme, just the root wrapper's #F5F4F0 showing through, and
+          the root wrapper itself isn't themed yet (see hero's own note on this). Same #0a0a0a /
+          #1a1226 tones as the hero's fade target, so there's no visible seam between the two
+          once both are themed, even though each sets its background independently. */}
+      <section id="channels" className="py-32 px-6 md:px-12 lg:px-20 dark:bg-[#0a0a0a] purple:bg-[#1a1226]">
         <div className="max-w-6xl mx-auto">
           {/* Header mirrors the Tools section: logo instead of a PixelIcon eyebrow, centred. */}
           <div className="mb-16 flex flex-col items-center text-center">
@@ -363,10 +395,10 @@ export default function AgenticPage() {
               alt="Act Angel AI"
               className="w-[86px] h-[86px] object-contain"
             />
-            <RevealText className="mt-5 text-4xl md:text-5xl lg:text-6xl font-light tracking-tight leading-[1.05]">
+            <RevealText className="mt-5 text-4xl md:text-5xl lg:text-6xl font-light tracking-tight leading-[1.05] text-[#111] dark:text-white purple:text-white">
               Reachable everywhere
             </RevealText>
-            <p className="mt-4 max-w-lg text-sm font-medium leading-relaxed text-[#111]/70">
+            <p className="mt-4 max-w-lg text-sm font-medium leading-relaxed text-[#111]/70 dark:text-white/75 purple:text-white/75">
               One Angel. Every Touchpoint. Nothing Gets Lost.
             </p>
           </div>
@@ -481,9 +513,13 @@ export default function AgenticPage() {
       </section>
 
       {/* ── ALL YOUR TOOLS (relocated from the "How It Works" slot) ────────── */}
+      {/* Same dark:/purple: bg pattern as the two sections above — this section has no
+          background of its own in the light theme either, just the still-unthemed root
+          wrapper's #F5F4F0 showing through. Same #0a0a0a / #1a1226 tones, so there's no seam
+          continuing down from "Reachable everywhere" above it. */}
       <section
         id="tools"
-        className="py-32 px-6 md:px-12 lg:px-20 border-t border-black/[0.06] overflow-hidden"
+        className="py-32 px-6 md:px-12 lg:px-20 border-t border-black/[0.06] dark:border-white/10 purple:border-[#EDE9F7]/15 dark:bg-[#0a0a0a] purple:bg-[#1a1226] overflow-hidden"
       >
         <div className="max-w-6xl mx-auto">
           <div className="mb-16 flex flex-col items-center text-center">
@@ -492,10 +528,10 @@ export default function AgenticPage() {
               alt="Act Angel AI"
               className="w-[86px] h-[86px] object-contain"
             />
-            <RevealText className="mt-5 text-4xl md:text-5xl font-light tracking-tight leading-[1.05]">
+            <RevealText className="mt-5 text-4xl md:text-5xl font-light tracking-tight leading-[1.05] text-[#111] dark:text-white purple:text-white">
               All Your Tools.
             </RevealText>
-            <p className="mt-4 text-md font-medium text-[#111]/70 leading-relaxed max-w-xlg">
+            <p className="mt-4 text-md font-medium text-[#111]/70 dark:text-white/75 purple:text-white/75 leading-relaxed max-w-xlg">
               Act Angel AI works alongside the platforms your business already
               runs on.
             </p>
@@ -546,11 +582,6 @@ export default function AgenticPage() {
               { name: "Spiral", logo: "/images/icons/spiral.png", pos: [106, 22] },                   
               { name: "Todoist", logo: "/images/icons/todoist.svg", pos: [222, 416] },
               { name: "monday.com", logo: "/images/icons/mondaydotcom.png", pos: [636, 412] },
-              // { name: "Email", logo: "/images/icons/email.png" },
-              // { name: "Video", logo: "/images/icons/video.png" },
-              // { name: "Notes", logo: "/images/icons/notes.png", pos: [227, 37] },
-              // { name: "Tasks", logo: "/images/icons/tasks.png", pos: [452, 109] },
-              // { name: "Marketing", logo: "/images/icons/marketing.png", pos: [558, 91] },
             ];
 
             return (
@@ -560,7 +591,22 @@ export default function AgenticPage() {
               // so widening the container (rather than re-deriving every position at a smaller
               // scale) is what buys back that lost breathing room — 78 units now maps to ~119px
               // of real separation instead of ~100px, comparable to the original spacing.
-              <div className="tools-orbit relative w-full max-w-[1100px] aspect-[720/420] mx-auto">
+              // [@media(992px<=width<=1098px)]: at this narrow a container, the fixed-72px
+              // node size eats proportionally more of the stage, exposing an asymmetry already
+              // latent in the hand-tuned positions — the rightmost icon (Googletv, x=698) was
+              // actually overflowing the 720-unit stage's right edge by ~44px of real margin
+              // while the leftmost (Asana/ClickUp, x=26) still had ~32px of clear margin.
+              // Computed via the actual node-size-at-this-scale math (not eyeballed): shifting
+              // the icon layer 39px left equalizes both sides instead of leaving one tight and
+              // one loose. A slightly taller aspect ratio in the same range (420->445) adds a
+              // bit more vertical breathing room between rows, as asked, without moving any
+              // icon's own position.
+              // [@media(768px<=width<=991px)]: same asymmetry, same fix — at this container
+              // width (viewport minus the md:px-12 96px gutters) the computed left/right
+              // margins come out to ~24-32px clear on the left vs. ~45-51px of overflow on the
+              // right across the whole range, a near-constant ~76-77px gap, so a single -38px
+              // shift (half the gap) equalizes both ends from 768px through 991px.
+              <div className="tools-orbit relative w-full max-w-[1100px] aspect-[720/420] [@media(992px<=width<=1098px)]:aspect-[720/445] mx-auto">
                 {/* Center hub — hidden below md: the hub gets cramped against the orbiting
                     tool nodes on small screens, so it's dropped rather than shrunk further.
                     display/alignItems/justifyContent removed from inline style (they used to
@@ -568,7 +614,12 @@ export default function AgenticPage() {
                     className) because an inline `display` can't be responsive and would have
                     overridden `hidden` at every breakpoint regardless of the md: prefix. */}
                 <div
-                  className="hidden md:flex absolute rounded-full bg-[#EDECE9] items-center justify-center z-10"
+                  // Width lives in className (not the inline style below) so the
+                  // [@media(768px<=width<=991px)]: override can win — inline styles beat
+                  // classes, so a responsive width can't be expressed there. The icon
+                  // img below is sized at 80% of this div, so shrinking this hub shrinks
+                  // the background circle and the icon inside it together.
+                  className="hidden md:flex absolute rounded-full bg-[#EDECE9] dark:bg-white/[0.07] purple:bg-white/10 items-center justify-center z-10 w-[min(200px,26%)] [@media(768px<=width<=991px)]:w-[min(160px,20.8%)]"
                   style={{
                     position: "absolute",
                     left: "50%",
@@ -580,13 +631,6 @@ export default function AgenticPage() {
                     boxShadow: "0 12px 50px 8px rgba(93,67,135,0.45)",
                     zIndex: 2,
                     animation: "centerLevitate 5s ease-in-out infinite",
-                    // 200px, but never more than 26% of the stage width. The tool positions are
-                    // percentages of the stage while this hub was a fixed size, so on the
-                    // narrower desktop widths (the stage goes down to ~665px) a fixed 200px hub
-                    // runs into the nearest icons (Tasks, WhatsApp) — especially at the top of
-                    // its float. The cap keeps a clear gap there; from a ~770px-wide stage up
-                    // it's the full 200px.
-                    width: "min(200px, 26%)",
                     aspectRatio: "1",
                   }}
                 >
@@ -597,6 +641,13 @@ export default function AgenticPage() {
                   />
                 </div>
 
+                {/* Wraps just the icon layer (not the hub above) so the 992-1098px and
+                    768-991px shifts below can nudge the icons without re-centering the hub
+                    along with them. Below 760px, globals.css's `.tools-orbit-icon-layer`
+                    rule sets this to `display: contents` — otherwise this wrapper would sit
+                    between .tools-orbit and .tools-orbit-node, breaking the plain-grid
+                    layout that CSS applies there (it needs the nodes as direct children). */}
+                <div className="tools-orbit-icon-layer absolute inset-0 [@media(992px<=width<=1098px)]:translate-x-[-39px] [@media(768px<=width<=991px)]:translate-x-[-38px]">
                 {TOOLS.map((tool, i) => {
                   const [left, top] = tool.pos;
 
@@ -613,7 +664,57 @@ export default function AgenticPage() {
                     {/* {i===12 && <div className="tools-orbit-node absolute [@media(max-width:540px)]:hidden!" style={{ left: '50%', top: '50%' }} />} */}
                     {i===24 && <div className="tools-orbit-node absolute [@media(540px<width<=760px)]:hidden!" style={{ left: '50%', top: '50%' }} />}
                     <div
-                      className="tools-orbit-node absolute"
+                      // Top-row icons (pos[1] <= 130 — Docs, Spiral, Chat, Outlook, Salesforce,
+                      // SAP, Notion, WhatsApp, Maps, HubSpot) shift up an extra 30px at
+                      // 992-1098px (same range as the icon-layer/aspect-ratio tweaks above),
+                      // and 40px at 768-991px — this narrower range compresses row spacing
+                      // more (smaller container height via the same aspect ratio), so it
+                      // needs a bigger push to clear the row below it.
+                      // Within that top row, the topmost sub-tier (pos[1] <= 40 — Spiral,
+                      // Salesforce, SAP, Notion) still crowded the row below them at
+                      // 768-991px even after the 40px shift, so they get 30px more there —
+                      // 70px total (a single translate, not two stacked ones, since a second
+                      // translate-y utility would replace rather than add to the first).
+                      // Middle-row icons (130 < pos[1] < 400 — Otter, Calendar, Googletv, Asana,
+                      // Slack, Gmail, Cloud, Zoom, Fathom, Google Meet, ClickUp, Phone) shift
+                      // down 20px at 992-1098px, to restore the gap the top row's upward shift
+                      // closed. Bottom row (pos[1] >= 400 — Fireflies, Todoist, monday.com) is
+                      // left alone.
+                      // Outlook individually needed its own nudge at 768-991px on top of the
+                      // shared top-row shift, in two rounds (10px right/20px down, then 20px
+                      // more of each since it was still cluttered) — 30px right total, and the
+                      // two 20px-down corrections exactly cancel the shared -40px upward shift,
+                      // so no net vertical translate remains (single combined values, not
+                      // stacked translate-y utilities, since only one wins per element).
+                      // Calendar (middle row) gets its own 768-991px nudge too — 24px right,
+                      // 6px up — on top of its unchanged 992-1098px down-shift.
+                      // Google Meet and Gmail (middle row) shift down 60px total at 768-991px
+                      // (20px matching their shared 992-1098px down-shift, then 40px more since
+                      // they were still too close to the row above). Phone started in that same
+                      // group, then needed 16px more (76px total) individually. Todoist (bottom
+                      // row, otherwise left alone) started with that same 60px-down fix plus
+                      // 30px left, then came up 14px twice more (net 32px down) since it kept
+                      // moving too far; it has no 992-1098px treatment since it was never part
+                      // of that group.
+                      className={`tools-orbit-node absolute${
+                        top <= 40
+                          ? " [@media(992px<=width<=1098px)]:-translate-y-[30px] [@media(768px<=width<=991px)]:-translate-y-[70px]"
+                          : tool.name === "Outlook"
+                          ? " [@media(992px<=width<=1098px)]:-translate-y-[30px] [@media(768px<=width<=991px)]:translate-x-[30px]"
+                          : top <= 130
+                          ? " [@media(992px<=width<=1098px)]:-translate-y-[30px] [@media(768px<=width<=991px)]:-translate-y-[40px]"
+                          : tool.name === "Calendar"
+                          ? " [@media(992px<=width<=1098px)]:translate-y-[20px] [@media(768px<=width<=991px)]:translate-x-[24px] [@media(768px<=width<=991px)]:-translate-y-[6px]"
+                          : tool.name === "Todoist"
+                          ? " [@media(768px<=width<=991px)]:translate-y-[32px] [@media(768px<=width<=991px)]:-translate-x-[30px]"
+                          : tool.name === "Phone"
+                          ? " [@media(992px<=width<=1098px)]:translate-y-[20px] [@media(768px<=width<=991px)]:translate-y-[76px]"
+                          : ["Google Meet", "Gmail"].includes(tool.name)
+                          ? " [@media(992px<=width<=1098px)]:translate-y-[20px] [@media(768px<=width<=991px)]:translate-y-[60px]"
+                          : top < 400
+                          ? " [@media(992px<=width<=1098px)]:translate-y-[20px]"
+                          : ""
+                      }`}
                       style={{
                         left: `${(left / 720) * 100}%`,
                         top: `${(top / 460) * 100}%`,
@@ -642,6 +743,7 @@ export default function AgenticPage() {
                     </React.Fragment>
                   );
                 })}
+                </div>
               </div>
             );
           })()}
@@ -649,9 +751,12 @@ export default function AgenticPage() {
       </section>
 
       {/* ── BUILD YOUR AGENTS (4 cards) ───────────────────────────────────── */}
+      {/* Same dark:/purple: bg pattern continuing down the page — see the note on the
+          "Reachable everywhere" section above for why this is set per-section rather than on
+          the root wrapper. */}
       <section
         id="agents"
-        className="py-32 px-6 md:px-12 lg:px-20 border-t border-black/[0.06]"
+        className="py-32 px-6 md:px-12 lg:px-20 border-t border-black/[0.06] dark:border-white/10 purple:border-[#EDE9F7]/15 dark:bg-[#0a0a0a] purple:bg-[#1a1226]"
       >
         <div className="max-w-6xl mx-auto">
           {/* Header mirrors Reachable-everywhere / Tools: logo instead of a PixelIcon eyebrow,
@@ -662,7 +767,7 @@ export default function AgenticPage() {
               alt="Act Angel AI"
               className="w-[86px] h-[86px] object-contain"
             />
-            <RevealText className="mt-5 text-4xl md:text-5xl font-light tracking-tight leading-[1.05]">
+            <RevealText className="mt-5 text-4xl md:text-5xl font-light tracking-tight leading-[1.05] text-[#111] dark:text-white purple:text-white">
               {"60% of a seller's time\nisn't spent selling."}
             </RevealText>
           </div>
@@ -675,17 +780,21 @@ export default function AgenticPage() {
       <DevExSection />
 
       {/* ── CTA ───────────────────────────────────────────────────────────── */}
+      {/* Same dark:/purple: bg pattern as every section above — shows through wherever the
+          image/fade layers below don't fully cover (mainly the upper portion of the section). */}
       <section
         id="pilot"
-        className="relative py-32 px-6 md:px-12 lg:px-20 border-t border-black/[0.06] overflow-hidden"
+        className="relative py-32 px-6 md:px-12 lg:px-20 border-t border-black/[0.06] dark:border-white/10 purple:border-[#EDE9F7]/15 dark:bg-[#0a0a0a] purple:bg-[#1a1226] overflow-hidden"
       >
-        {/* Glass panels image — anchored to bottom center */}
+        {/* Glass panels image — anchored to bottom center. Its own background is a very light
+            lavender/white (checked the actual file), so at the light theme's 0.85 opacity it'd
+            sit as a bright wash on a dark section — dropped much lower for dark/purple so it
+            reads as a subtle texture instead of fighting the section's own background. */}
         <img
           src="/images/footer.png"
           alt=""
           aria-hidden="true"
-          className="absolute bottom-0 left-0 w-full object-cover object-bottom pointer-events-none select-none"
-          style={{ opacity: 0.85 }}
+          className="absolute bottom-0 left-0 w-full object-cover object-bottom pointer-events-none select-none opacity-[0.85] dark:opacity-[0.15] purple:opacity-[0.18]"
         />
         {/* Progressive blur from bottom — blends into site bg */}
         <div
@@ -698,24 +807,24 @@ export default function AgenticPage() {
             WebkitBackdropFilter: "blur(18px)",
           }}
         />
-        {/* Colour fade from bottom to site bg #f5f4f0 */}
+        {/* Colour fade from bottom to site bg — var(--cta-fade-gradient), themed in globals.css,
+            same reasoning as the hero's own fade gradient variable. */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            background:
-              "linear-gradient(to top, rgb(245,244,240) 0%, rgba(245,244,240,0.92) 18%, rgba(245,244,240,0.55) 35%, transparent 55%)",
+            background: "var(--cta-fade-gradient)",
           }}
         />
         <div className="relative z-10 max-w-2xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tight leading-[1.05] mb-10">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tight leading-[1.05] mb-10 text-[#111] dark:text-white purple:text-white">
             Hire your first
             <br />
-            AI employee
+            AI specialist
           </h2>
           <Link
             href="/get-started"
             onClick={() => posthog.capture("cta_get_started_clicked", { location: "hero" })}
-            className="inline-block px-8 py-3 bg-[#111] text-white text-sm rounded-xl hover:bg-[#333] transition-colors tracking-wide font-medium"
+            className="inline-block px-8 py-3 bg-[#111] text-white text-sm rounded-xl hover:bg-[#333] dark:bg-white dark:text-black dark:hover:bg-white/85 purple:bg-white purple:text-black purple:hover:bg-white/85 transition-colors tracking-wide font-medium"
           >
             Get Started
           </Link>
@@ -723,9 +832,10 @@ export default function AgenticPage() {
       </section>
 
       {/* ── FOOTER ────────────────────────────────────────────────────────── */}
+      {/* Same dark:/purple: bg pattern as every section above. */}
       <footer
         id="contact"
-        className="py-10 px-6 md:px-12 lg:px-20 border-t border-black/[0.06]"
+        className="py-10 px-6 md:px-12 lg:px-20 border-t border-black/[0.06] dark:border-white/10 purple:border-[#EDE9F7]/15 dark:bg-[#0a0a0a] purple:bg-[#1a1226]"
       >
         <div className="max-w-6xl mx-auto flex flex-col gap-6">
           {/* Row 1: logo, address, email. Stacks on small screens, one row from md up. */}
@@ -735,46 +845,48 @@ export default function AgenticPage() {
               aria-label="Act Angel AI — go to homepage"
               className="flex items-center gap-2 font-pixel text-xs tracking-[0.25em] text-black/50"
             >
+              {/* Same invert treatment as the nav logo (mobile-nav.tsx) — no separate light-logo
+                  asset, so this flips the dark wordmark to white via filter instead. */}
               <img
                 src="/images/logo.png"
                 alt=""
                 aria-hidden="true"
-                className="h-10 w-auto"
+                className="h-10 w-auto dark:brightness-0 dark:invert purple:brightness-0 purple:invert"
               />
             </Link>
-            <a href="#m" className="text-sm text-black/55 hover:text-black/70 transition-colors tracking-widest">
+            <a href="#m" className="text-sm text-black/55 hover:text-black/70 dark:text-white/55 dark:hover:text-white/75 purple:text-[#EDE9F7]/60 purple:hover:text-[#EDE9F7]/85 transition-colors tracking-widest">
               One Boston Place, # 2600, Boston, MA, 02108
             </a>
             <a
               href="mailto:Hello@ActAngel.com"
-              className="text-sm text-[gray] font-medium underline underline-offset-2 hover:text-black/70 transition-colors tracking-widest"
+              className="text-sm text-[gray] font-medium underline underline-offset-2 hover:text-black/70 dark:text-white/60 dark:hover:text-white/80 purple:text-[#EDE9F7]/65 purple:hover:text-[#EDE9F7]/90 transition-colors tracking-widest"
             >
               Hello@ActAngel.com
             </a>
           </div>
 
         </div>
-        <div className="max-w-6xl mx-auto mt-8 pt-6 border-t border-black/[0.04] flex flex-col-reverse md:flex-row md:items-center md:justify-between gap-4">
-          <span className="text-sm text-black/55">© 2026 Act Angel AI, Inc.</span>
+        <div className="max-w-6xl mx-auto mt-8 pt-6 border-t border-black/[0.04] dark:border-white/10 purple:border-[#EDE9F7]/15 flex flex-col-reverse md:flex-row md:items-center md:justify-between gap-4">
+          <span className="text-sm text-black/55 dark:text-white/55 purple:text-[#EDE9F7]/60">© 2026 Act Angel AI, Inc.</span>
           <div className="flex flex-wrap items-center justify-start md:justify-end gap-x-6 gap-y-2">
             <a
               href="/privacy"
               target="_blank"
-              className="text-sm text-black/55 hover:text-black/70 transition-colors tracking-widest"
+              className="text-sm text-black/55 hover:text-black/70 dark:text-white/55 dark:hover:text-white/75 purple:text-[#EDE9F7]/60 purple:hover:text-[#EDE9F7]/85 transition-colors tracking-widest"
             >
               Privacy Policy
             </a>
             <a
               href="/terms"
               target="_blank"
-              className="text-sm text-black/55 hover:text-black/70 transition-colors tracking-widest"
+              className="text-sm text-black/55 hover:text-black/70 dark:text-white/55 dark:hover:text-white/75 purple:text-[#EDE9F7]/60 purple:hover:text-[#EDE9F7]/85 transition-colors tracking-widest"
             >
               Terms &amp; Conditions
             </a>
             <a
               href="/cookies"
               target="_blank"
-              className="text-sm text-black/55 hover:text-black/70 transition-colors tracking-widest"
+              className="text-sm text-black/55 hover:text-black/70 dark:text-white/55 dark:hover:text-white/75 purple:text-[#EDE9F7]/60 purple:hover:text-[#EDE9F7]/85 transition-colors tracking-widest"
             >
               Cookies Policy
             </a>

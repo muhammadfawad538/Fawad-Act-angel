@@ -1,17 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
+import { normalizePhone } from "@/lib/phone";
+import { hasMeaningfulContent } from "@/lib/text-quality";
+import { saveDraft, loadDraft, clearDraft } from "@/lib/form-draft";
+import { isValidUrl } from "@/lib/url";
 
-type Priority =
-  | "Purposeful fundraising"
-  | "Donor engagement"
-  | "Volunteer outreach"
-  | "Funding applications and disbursement support"
-  | "Multilingual communications"
-  | "Several of these";
-
-const PRIORITIES: Priority[] = [
+// Used only until the /api/hope-angel/priority-options fetch below resolves, so the
+// dropdown isn't empty on first render or if that fetch fails - not the source of truth.
+// The actual list lives in data/hope-angel-priority-options.json (not hardcoded here)
+// since the client hasn't confirmed yet whether these six are final or who manages them.
+const FALLBACK_PRIORITIES = [
   "Purposeful fundraising",
   "Donor engagement",
   "Volunteer outreach",
@@ -53,42 +65,38 @@ type FieldName =
   | "workEmail"
   | "annualReport"
   | "governancePage"
-  | "campaignPage";
-
-function isValidUrl(value: string): boolean {
-  try {
-    const url = new URL(value.trim());
-    return url.protocol === "http:" || url.protocol === "https:";
-  } catch {
-    return false;
-  }
-}
+  | "campaignPage"
+  | "phone";
 
 function validateField(name: FieldName, value: string): string {
   const trimmed = value.trim();
   switch (name) {
     case "orgName":
-      return trimmed ? "" : "Please enter your organization's name.";
+      return hasMeaningfulContent(value) ? "" : "Please enter your organization's name.";
     case "registrationRegion":
-      return trimmed ? "" : "Please enter your registration country or region.";
+      return hasMeaningfulContent(value)
+        ? ""
+        : "Please enter your registration country or region.";
     case "whereYouWork":
-      return trimmed ? "" : "Please tell us where you work.";
+      return hasMeaningfulContent(value) ? "" : "Please tell us where you work.";
     case "registrationNumber":
-      return trimmed
+      return hasMeaningfulContent(value)
         ? ""
         : "Please provide a registration number, registry link, or reason for exemption.";
     case "mission":
-      return trimmed ? "" : "Please describe your mission and who you serve.";
+      return hasMeaningfulContent(value)
+        ? ""
+        : "Please describe your mission and who you serve.";
     case "priority":
       return trimmed ? "" : "Please select your first priority.";
     case "helpFirst":
-      return trimmed
+      return hasMeaningfulContent(value)
         ? ""
         : "Please tell us what you'd like Hope Angel to help with first.";
     case "contactName":
-      return trimmed ? "" : "Please enter your name.";
+      return hasMeaningfulContent(value) ? "" : "Please enter your name.";
     case "contactRole":
-      return trimmed ? "" : "Please enter your role at the NPO.";
+      return hasMeaningfulContent(value) ? "" : "Please enter your role at the NPO.";
     case "workEmail":
       if (!trimmed) return "Please enter your work email.";
       return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)
@@ -105,7 +113,36 @@ function validateField(name: FieldName, value: string): string {
       return !trimmed || isValidUrl(trimmed)
         ? ""
         : "Please enter a valid URL (e.g. https://example.org).";
+    case "phone":
+      // Optional - only validated when non-empty. normalizePhone requires an explicit
+      // country code (leading '+'), which is what makes this work for any country without
+      // a country-specific regex; it also strips spaces/dashes/parens/dots before checking,
+      // so normal formatting is still allowed.
+      return !trimmed || normalizePhone(trimmed)
+        ? ""
+        : "Please enter a valid phone number including country code, e.g. +14155551234 or +919876543210.";
   }
+}
+
+// Truncates a dropdown option's label with an ellipsis once it no longer fits the (now
+// trigger-width-constrained) menu. Every option gets a tooltip showing its full text on hover,
+// not just the ones currently truncated, so it stays correct if the menu's width (and therefore
+// which options clip) changes later.
+//
+// line-clamp-1 (not `truncate`) — same mechanism SelectTrigger already uses for the closed
+// field's value (components/ui/select.tsx), which held up inside this component's nested flex
+// layout where plain `truncate`'s width-based ellipsis didn't reliably trigger.
+function TruncatedOptionText({ text }: { text: string }) {
+  const span = (
+    <span className="line-clamp-1 w-full min-w-0 max-w-full">{text}</span>
+  );
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{span}</TooltipTrigger>
+      <TooltipContent>{text}</TooltipContent>
+    </Tooltip>
+  );
 }
 
 function FieldError({ message }: { message?: string }) {
@@ -113,9 +150,18 @@ function FieldError({ message }: { message?: string }) {
   return <p className="mt-1.5 text-xs text-red-600">{message}</p>;
 }
 
+// AAA-HA-002: the form kept all entered values in plain component state only, so navigating
+// away (including via the browser Back button from the "ready" screen, which isn't a separate
+// route/history entry - see share-your-mission-form.tsx's handleSubmit) and reopening
+// /share-your-mission unmounted and remounted the component from scratch, losing everything
+// typed. Persisting to sessionStorage (tab-scoped, gone once the tab closes) survives that
+// without needing any routing changes.
+const DRAFT_STORAGE_KEY = "shareYourMissionForm:draft";
+type DraftFields = Record<FieldName, string> & { currentTools: string };
+
 /**
  * The nonprofit application form from https://hope-angel.vercel.app/hire-an-angel/hope-angel's
- * "Share Your Mission" flow. Submits to /api/hope-angel/mission, which proxies it into the WEB
+ * "Share Your Mission" flow. Submits to /api/hope-angel/intake, which proxies it into the WEB
  * backend's registration-requests queue for a SAD to review, since eligibility/authenticity
  * review is a manual, human step on Act Angel's side before an Angel is offered.
  */
@@ -132,7 +178,39 @@ export function ShareYourMissionForm() {
   const [annualReport, setAnnualReport] = useState("");
   const [governancePage, setGovernancePage] = useState("");
 
-  const [priority, setPriority] = useState<Priority | "">("");
+  const [priority, setPriority] = useState("");
+  const [priorityOptions, setPriorityOptions] = useState<string[]>(FALLBACK_PRIORITIES);
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/hope-angel/priority-options")
+      .then((res) => (res.ok ? res.json() : Promise.reject()))
+      .then((data: { options?: unknown }) => {
+        if (!cancelled && Array.isArray(data.options) && data.options.length) {
+          setPriorityOptions(data.options as string[]);
+        }
+      })
+      .catch(() => {
+        // Keep FALLBACK_PRIORITIES - better to show something than block the form.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  // Measured directly rather than left to Radix's own --radix-select-trigger-width CSS var:
+  // that var didn't reliably keep the open dropdown panel at exactly the trigger's width at
+  // small viewport sizes. A ResizeObserver on the trigger's wrapper gives us the real pixel
+  // width to set on SelectContent's own `style`, which always wins over any CSS-based sizing.
+  const priorityTriggerWrapperRef = useRef<HTMLDivElement>(null);
+  const [priorityTriggerWidth, setPriorityTriggerWidth] = useState<number>();
+  useEffect(() => {
+    const el = priorityTriggerWrapperRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(([entry]) => {
+      setPriorityTriggerWidth(entry.contentRect.width);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
   const [campaignPage, setCampaignPage] = useState("");
   const [helpFirst, setHelpFirst] = useState("");
   const [currentTools, setCurrentTools] = useState("");
@@ -163,7 +241,63 @@ export function ShareYourMissionForm() {
     annualReport,
     governancePage,
     campaignPage,
+    phone,
   };
+
+  // Restores a previously saved draft on mount (e.g. after Back navigation, a reload, or
+  // reopening this page), so entered data survives rather than starting blank. Runs once,
+  // after mount rather than in a lazy useState initializer, since sessionStorage isn't
+  // available during server rendering and reading it there would cause a hydration mismatch.
+  useEffect(() => {
+    const d = loadDraft(DRAFT_STORAGE_KEY);
+    if (!d) return;
+
+    const restore = (value: unknown, setter: (v: string) => void) => {
+      if (typeof value === "string" && value) setter(value);
+    };
+    restore(d.orgName, setOrgName);
+    restore(d.orgWebsite, setOrgWebsite);
+    restore(d.registrationRegion, setRegistrationRegion);
+    restore(d.whereYouWork, setWhereYouWork);
+    restore(d.registrationNumber, setRegistrationNumber);
+    restore(d.mission, setMission);
+    restore(d.priority, setPriority);
+    restore(d.helpFirst, setHelpFirst);
+    restore(d.currentTools, setCurrentTools);
+    restore(d.contactName, setContactName);
+    restore(d.contactRole, setContactRole);
+    restore(d.workEmail, setWorkEmail);
+    restore(d.annualReport, setAnnualReport);
+    restore(d.governancePage, setGovernancePage);
+    restore(d.campaignPage, setCampaignPage);
+    restore(d.phone, setPhone);
+  }, []);
+
+  // Keeps the draft above current as the user types, so in-progress work survives accidental
+  // navigation. Cleared separately in handleSubmit once a submission actually completes
+  // (AAA-HA-008) - this effect's job is only to persist while the user is still filling the
+  // form in, not to decide when a finished submission's data should stop reappearing.
+  useEffect(() => {
+    const draft: DraftFields = { ...fieldValues, currentTools };
+    saveDraft(DRAFT_STORAGE_KEY, draft);
+  }, [
+    orgName,
+    orgWebsite,
+    registrationRegion,
+    whereYouWork,
+    registrationNumber,
+    mission,
+    priority,
+    helpFirst,
+    currentTools,
+    contactName,
+    contactRole,
+    workEmail,
+    annualReport,
+    governancePage,
+    campaignPage,
+    phone,
+  ]);
 
   // Validates on blur (so errors show once the user leaves a field, not while they're still
   // typing it the first time), and live once a field already has an error showing, so it clears
@@ -275,6 +409,11 @@ export function ShareYourMissionForm() {
     const href = `mailto:${MISSION_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join("\n"))}`;
     setMailtoHref(href);
     setReady(true);
+    // AAA-HA-008: a completed submission is done - the next time this form is opened, it
+    // should be a fresh one, not a resurrected copy of what was already sent. Clearing here
+    // (not earlier) means in-progress work is never lost while the user is still filling the
+    // form in or hasn't submitted yet - only a real, successful submission triggers this.
+    clearDraft(DRAFT_STORAGE_KEY);
     // Opened synchronously within this click handler (not a useEffect) so browsers treat it as
     // a direct result of the user's action instead of an unrequested popup.
     window.location.href = href;
@@ -318,7 +457,7 @@ export function ShareYourMissionForm() {
         <h2 className="text-base font-semibold text-[#111]">
           Your organization
         </h2>
-        <div className="mt-5 grid sm:grid-cols-2 gap-x-4 gap-y-4">
+        <div className="mt-5 grid [@media(min-width:1180px)]:grid-cols-2 gap-x-4 gap-y-4">
           <div>
             <label className={requiredLabelClass}>Organization name</label>
             <input
@@ -376,7 +515,7 @@ export function ShareYourMissionForm() {
             />
             <FieldError message={fieldErrors.whereYouWork} />
           </div>
-          <div className="sm:col-span-2">
+          <div className="[@media(min-width:1180px)]:col-span-2">
             <label className={requiredLabelClass}>
               Registration number, registry link, or reason for exemption
             </label>
@@ -395,7 +534,7 @@ export function ShareYourMissionForm() {
             />
             <FieldError message={fieldErrors.registrationNumber} />
           </div>
-          <div className="sm:col-span-2">
+          <div className="[@media(min-width:1180px)]:col-span-2">
             <label className={requiredLabelClass}>
               What is your mission, and who do you serve?
             </label>
@@ -454,13 +593,12 @@ export function ShareYourMissionForm() {
         <h2 className="text-base font-semibold text-[#111]">
           How Hope Angel could help
         </h2>
-        <div className="mt-5 grid sm:grid-cols-2 gap-x-4 gap-y-4">
+        <div className="mt-5 grid [@media(min-width:1180px)]:grid-cols-2 gap-x-4 gap-y-4">
           <div>
             <label className={requiredLabelClass}>Your first priority</label>
-            <select
+            <Select
               value={priority}
-              onChange={(e) => {
-                const value = e.target.value as Priority | "";
+              onValueChange={(value) => {
                 setPriority(value);
                 setFieldErrors((prev) =>
                   prev.priority
@@ -468,16 +606,50 @@ export function ShareYourMissionForm() {
                     : prev,
                 );
               }}
-              onBlur={() => handleBlur("priority")}
-              className={`${fieldClass(!!fieldErrors.priority)} mt-2`}
             >
-              <option value="">Select one</option>
-              {PRIORITIES.map((p) => (
-                <option key={p} value={p}>
-                  {p}
-                </option>
-              ))}
-            </select>
+              <div ref={priorityTriggerWrapperRef} className="mt-2">
+                {/* whitespace-normal overrides the base component's whitespace-nowrap — verified
+                    with Playwright (measuring the trigger's own boundingBox before/after
+                    selecting a long option) that nowrap was the actual cause of the field
+                    growing: below the 1180px breakpoint this grid has no explicit
+                    grid-template-columns, so its single column's width is driven by the widest
+                    max-content contribution among its children. With nowrap, the browser treats
+                    a long selected label as one unbreakable line when computing that
+                    max-content, which forced the whole column (not just this field — every
+                    field sharing it grows in lockstep) past the viewport width. line-clamp-1
+                    (on the value span) doesn't need nowrap to clip to one line; it just needs
+                    white-space to allow wrapping so intrinsic sizing stays sane, then clips
+                    visually once a real width is assigned.
+                    *:data-[slot=select-value]:min-w-0/max-w-full — Radix's Select.Value
+                    primitive silently drops any className passed directly to it (destructured
+                    out of props, never spread onto the rendered span — confirmed in
+                    @radix-ui/react-select's source), so it has to be targeted this way, the
+                    same descendant-selector mechanism the base component already uses for its
+                    other styling. */}
+                <SelectTrigger
+                  onBlur={() => handleBlur("priority")}
+                  className={`${fieldClass(!!fieldErrors.priority)} h-auto data-[size=default]:h-auto font-normal overflow-hidden whitespace-normal *:data-[slot=select-value]:min-w-0 *:data-[slot=select-value]:max-w-full focus-visible:border-[#5D4387] focus-visible:ring-[#5D4387]/20`}
+                >
+                  <SelectValue placeholder="Select one" />
+                </SelectTrigger>
+              </div>
+              <SelectContent
+                side="bottom"
+                avoidCollisions={false}
+                style={priorityTriggerWidth ? { width: priorityTriggerWidth } : undefined}
+                className="rounded-xl border-black/10 shadow-lg"
+              >
+                {priorityOptions.map((p) => (
+                  <SelectItem
+                    key={p}
+                    value={p}
+                    className="cursor-pointer rounded-lg text-sm focus:bg-[#5D4387]/10 focus:text-[#5D4387] data-[state=checked]:font-medium data-[state=checked]:text-[#5D4387] [&_svg:not([class*='text-'])]:text-[#5D4387]"
+                  >
+                    <TruncatedOptionText text={p} />
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <FieldError message={fieldErrors.priority} />
           </div>
           <div>
@@ -496,7 +668,7 @@ export function ShareYourMissionForm() {
             />
             <FieldError message={fieldErrors.campaignPage} />
           </div>
-          <div className="sm:col-span-2">
+          <div className="[@media(min-width:1180px)]:col-span-2">
             <label className={requiredLabelClass}>
               What would you like Hope Angel to help with first?
             </label>
@@ -512,7 +684,7 @@ export function ShareYourMissionForm() {
             />
             <FieldError message={fieldErrors.helpFirst} />
           </div>
-          <div className="sm:col-span-2">
+          <div className="[@media(min-width:1180px)]:col-span-2">
             <label className={optionalLabelClass}>
               Current tools or communication channels
             </label>
@@ -530,7 +702,7 @@ export function ShareYourMissionForm() {
         <h2 className="text-base font-semibold text-[#111]">
           Who we can contact
         </h2>
-        <div className="mt-5 grid sm:grid-cols-2 gap-x-4 gap-y-4">
+        <div className="mt-5 grid [@media(min-width:1180px)]:grid-cols-2 gap-x-4 gap-y-4">
           <div>
             <label className={requiredLabelClass}>Your name</label>
             <input
@@ -572,10 +744,13 @@ export function ShareYourMissionForm() {
             <label className={optionalLabelClass}>Phone</label>
             <input
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e) => handleChange("phone", e.target.value, setPhone)}
+              onBlur={() => handleBlur("phone")}
               type="tel"
-              className={`${fieldClass(false)} mt-2`}
+              placeholder="+1 415 555 1234"
+              className={`${fieldClass(!!fieldErrors.phone)} mt-2`}
             />
+            <FieldError message={fieldErrors.phone} />
           </div>
         </div>
       </div>

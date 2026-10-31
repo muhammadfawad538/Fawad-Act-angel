@@ -73,19 +73,23 @@ export async function POST(request: NextRequest) {
   }
 
   const isEmailChannel = channel?.toLowerCase() === "email";
-  // Call/WhatsApp still go through the n8n intake workflow (picks the right
-  // outbound number by country, fires the Retell call) - only Email is
-  // handled here. Checked up front so a misconfigured deployment fails fast
+  // Call/WhatsApp go through the n8n intake workflow (picks the right
+  // outbound number by country, fires the Retell call). Email now goes
+  // through BOTH: the client's own email-assistant pipeline below (the
+  // actual candidate-facing conversation, unchanged) AND this same n8n
+  // webhook with data_only - so an Email-channel lead lands in our own DB
+  // too, same as every other channel, without triggering a welcome email
+  // or a call. Checked up front so a misconfigured deployment fails fast
   // with a clear error instead of after burning both Twilio Verify calls.
   const intakeUrl = process.env.N8N_INTAKE_WEBHOOK_URL;
   const intakeApiKey = process.env.N8N_INTAKE_WEBHOOK_API_KEY;
   const webApiUrl = process.env.ACTANGEL_WEB_API_URL;
   const emailAssistantId = process.env.ACTANGEL_EMAIL_ASSISTANT_ID;
-  if (isEmailChannel ? !webApiUrl || !emailAssistantId : !intakeUrl || !intakeApiKey) {
+  if (!intakeUrl || !intakeApiKey || (isEmailChannel && (!webApiUrl || !emailAssistantId))) {
     return NextResponse.json(
       {
         error: isEmailChannel
-          ? "Server is misconfigured: missing ACTANGEL_WEB_API_URL or ACTANGEL_EMAIL_ASSISTANT_ID"
+          ? "Server is misconfigured: missing ACTANGEL_WEB_API_URL, ACTANGEL_EMAIL_ASSISTANT_ID, or intake webhook config"
           : "Server is misconfigured: missing intake webhook config",
       },
       { status: 500 }
@@ -149,6 +153,25 @@ export async function POST(request: NextRequest) {
       });
       intakeData = await enquiryRes.json().catch(() => null);
       intakeOk = enquiryRes.ok;
+
+      // Also store the lead in our own DB, same as Call/WhatsApp get via the
+      // branch below - data_only tells the intake workflow to skip the
+      // welcome email and the call dispatch, since the email-assistant
+      // pipeline above already owns the actual candidate-facing
+      // conversation. Best-effort: this must never affect the response the
+      // candidate's own OTP verification depends on.
+      try {
+        await fetch(intakeUrl!, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-Intake-Api-Key": intakeApiKey! },
+          body: JSON.stringify({ name, phone, email, otp_status: "verified", channel, source, data_only: true }),
+        });
+      } catch (err) {
+        console.error(
+          "Email-channel lead storage (data_only intake call) failed:",
+          err instanceof Error ? err.message : String(err)
+        );
+      }
     } else {
       // n8n intake workflow: pushes the lead to Postgres, picks the right
       // outbound number by country, and fires the Retell call.

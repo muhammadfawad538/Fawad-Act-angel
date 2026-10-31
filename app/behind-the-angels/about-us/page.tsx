@@ -5,7 +5,7 @@ import { SiteFooter } from "@/components/site-footer"
 export const metadata: Metadata = {
   title: "Behind the Angels — Act Angel AI",
   description:
-    "Act Angel AI is a Boston-headquartered AI company building Virtual AI Employees — combining three decades of enterprise, SaaS and business-process expertise with a new generation of AI-native talent.",
+    "Act Angel AI is a Boston-headquartered AI company building Virtual AI Specialists — combining three decades of enterprise, SaaS and business-process expertise with a new generation of AI-native talent.",
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -29,7 +29,7 @@ export default function BehindTheAngelsPage() {
       <div className="flex-1 px-6 md:px-12 lg:px-20 pt-28 md:pt-32 pb-16 md:pb-32">
       <main className="max-w-6xl mx-auto">
         <h1 className="text-3xl md:text-5xl font-light tracking-tight leading-[1.15] md:leading-[1.1] max-w-3xl mx-auto text-center">
-          We Don&rsquo;t Build More Software.<br className="hidden md:block"/>We Build AI Employees.
+          We Don&rsquo;t Build More Software.<br className="hidden md:block"/>We Build AI Specialists.
         </h1>
         <p className="mt-4 text-lg md:text-xl text-black/55 text-center">
           Scale your business — not your headcount.
@@ -54,7 +54,7 @@ export default function BehindTheAngelsPage() {
         <Section title="Software isn't the point — action is">
           <p>Businesses have enough software. <strong className="font-medium text-[#111]">What they need is action.</strong></p>
           <p>
-            Our <strong className="font-medium text-[#111]">Virtual AI Employees</strong> understand
+            Our <strong className="font-medium text-[#111]">Virtual AI Specialists</strong> understand
             context and take the right action at the right time — without reminders or chasing.
             They work across your existing systems, data, processes, and channels to{" "}
             <strong className="font-medium text-[#111]">engage prospects, serve customers, follow

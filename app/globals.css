@@ -1,7 +1,149 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
+/* Radix popovers (e.g. the Select on /share-your-mission) lock background scroll via
+   react-remove-scroll, which — while open — injects its own <style> tag with
+   `body[data-scroll-locked] { overflow: hidden !important; position: relative !important; ... }`
+   (confirmed by inspecting the live page, not just its docs; it's not a plain inline style).
+   Either of those two properties alone is enough to break a `position: sticky` descendant
+   elsewhere on the page: per spec, a sticky element sticks relative to its nearest ancestor with
+   a "scrolling mechanism", and ANY non-`visible` overflow value establishes one — not just
+   `position: relative`. With body suddenly acting as that ancestor (and body's own scrollTop
+   never actually changing, since real scrolling had moved to <html>), the sticky element
+   un-sticks and snaps to its normal, pre-scroll document position, which can be well above the
+   current viewport (verified via Playwright: a sticky sidebar heading at a normal y:112 jumped
+   to y:-298 the instant the dropdown opened). The selector has to at least match
+   `body[data-scroll-locked]`'s specificity to win the !important-vs-!important tie (a bare
+   `body { !important }` rule, tried first, lost to it regardless of source order); `html
+   body[data-scroll-locked]` is one level more specific, so it wins outright. This does give up
+   the scroll-lock's actual job (the page can scroll in the background while a dropdown is open)
+   — an acceptable trade for not breaking sticky positioning site-wide, and the same trade this
+   page's native <select> equivalent made implicitly, since native selects don't lock scroll. */
+html body[data-scroll-locked] {
+  position: static !important;
+  overflow: visible !important;
+}
+
 @custom-variant dark (&:is(.dark *));
+@custom-variant purple (&:is(.purple *));
+
+/* Navbar surface colors, as CSS variables rather than Tailwind dark:/purple: classes: the nav
+   bar's background and shadow are set via inline `style` (NAV_STYLE/NAV_DROPDOWN_STYLE in
+   mobile-nav.tsx, needed for backdrop-filter blur), and Tailwind's variant classes only ever
+   apply to className, never to an inline style object. Referencing var(--nav-bg) etc. from that
+   style object instead lets the same three theme classes below drive it automatically, with no
+   theme-conditional logic needed in the component. --nav-dropdown-bg covers the floating
+   Hire-an-Angel/Behind-the-Angels panels and the mobile menu — same surface as the bar, just
+   pushed more opaque (matching NAV_DROPDOWN_STYLE's existing light-theme relationship to
+   NAV_STYLE), since panels sit directly over page content rather than always at the very top. */
+:root {
+  --nav-bg: rgba(255, 255, 255, 0.75);
+  --nav-dropdown-bg: rgba(255, 255, 255, 0.99);
+  --nav-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.12);
+}
+.dark {
+  --nav-bg: rgba(15, 15, 17, 0.78);
+  --nav-dropdown-bg: rgba(15, 15, 17, 0.97);
+  --nav-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.6);
+}
+.purple {
+  /* A dark, desaturated step down from the brand accent (#5D4387), not just a tinted black —
+     keeps the bar reading as "purple" rather than "black with a purple border". */
+  --nav-bg: rgba(35, 24, 54, 0.8);
+  --nav-dropdown-bg: rgba(35, 24, 54, 0.97);
+  --nav-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.6);
+}
+
+/* The hero's own bottom gradient (app/page.tsx) fades the background video into solid page
+   background color at several alpha stops — currently #F5F4F0, hardcoded, because the rest of
+   the page (every section below hero) is still that same light color and hasn't been themed
+   yet. The whole gradient (not just one color swapped into a fixed shape) is a variable because
+   the multi-stop alpha blend needs a matching base color at every stop, not a single hue
+   dropped in with varying opacity. This only changes what the hero itself fades to; it's
+   deliberately NOT applied anywhere else the page background is set, since doing that now —
+   before the sections below hero get their own dark/purple pass — would turn still-unthemed
+   text (dark-on-light) illegible against a dark page background. Expect a visible seam between
+   hero and the section below it until that later pass happens; that's the known, temporary cost
+   of theming section-by-section. */
+:root {
+  --hero-fade-gradient: linear-gradient(
+    to top,
+    #f5f4f0 0%,
+    #f5f4f0 18%,
+    rgba(245, 244, 240, 0.85) 35%,
+    rgba(245, 244, 240, 0.5) 55%,
+    rgba(245, 244, 240, 0.15) 75%,
+    transparent 100%
+  );
+}
+.dark {
+  --hero-fade-gradient: linear-gradient(
+    to top,
+    #0a0a0a 0%,
+    #0a0a0a 18%,
+    rgba(10, 10, 10, 0.85) 35%,
+    rgba(10, 10, 10, 0.5) 55%,
+    rgba(10, 10, 10, 0.15) 75%,
+    transparent 100%
+  );
+}
+.purple {
+  --hero-fade-gradient: linear-gradient(
+    to top,
+    #1a1226 0%,
+    #1a1226 18%,
+    rgba(26, 18, 38, 0.85) 35%,
+    rgba(26, 18, 38, 0.5) 55%,
+    rgba(26, 18, 38, 0.15) 75%,
+    transparent 100%
+  );
+}
+
+/* The closing CTA section's own glass-panels image fade (app/page.tsx, id="pilot") — same
+   reasoning as --hero-fade-gradient above, a different shape (fewer stops, fades out by 55%
+   instead of 100%) so it's its own variable rather than reusing that one. */
+:root {
+  --cta-fade-gradient: linear-gradient(
+    to top,
+    rgb(245, 244, 240) 0%,
+    rgba(245, 244, 240, 0.92) 18%,
+    rgba(245, 244, 240, 0.55) 35%,
+    transparent 55%
+  );
+}
+.dark {
+  --cta-fade-gradient: linear-gradient(
+    to top,
+    #0a0a0a 0%,
+    rgba(10, 10, 10, 0.92) 18%,
+    rgba(10, 10, 10, 0.55) 35%,
+    transparent 55%
+  );
+}
+.purple {
+  --cta-fade-gradient: linear-gradient(
+    to top,
+    #1a1226 0%,
+    rgba(26, 18, 38, 0.92) 18%,
+    rgba(26, 18, 38, 0.55) 35%,
+    transparent 55%
+  );
+}
+
+/* Agent cards (components/stacking-agent-cards.tsx) — a CSS var rather than dark:/purple:
+   classes because the same color is needed in two places that can't both use Tailwind
+   variants: the card's own background (fine as a class) and the desktop image's fade-to-card
+   gradient (an inline style, since it needs a specific fade shape, same reasoning as the
+   hero/channel-ticker gradients above). One var covers both, so they can't drift apart. */
+:root {
+  --agent-card-bg: #faf9f7;
+}
+.dark {
+  --agent-card-bg: #141414;
+}
+.purple {
+  --agent-card-bg: #241a35;
+}
 
 :root {
   --background: oklch(1 0 0);
@@ -162,6 +304,13 @@
     display: none;
   }
 
+  /* The icon-layer wrapper (desktop-only horizontal shift, see app/page.tsx) sits between
+     .tools-orbit and the .tools-orbit-node icons. `display: contents` removes its own box so
+     the icons become direct grid children again, as this grid layout requires. */
+  .tools-orbit-icon-layer {
+    display: contents;
+  }
+
   .tools-orbit-node {
     position: static;
     width: auto;
@@ -275,6 +424,16 @@
 @keyframes message-in {
   0%   { opacity: 0; transform: translateY(8px); }
   100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Nav "Business Functions" tooltip (components/mobile-nav.tsx) — this card is React
+   mount/unmount driven (position:fixed, coordinates computed in JS), not a CSS group-hover
+   child, so a plain `transition` has no "from" state to animate from on mount. An `animation`
+   plays automatically when the element is created, which a transition can't do here — this
+   replicates the fade+scale-in the old group-hover version had. */
+@keyframes tooltip-in {
+  0%   { opacity: 0; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
 }
 
 /* "Connecting…" label on the call-answered stage — the theme pulses it while it waits. */
@@ -405,6 +564,24 @@ body[data-scroll-locked] {
   background: linear-gradient(to left, rgba(245, 244, 240, 0.72) 0%, rgba(245, 244, 240, 0.42) 45%, transparent 100%);
 }
 
+/* Edge-fade colors match this section's own dark:/purple: background (set directly on the
+   <section> in page.tsx, same #0a0a0a / #1a1226 tones as the hero's fade target) rather than
+   the page's still-light root background — these are plain CSS classes, not Tailwind
+   utilities, so the .dark/.purple classes next-themes toggles on <html> are targeted directly
+   rather than through the dark:/purple: variant syntax used elsewhere. */
+.dark .channel-ticker::before {
+  background: linear-gradient(to right, rgba(10, 10, 10, 0.75) 0%, rgba(10, 10, 10, 0.45) 45%, transparent 100%);
+}
+.dark .channel-ticker::after {
+  background: linear-gradient(to left, rgba(10, 10, 10, 0.75) 0%, rgba(10, 10, 10, 0.45) 45%, transparent 100%);
+}
+.purple .channel-ticker::before {
+  background: linear-gradient(to right, rgba(26, 18, 38, 0.75) 0%, rgba(26, 18, 38, 0.45) 45%, transparent 100%);
+}
+.purple .channel-ticker::after {
+  background: linear-gradient(to left, rgba(26, 18, 38, 0.75) 0%, rgba(26, 18, 38, 0.45) 45%, transparent 100%);
+}
+
 .channel-ticker-track {
   display: flex;
   width: max-content;
@@ -432,6 +609,17 @@ body[data-scroll-locked] {
   font-size: 14px;
 }
 
+.dark .channel-pill {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.4);
+}
+.purple .channel-pill {
+  background: rgba(93, 67, 135, 0.25);
+  color: #ede9f7;
+  box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.4);
+}
+
 .channel-pill svg {
   flex-shrink: 0;
 }
@@ -457,6 +645,34 @@ body[data-scroll-locked] {
 }
 .themed-scrollbar::-webkit-scrollbar-thumb:hover {
   background-color: rgba(0, 0, 0, 0.32);
+}
+
+/* Nav "Hire an Angel" dropdown's own scrollbar (components/mobile-nav.tsx) — lighter, thinner,
+   and brand-purple-tinted rather than the grey .themed-scrollbar used in modals; the thumb has
+   no border, and the up/down arrow buttons some browsers draw on a styled webkit scrollbar are
+   explicitly hidden. */
+.nav-dropdown-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(93, 67, 135, 0.3) transparent;
+}
+.nav-dropdown-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.nav-dropdown-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.nav-dropdown-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(93, 67, 135, 0.3);
+  border: none;
+  border-radius: 999px;
+}
+.nav-dropdown-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(93, 67, 135, 0.45);
+}
+.nav-dropdown-scrollbar::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 /* Hides the scrollbar on an overflow-x-auto row (persona tab bar on narrow viewports) while

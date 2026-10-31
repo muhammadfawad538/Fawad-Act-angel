@@ -111,7 +111,7 @@ export interface Persona {
   closingCtaHref?: string
   closingQuote?: string // pull-quote banner between the closing CTA and the mission form
   closingQuoteTag?: string // small-caps label on the quote banner's right edge
-  showMissionForm?: boolean // embeds the nonprofit application form (Hope Angel) at #share-your-mission
+  showMissionForm?: boolean // shows the floating "Share Your Mission" widget (Hope Angel), linking to the standalone /share-your-mission page
 
   // Hope Angel's phone-demo override — see CampaignDemo above.
   campaignDemo?: CampaignDemo
@@ -142,10 +142,10 @@ export const PERSONAS: Persona[] = [
       ["in", "Saturday works"],
       ["out", "Booked — Sat, 11:00 AM"],
     ],
-    eyebrow: "Virtual AI Sales Employee",
+    eyebrow: "AI Sales Specialist",
     heroHeadline: "Turn Every Deal Into Action.",
     heroSubtext:
-      "Your virtual AI sales employee engages deals, qualifies interest, books meetings, and moves opportunities forward across your connected sales systems.",
+      "Your AI sales Specialist engages deals, qualifies interest, books meetings, and moves opportunities forward across your connected sales systems.",
     capabilities: [
       { title: "Engage new deals.", description: "Respond to inbound enquiries with relevant, timely conversations." },
       { title: "Qualify interest.", description: "Capture needs, timing, and fit against your sales criteria." },
@@ -159,7 +159,7 @@ export const PERSONAS: Persona[] = [
       "Reduce manual follow-up, shorten the path from enquiry to meeting, and give sellers more time for relationships and closing.",
     whatIsTitle: "What is a Sales Angel?",
     whatIsDescription:
-      "A Sales Angel is a virtual AI sales employee from Act Angel AI that autonomously qualifies deals, follows up, schedules meetings, and updates connected sales systems within your defined rules and permissions.",
+      "A Sales Angel is a virtual AI sales specialist from Act Angel AI that autonomously qualifies deals, follows up, schedules meetings, and updates connected sales systems within your defined rules and permissions.",
     ctaLine: "Put your next opportunity in motion.",
     ctaHireLabel: "Hire a Sales Angel",
     // ?source=sales — same mechanism as Hope Angel's ctaHref below. The trailing slash before
@@ -185,10 +185,10 @@ export const PERSONAS: Persona[] = [
       ["in", "Great, thank you!"],
       ["out", "You're welcome. I'll text you once it's delivered."],
     ],
-    eyebrow: "Virtual AI Customer Service Employee",
+    eyebrow: "AI Customer Service Specialist",
     heroHeadline: "From Customer Request to Resolution.",
     heroSubtext:
-      "Your virtual AI service employee answers questions, acts on routine requests, and keeps customers informed across your connected support systems.",
+      "Your AI service Specialist answers questions, acts on routine requests, and keeps customers informed across your connected support systems.",
     capabilities: [
       { title: "Answer with context.", description: "Use approved knowledge and customer records to deliver relevant answers." },
       { title: "Resolve routine requests.", description: "Complete permitted account and service updates in connected systems." },
@@ -202,7 +202,7 @@ export const PERSONAS: Persona[] = [
       "Reduce repetitive support work, improve response consistency, and give specialists more capacity for complex customer needs.",
     whatIsTitle: "What is a Service Angel?",
     whatIsDescription:
-      "A Service Angel is a virtual AI customer service employee from Act Angel AI that answers questions and autonomously completes routine service workflows across connected systems, with escalation when human judgement is needed.",
+      "A Service Angel is a virtual AI customer service specialist from Act Angel AI that answers questions and autonomously completes routine service workflows across connected systems, with escalation when human judgement is needed.",
     ctaLine: "Make every service interaction count.",
     ctaHireLabel: "Hire a Service Angel",
     ctaHref: "/get-started/?source=service",
@@ -225,10 +225,10 @@ export const PERSONAS: Persona[] = [
     ],
     // Content doc's "HR Angel" section, used verbatim — displayed under the "HR Angel" label
     // above while the URL stays /hire-an-angel/recruitment-angel (route intentionally unchanged).
-    eyebrow: "Virtual AI HR Employee",
+    eyebrow: "AI HR Specialist",
     heroHeadline: "Less HR Admin. More Human Impact.",
     heroSubtext:
-      "Your virtual AI HR employee coordinates people processes, handles routine employee requests, and keeps work moving across your connected HR systems.",
+      "Your AI HR Specialist coordinates people processes, handles routine employee requests, and keeps work moving across your connected HR systems.",
     capabilities: [
       { title: "Coordinate recruitment.", description: "Schedule interviews and keep candidates informed of next steps." },
       { title: "Orchestrate onboarding.", description: "Launch checklists, request documents, and track assigned tasks." },
@@ -242,7 +242,7 @@ export const PERSONAS: Persona[] = [
       "Reduce repetitive administration, improve follow-through across the employee lifecycle, and free HR teams to focus on people and organisational priorities.",
     whatIsTitle: "What is an HR Angel?",
     whatIsDescription:
-      "An HR Angel is a virtual AI employee from Act Angel AI that autonomously coordinates routine HR workflows across connected systems and approved data. Sensitive cases and employment decisions remain with authorised people.",
+      "An HR Angel is a virtual AI specialist from Act Angel AI that autonomously coordinates routine HR workflows across connected systems and approved data. Sensitive cases and employment decisions remain with authorised people.",
     ctaLine: "Give your people team more capacity.",
     ctaHireLabel: "Hire an HR Angel",
     ctaHref: "/get-started/?source=hr",
@@ -266,10 +266,10 @@ export const PERSONAS: Persona[] = [
     // Content doc's "Assistant Angel" section, used verbatim — displayed under the "Assistant
     // Angel" label above while the URL stays /hire-an-angel/executive-assistant-angel (route
     // intentionally unchanged).
-    eyebrow: "Virtual AI Assistant Employee",
+    eyebrow: "AI Assistant Specialist",
     heroHeadline: "Give Your Priorities Room to Move.",
     heroSubtext:
-      "Your virtual AI assistant coordinates schedules, prepares information, and follows through on everyday work across your connected tools and workflows.",
+      "Your AI assistant Specialist coordinates schedules, prepares information, and follows through on everyday work across your connected tools and workflows.",
     capabilities: [
       { title: "Coordinate calendars.", description: "Arrange meetings, resolve scheduling clashes, and send reminders." },
       { title: "Organise the inbox.", description: "Prioritise messages, draft replies, and route requests for action." },
@@ -283,7 +283,7 @@ export const PERSONAS: Persona[] = [
       "Reduce coordination overhead, keep commitments visible, and give leaders and teams more time for decisions that move the business forward.",
     whatIsTitle: "What is an Assistant Angel?",
     whatIsDescription:
-      "An Assistant Angel is a virtual AI assistant employee from Act Angel AI that autonomously coordinates administrative work across connected calendars, communication tools, data, and processes, following your permissions and approval rules.",
+      "An Assistant Angel is a virtual AI assistant specialist from Act Angel AI that autonomously coordinates administrative work across connected calendars, communication tools, data, and processes, following your permissions and approval rules.",
     ctaLine: "Make space for your highest-value work.",
     ctaHireLabel: "Hire an Assistant Angel",
     ctaHref: "/get-started/?source=assistance",
@@ -361,10 +361,10 @@ export const PERSONAS: Persona[] = [
         progressPct: 0,
       },
     ],
-    eyebrow: "Devoted AI Volunteer Employee for Nonprofits",
+    eyebrow: "Devoted AI Workforce for Nonprofits",
     heroHeadline: "Hope Angel: More Good, Done Every Day.",
     heroSubtext:
-      "Your virtual AI volunteer employee raises funds, welcomes donors and volunteers, and guides applicants across your nonprofit's connected systems.",
+      "Your AI volunteer Workforce raises funds, welcomes donors and volunteers, and guides applicants across your nonprofit's connected systems.",
       // "Hope Angel serves your nonprofit's purpose without taking a salary. It helps raise funds for clear goals, welcome donors and volunteers, and guide people applying for support. As your mission grows, Hope Angel helps you reach more people and act quickly, with consistent follow-up so opportunities to help are less likely to be missed.",
       // "Hope Angel serves your nonprofit's purpose without taking a salary. It helps raise funds for clear goals, welcome donors and volunteers, and guide people applying for support. As your mission grows, Hope Angel helps you reach more people and act quickly, with consistent follow-up so opportunities to help are less likely to be missed.",
     // heroSubtext2:
@@ -392,7 +392,7 @@ export const PERSONAS: Persona[] = [
       {
         question: "What is Hope Angel?",
         answer:
-          "Hope Angel is a devoted virtual AI volunteer employee from Act Angel AI (AAA) for eligible nonprofit organizations. It helps with purposeful fundraising, donor and volunteer engagement, and applications for funds or grants raised by the NPO. It works within each organization's rules and human oversight.",
+          "Hope Angel is a devoted virtual AI volunteer specialist from Act Angel AI (AAA) for eligible nonprofit organizations. It helps with purposeful fundraising, donor and volunteer engagement, and applications for funds or grants raised by the NPO. It works within each organization's rules and human oversight.",
       },
       {
         question: "Can Hope Angel show fundraising progress in real time?",
@@ -421,7 +421,7 @@ export const PERSONAS: Persona[] = [
     liveDemoSubtext:
       "Choose a scenario and a channel to see an example of how Hope Angel moves a conversation toward a helpful next step.",
     liveDemoCtaLabel: "Share Your Mission",
-    liveDemoCtaHref: "#share-your-mission",
+    liveDemoCtaHref: "/share-your-mission",
     liveDemoCtaVariant: "purple",
     liveDemoCaption: "See what service could look like for your NPO.",
     livePreviewPillLabel: "Devoted Volunteer",
@@ -432,7 +432,7 @@ export const PERSONAS: Persona[] = [
     closingDescription:
       "We would be honored to learn about the good your organization does. As part of our Progress with Purpose commitment, Act Angel AI (AAA) invests in Hope Angel and extends its service on a complimentary basis to eligible NPOs. Before offering an Angel, we take time to understand each organization and verify its authenticity and ethical practices. Please tell us about your mission and how Hope Angel might serve it.",
     closingCtaLabel: "Share Your Mission",
-    closingCtaHref: "#share-your-mission",
+    closingCtaHref: "/share-your-mission",
     closingQuote: "We choose to measure success by the good we do with it.",
     closingQuoteTag: "Revenue. Angels. Time.",
     showMissionForm: true,

@@ -117,7 +117,15 @@ function SelectItem({
           <CheckIcon className="size-4" />
         </SelectPrimitive.ItemIndicator>
       </span>
-      <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+      {/* min-w-0 lets this shrink below its text's intrinsic width — flex items default to
+          min-width: auto, which would otherwise stop long option text from ever triggering
+          overflow (and therefore a child's `truncate`) no matter how narrow the menu is.
+          max-w-full is a second, non-flex-dependent cap to the same end: it keeps this from
+          exceeding the row's available width even if something upstream ever changes how the
+          flex-grow/shrink math here resolves. */}
+      <SelectPrimitive.ItemText className="min-w-0 max-w-full flex-1">
+        {children}
+      </SelectPrimitive.ItemText>
     </SelectPrimitive.Item>
   )
 }

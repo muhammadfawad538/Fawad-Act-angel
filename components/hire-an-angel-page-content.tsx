@@ -6,7 +6,6 @@ import { PERSONAS, type Persona, type PersonaId } from "@/lib/personas";
 import { PersonaPhoneDemo } from "@/components/persona-phone-demo";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { ShareYourMissionForm } from "@/components/share-your-mission-form";
 
 // Act Angel's own multi-channel concept (already used on the homepage's "always on / reachable
 // everywhere" section) — reused here as the second picker in LiveDemoSection below.
@@ -470,7 +469,7 @@ export function HireAnAngelPageContent({
                     </p>
                     <p className="mt-1.5 text-[13px] text-black/50 leading-relaxed">
                       {persona.trustSubtext ??
-                        "Free from personal worries, emotional ups and downs, or self-interest. Your Virtual AI Employee stays focused on the work and your business goals—24/7."}
+                        "Free from personal worries, emotional ups and downs, or self-interest. Your Virtual AI Specialist stays focused on the work and your business goals—24/7."}
                     </p>
                   </div>
                   {/* inline-block (not w-full max-w-[240px]): the card now shrinks/grows to fit
@@ -659,45 +658,6 @@ export function HireAnAngelPageContent({
                 </section>
               )}
 
-              {/* Nonprofit application form, embedded directly on the page (not a separate
-                  route) — matches the reference site, where "Share Your Mission" scrolls down
-                  to this same section instead of navigating away. Only Hope Angel opts in. */}
-              {persona.showMissionForm && (
-                <section
-                  id="share-your-mission"
-                  className="mt-20 pb-4 scroll-mt-24"
-                >
-                  <div className="rounded-3xl bg-[#EDE9F7] p-8 md:p-12">
-                    <div className="grid md:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] gap-10 md:gap-14 items-start">
-                      <div className="md:sticky md:top-28">
-                        <span className="inline-block px-4 py-1.5 rounded-full bg-white text-[#5D4387] text-[11px] font-semibold uppercase tracking-widest">
-                          Share Your Mission
-                        </span>
-                        <h2 className="mt-5 text-2xl md:text-3xl font-bold tracking-tight">
-                          Tell us about the good you do.
-                        </h2>
-                        <p className="mt-4 text-[15px] text-black/55 leading-relaxed">
-                          A few details help Act Angel AI understand your
-                          organization, verify its standing, and see where Hope
-                          Angel could serve. Please share public links where
-                          possible; we can request further evidence during
-                          review.
-                        </p>
-                        <ol className="mt-6 flex flex-col gap-1.5 text-[13px] text-black/45 border-l-2 border-[#5D4387]/30 pl-4">
-                          <li className="font-bold text-[#111]">
-                            1. Share your NPO details
-                          </li>
-                          <li>2. AAA reviews your organization</li>
-                          <li>3. Explore an Angel if you wish</li>
-                        </ol>
-                      </div>
-                      <div className="bg-white border border-black/[0.08] rounded-2xl p-6 md:p-8">
-                        <ShareYourMissionForm />
-                      </div>
-                    </div>
-                  </div>
-                </section>
-              )}
             </>
           ) : (
             <div className="mt-16 flex justify-center">
@@ -713,10 +673,11 @@ export function HireAnAngelPageContent({
 
       {/* Floating "Share Your Mission" widget — Hope Angel-only (persona.showMissionForm),
           pinned to the bottom-right of the viewport on every scroll position, matching the
-          reference design's persistent conversion prompt. */}
+          reference design's persistent conversion prompt. Links to the standalone
+          /share-your-mission page (not an in-page anchor — the form no longer lives here). */}
       {persona.showMissionForm && (
-        <a
-          href="#share-your-mission"
+        <Link
+          href="/share-your-mission"
           className="fixed bottom-6 right-6 z-40 hidden sm:flex items-center gap-3 pl-6 pr-2 py-2 rounded-full bg-white shadow-[0_10px_40px_-10px_rgba(0,0,0,0.3)] border border-black/[0.06] hover:shadow-[0_14px_44px_-8px_rgba(0,0,0,0.35)] transition-shadow"
         >
           <span className="text-[13px] font-medium text-black/60 whitespace-nowrap">
@@ -726,7 +687,7 @@ export function HireAnAngelPageContent({
             Share Your Mission
             <span aria-hidden="true">↗</span>
           </span>
-        </a>
+        </Link>
       )}
     </div>
   );

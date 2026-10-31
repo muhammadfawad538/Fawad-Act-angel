@@ -37,7 +37,7 @@ const OFFSET_STEP  = 8    // px pushed down per card stacked on top
 
 function Tag({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] tracking-widest font-sans text-black/40 bg-black/[0.04]">
+    <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] tracking-widest font-sans text-black/40 bg-black/[0.04] dark:text-white/50 dark:bg-white/[0.06] purple:text-[#EDE9F7]/70 purple:bg-white/[0.08]">
       {children}
     </span>
   )
@@ -93,7 +93,10 @@ export function StackingAgentCards() {
                 willChange:     "transform",
               }}
             >
-              <div className="group relative bg-[#faf9f7] rounded-2xl border border-black/[0.07] overflow-hidden cursor-pointer">
+              {/* bg-(--agent-card-bg): a CSS var (globals.css), not dark:/purple: classes —
+                  the same color also drives the desktop image's fade gradient below, via the
+                  same var, so the two can't end up mismatched. */}
+              <div className="group relative bg-(--agent-card-bg) rounded-2xl border border-black/[0.07] dark:border-white/10 purple:border-[#EDE9F7]/15 overflow-hidden cursor-pointer">
 
                 {/* ── MOBILE: image top, fades out at bottom ── */}
                 {agent.img && (
@@ -121,7 +124,7 @@ export function StackingAgentCards() {
                     <div
                       className="absolute inset-0"
                       style={{
-                        background: "linear-gradient(to right, #faf9f7 0%, transparent 55%)",
+                        background: "linear-gradient(to right, var(--agent-card-bg) 0%, transparent 55%)",
                       }}
                     />
                   </div>
@@ -139,15 +142,15 @@ export function StackingAgentCards() {
                         <Tag>{agent.label}</Tag>
                       </div>
                     )}
-                    <h3 className={`text-xl font-light ${agent.stats ? "mb-3" : ""} ${!agent.label ? "mt-0" : ""}`}>{agent.title}</h3>
-                    <p className="text-sm text-black/45 leading-relaxed mb-8">{agent.desc}</p>
+                    <h3 className={`text-xl font-light text-[#111] dark:text-white purple:text-white ${agent.stats ? "mb-3" : ""} ${!agent.label ? "mt-0" : ""}`}>{agent.title}</h3>
+                    <p className="text-sm text-black/45 dark:text-white/55 purple:text-white/55 leading-relaxed mb-8">{agent.desc}</p>
                   </div>
                   {agent.stats && agent.stats.length > 0 && (
-                    <div className="flex gap-8 pt-6 border-t border-black/[0.06]">
+                    <div className="flex gap-8 pt-6 border-t border-black/[0.06] dark:border-white/10 purple:border-[#EDE9F7]/15">
                       {agent.stats.map(s => (
                         <div key={s.l}>
-                          <div className="text-2xl font-light">{s.v}</div>
-                          <div className="text-[11px] text-black/35 tracking-widest mt-0.5">{s.l}</div>
+                          <div className="text-2xl font-light text-[#111] dark:text-white purple:text-white">{s.v}</div>
+                          <div className="text-[11px] text-black/35 dark:text-white/40 purple:text-white/40 tracking-widest mt-0.5">{s.l}</div>
                         </div>
                       ))}
                     </div>
