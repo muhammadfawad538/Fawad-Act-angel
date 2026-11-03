@@ -72,7 +72,7 @@ const NAV_DROPDOWN_STYLE = {
 // rather than using the site's Geist font — applied as a class here (not inherited from a
 // wrapper) so it still reaches the dropdown popover, which portals outside the nav in the DOM.
 const NAV_ITEM =
-  "text-[14px] font-medium text-[#4A4A4A] hover:text-[#111] transition-colors duration-200 [font-family:system-ui,-apple-system,sans-serif] dark:text-white/60 dark:hover:text-white purple:text-[#EDE9F7]/65 purple:hover:text-white";
+  "text-[14px] font-medium text-[#4A4A4A] hover:text-[#111] transition-colors duration-200 [font-family:system-ui,-apple-system,sans-serif] dark:text-white/60 dark:hover:text-white purple:text-[#ABA6D9] purple:hover:text-[#F6F4FF]";
 
 // Nav pill buttons (requirements/Buttons_update_header.png): "Hire an Angel", "Behind the
 // Angels" and "Contact" are now outlined pills the same size as Get Started (46px tall, 12px
@@ -83,15 +83,17 @@ const NAV_ITEM =
 // it sized to its own content in both contexts. shrink-0/whitespace-nowrap stop the label from
 // wrapping or the pill from getting squeezed when the desktop row is short on space.
 const NAV_PILL =
-  "inline-flex items-center justify-center gap-[6px] h-[46px] px-6 rounded-full border border-[#DADADA] hover:border-[#b8b8b8] text-[12px] font-medium uppercase tracking-[0.08em] text-[#111] whitespace-nowrap shrink-0 transition-colors duration-200 dark:border-white/15 dark:hover:border-white/35 dark:text-white purple:border-[#EDE9F7]/20 purple:hover:border-[#EDE9F7]/45 purple:text-[#EDE9F7]";
+  "inline-flex items-center justify-center gap-[6px] h-[46px] px-6 rounded-full border border-[#DADADA] hover:border-[#b8b8b8] text-[12px] font-medium uppercase tracking-[0.08em] text-[#111] whitespace-nowrap shrink-0 transition-colors duration-200 dark:border-white/15 dark:hover:border-white/35 dark:text-white purple:border-[#B79CFF]/25 purple:hover:border-[#B79CFF]/50 purple:text-[#ABA6D9] purple:hover:text-[#F6F4FF]";
 
 // Get Started is filled — #5D4387 is a mid-tone step sampled from the logo icon's own gradient,
 // lightening to #7168A0 on hover (both from the reference screenshot).
 // dark: (the black theme specifically, not purple) inverts this to a white pill/black text —
 // the purple fill reads as a muddy, low-contrast accent against a near-black bar, where a plain
 // white button pops the way the purple one does against the light bar.
+// purple: overrides the light-theme fill with the client reference palette's own accent
+// (#7C5CFF, the solid color its "Hire a Sales Angel" buttons and active nav pill use).
 const NAV_CTA =
-  "inline-flex items-center justify-center h-[46px] px-[26px] rounded-full bg-[#5D4387] hover:bg-[#7168A0] text-[12px] font-medium uppercase tracking-[0.08em] text-white whitespace-nowrap shrink-0 transition-colors duration-200 dark:bg-white dark:text-black dark:hover:bg-white/85";
+  "inline-flex items-center justify-center h-[46px] px-[26px] rounded-full bg-[#5D4387] hover:bg-[#7168A0] text-[12px] font-medium uppercase tracking-[0.08em] text-white whitespace-nowrap shrink-0 transition-colors duration-200 dark:bg-white dark:text-black dark:hover:bg-white/85 purple:bg-[#7C5CFF] purple:hover:bg-[#8F72FF]";
 
 // No props: every item here is now a real link (persona pages, /get-started, /contact)
 // rather than something that opens a modal, so the nav no longer needs callbacks from its
@@ -291,7 +293,7 @@ export function MobileNav() {
       <div className="pointer-events-auto w-full max-w-6xl mx-auto relative">
         {/* Main bar */}
         <nav
-          className="flex items-center justify-between px-5 py-3 rounded-2xl border border-black/[0.06] dark:border-white/10 purple:border-[#EDE9F7]/15"
+          className="flex items-center justify-between px-5 py-3 rounded-2xl border border-black/[0.06] dark:border-white/10 purple:border-[#B79CFF]/15"
           style={NAV_STYLE}
         >
           <Link
@@ -353,7 +355,7 @@ export function MobileNav() {
                     ref={panelScrollRef}
                     onScroll={() => tooltip && updateTooltipAtCursor()}
                     onMouseMove={(e) => { lastMouseRef.current = { x: e.clientX, y: e.clientY }; }}
-                    className="themed-scrollbar w-[410px] max-h-[calc(100vh-160px)] overflow-y-auto rounded-2xl border border-black/[0.06] dark:border-white/10 purple:border-[#EDE9F7]/15"
+                    className="themed-scrollbar w-[410px] max-h-[calc(100vh-160px)] overflow-y-auto rounded-2xl border border-black/[0.06] dark:border-white/10 purple:border-[#B79CFF]/15"
                     style={NAV_DROPDOWN_STYLE}
                   >
                     <div className="flex flex-col">
@@ -372,11 +374,11 @@ export function MobileNav() {
                             positionTooltip(p.id);
                           }}
                           onPointerLeave={(e) => { if (e.pointerType === "mouse") setTooltip(null); }}
-                          className="group relative flex flex-col border-b border-black/[0.06] dark:border-white/10 purple:border-[#EDE9F7]/15 last:border-b-0 px-3 transition-colors duration-200 hover:bg-[#EDE9F7]/70 dark:hover:bg-white/5 purple:hover:bg-white/8 [font-family:system-ui,-apple-system,sans-serif]"
+                          className="group relative flex flex-col border-b border-black/[0.06] dark:border-white/10 purple:border-[#B79CFF]/15 last:border-b-0 px-3 transition-colors duration-200 hover:bg-[#EDE9F7]/70 dark:hover:bg-white/5 purple:hover:bg-[#7C5CFF]/10 [font-family:system-ui,-apple-system,sans-serif]"
                         >
                           <div
                             ref={(el) => { pillRefs.current[p.id] = el; }}
-                            className="my-4 flex items-center gap-3 rounded-lg bg-[#5D4387]/10 pl-3 pr-3 py-2.5 transition-[background-color,padding] duration-200 group-hover:bg-[#5D4387]/30 group-hover:pl-[18px] dark:bg-white/[0.06] dark:group-hover:bg-white/[0.12] purple:bg-[#5D4387]/30 purple:group-hover:bg-[#5D4387]/50"
+                            className="my-4 flex items-center gap-3 rounded-lg bg-[#5D4387]/10 pl-3 pr-3 py-2.5 transition-[background-color,padding] duration-200 group-hover:bg-[#5D4387]/30 group-hover:pl-[18px] dark:bg-white/[0.06] dark:group-hover:bg-white/[0.12] purple:bg-[#7C5CFF]/[0.12] purple:group-hover:bg-[#7C5CFF]/20"
                           >
                             <img
                               src={p.avatar}
@@ -385,10 +387,10 @@ export function MobileNav() {
                               className="w-[75px] h-[75px] rounded-lg object-cover shrink-0"
                             />
                             <div className="min-w-0 flex-1">
-                              <p title={p.label} className="text-[16px] font-semibold text-[#111] dark:text-white purple:text-white truncate">{p.label}</p>
-                              <p title={p.dropdownRole} className="text-[13px] text-black/50 dark:text-white/55 purple:text-white/55 truncate">{p.dropdownRole}</p>
+                              <p title={p.label} className="text-[16px] font-semibold text-[#111] dark:text-white purple:text-[#F6F4FF] truncate">{p.label}</p>
+                              <p title={p.dropdownRole} className="text-[13px] text-black/50 dark:text-white/55 purple:text-[#ABA6D9] truncate">{p.dropdownRole}</p>
                             </div>
-                            <span className="text-black/30 dark:text-white/30 purple:text-white/30 text-sm shrink-0">›</span>
+                            <span className="text-black/30 dark:text-white/30 purple:text-[#716C9E] text-sm shrink-0">›</span>
                           </div>
                         </Link>
                       ))}
@@ -419,7 +421,7 @@ export function MobileNav() {
                   this panel and Hire an Angel's open at the same depth below the bar. */}
               {behindOpen && (
                 <div
-                  className="absolute top-full left-1/2 -translate-x-1/2 mt-5 w-[440px] rounded-2xl border border-black/[0.06] dark:border-white/10 purple:border-[#EDE9F7]/15 overflow-hidden z-50 p-3"
+                  className="absolute top-full left-1/2 -translate-x-1/2 mt-5 w-[440px] rounded-2xl border border-black/[0.06] dark:border-white/10 purple:border-[#B79CFF]/15 overflow-hidden z-50 p-3"
                   style={NAV_DROPDOWN_STYLE}
                 >
                   <div className="grid grid-cols-2 gap-2.5">
@@ -428,9 +430,9 @@ export function MobileNav() {
                         key={item.href}
                         href={item.href}
                         onClick={() => setBehindOpen(false)}
-                        className="flex items-center justify-between gap-2 rounded-xl border border-black/[0.08] p-4 cursor-pointer hover:border-black/20 hover:bg-black/[0.02] dark:border-white/10 dark:hover:border-white/25 dark:hover:bg-white/5 purple:border-[#EDE9F7]/15 purple:hover:border-[#EDE9F7]/35 purple:hover:bg-white/8 transition-colors [font-family:system-ui,-apple-system,sans-serif]"
+                        className="flex items-center justify-between gap-2 rounded-xl border border-black/[0.08] p-4 cursor-pointer hover:border-black/20 hover:bg-black/[0.02] dark:border-white/10 dark:hover:border-white/25 dark:hover:bg-white/5 purple:border-[#B79CFF]/15 purple:hover:border-[#7C5CFF]/40 purple:hover:bg-[#7C5CFF]/10 transition-colors [font-family:system-ui,-apple-system,sans-serif]"
                       >
-                        <p className="text-[14px] font-semibold text-[#111] dark:text-white purple:text-white">{item.title}</p>
+                        <p className="text-[14px] font-semibold text-[#111] dark:text-white purple:text-[#F6F4FF]">{item.title}</p>
                       </Link>
                     ))}
                   </div>
@@ -453,18 +455,18 @@ export function MobileNav() {
           {/* Burger — shown below 1180px, same threshold as the desktop group above */}
           <button
             onClick={() => setOpen((v) => !v)}
-            className="[@media(min-width:1180px)]:hidden flex flex-col justify-center items-center w-8 h-8 gap-[5px] rounded-lg hover:bg-black/[0.04] dark:hover:bg-white/10 purple:hover:bg-white/10 transition-colors"
+            className="[@media(min-width:1180px)]:hidden flex flex-col justify-center items-center w-8 h-8 gap-[5px] rounded-lg hover:bg-black/[0.04] dark:hover:bg-white/10 purple:hover:bg-[#7C5CFF]/12 transition-colors"
             aria-label={open ? "Close menu" : "Open menu"}
           >
             <span
-              className="block h-px bg-black/60 dark:bg-white/70 purple:bg-[#EDE9F7]/80 transition-all duration-300 origin-center"
+              className="block h-px bg-black/60 dark:bg-white/70 purple:bg-[#F6F4FF]/85 transition-all duration-300 origin-center"
               style={{
                 width: "18px",
                 transform: open ? "translateY(6px) rotate(45deg)" : "none",
               }}
             />
             <span
-              className="block h-px bg-black/60 dark:bg-white/70 purple:bg-[#EDE9F7]/80 transition-all duration-300"
+              className="block h-px bg-black/60 dark:bg-white/70 purple:bg-[#F6F4FF]/85 transition-all duration-300"
               style={{
                 width: "18px",
                 opacity: open ? 0 : 1,
@@ -472,7 +474,7 @@ export function MobileNav() {
               }}
             />
             <span
-              className="block h-px bg-black/60 dark:bg-white/70 purple:bg-[#EDE9F7]/80 transition-all duration-300 origin-center"
+              className="block h-px bg-black/60 dark:bg-white/70 purple:bg-[#F6F4FF]/85 transition-all duration-300 origin-center"
               style={{
                 width: "18px",
                 transform: open ? "translateY(-6px) rotate(-45deg)" : "none",
@@ -497,16 +499,16 @@ export function MobileNav() {
           return (
             <div
               key={tooltip.id}
-              className="hidden [@media(min-width:1180px)]:block fixed w-[240px] rounded-xl border border-black/[0.06] bg-[#EDE9F7] dark:bg-[#1c1c1c] dark:border-white/10 purple:bg-[#3D2E5C] purple:border-[#EDE9F7]/15 p-4 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.35)] z-50 pointer-events-none"
+              className="hidden [@media(min-width:1180px)]:block fixed w-[240px] rounded-xl border border-black/[0.06] bg-[#EDE9F7] dark:bg-[#1c1c1c] dark:border-white/10 purple:bg-[#1C1A56] purple:border-[#B79CFF]/15 p-4 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.35)] z-50 pointer-events-none"
               style={{ ...tooltip.style, transformOrigin: "left center", animation: "tooltip-in 180ms ease" }}
             >
-              <p className="text-[10.5px] font-medium uppercase tracking-widest text-black/40 dark:text-white/45 purple:text-white/45">
+              <p className="text-[10.5px] font-medium uppercase tracking-widest text-black/40 dark:text-white/45 purple:text-[#716C9E]">
                 Business Functions
               </p>
               <ul className="mt-2 flex flex-col gap-1.5">
                 {p.useCases?.map((uc) => (
-                  <li key={uc} className="flex items-center gap-2 text-[13px] font-medium text-[#333] dark:text-white/90 purple:text-white/90">
-                    <span className="w-1 h-1 rounded-full bg-[#5D4387] dark:bg-white/60 purple:bg-[#5D4387] shrink-0" />
+                  <li key={uc} className="flex items-center gap-2 text-[13px] font-medium text-[#333] dark:text-white/90 purple:text-[#F6F4FF]">
+                    <span className="w-1 h-1 rounded-full bg-[#5D4387] dark:bg-white/60 purple:bg-[#7C5CFF] shrink-0" />
                     {uc}
                   </li>
                 ))}
@@ -521,7 +523,7 @@ export function MobileNav() {
           style={{ maxHeight: open ? "min(2000px, 80vh)" : "0px", opacity: open ? 1 : 0 }}
         >
           <div
-            className="rounded-2xl border border-black/[0.06] dark:border-white/10 purple:border-[#EDE9F7]/15 px-2 py-2 flex flex-col"
+            className="rounded-2xl border border-black/[0.06] dark:border-white/10 purple:border-[#B79CFF]/15 px-2 py-2 flex flex-col"
             style={NAV_DROPDOWN_STYLE}
           >
             {/* "Hire an Angel" — mirrors the desktop version's vertical stack/pill-card look: a
@@ -531,7 +533,7 @@ export function MobileNav() {
                 flyout — there isn't room to pop one out to the right on a phone screen. */}
             <button
               onClick={() => setPersonasOpen((v) => !v)}
-              className={`flex items-center justify-between px-4 py-3 hover:bg-black/[0.03] dark:hover:bg-white/5 purple:hover:bg-white/8 rounded-xl ${NAV_ITEM}`}
+              className={`flex items-center justify-between px-4 py-3 hover:bg-black/[0.03] dark:hover:bg-white/5 purple:hover:bg-[#7C5CFF]/10 rounded-xl ${NAV_ITEM}`}
             >
               Hire an Angel
               <ChevronIcon open={personasOpen} />
@@ -544,12 +546,12 @@ export function MobileNav() {
                 {PERSONAS.map((p) => {
                   const isExpanded = expandedPersonaId === p.id;
                   return (
-                    <div key={p.id} className="border-b border-black/[0.06] dark:border-white/10 purple:border-[#EDE9F7]/15 last:border-b-0">
+                    <div key={p.id} className="border-b border-black/[0.06] dark:border-white/10 purple:border-[#B79CFF]/15 last:border-b-0">
                       <div className="flex items-center gap-2 py-2">
                         <Link
                           href={`/hire-an-angel/${p.slug}`}
                           onClick={close}
-                          className="flex flex-1 min-w-0 items-center gap-3 rounded-lg bg-[#5D4387]/10 dark:bg-white/[0.06] purple:bg-[#5D4387]/30 pl-3 pr-3 py-2.5 [font-family:system-ui,-apple-system,sans-serif]"
+                          className="flex flex-1 min-w-0 items-center gap-3 rounded-lg bg-[#5D4387]/10 dark:bg-white/[0.06] purple:bg-[#7C5CFF]/[0.12] pl-3 pr-3 py-2.5 [font-family:system-ui,-apple-system,sans-serif]"
                         >
                           <img
                             src={p.avatar}
@@ -558,8 +560,8 @@ export function MobileNav() {
                             className="w-[75px] h-[75px] rounded-lg object-cover shrink-0"
                           />
                           <div className="min-w-0 flex-1">
-                            <p title={p.label} className="text-[16px] font-semibold text-[#111] dark:text-white purple:text-white truncate">{p.label}</p>
-                            <p title={p.dropdownRole} className="text-[13px] text-black/50 dark:text-white/55 purple:text-white/55 truncate">{p.dropdownRole}</p>
+                            <p title={p.label} className="text-[16px] font-semibold text-[#111] dark:text-white purple:text-[#F6F4FF] truncate">{p.label}</p>
+                            <p title={p.dropdownRole} className="text-[13px] text-black/50 dark:text-white/55 purple:text-[#ABA6D9] truncate">{p.dropdownRole}</p>
                           </div>
                         </Link>
                         <button
@@ -567,7 +569,7 @@ export function MobileNav() {
                           onClick={() => setExpandedPersonaId(isExpanded ? null : p.id)}
                           aria-expanded={isExpanded}
                           aria-label={`Toggle ${p.label} use cases`}
-                          className="p-2 -m-2 shrink-0 text-black/40 dark:text-white/40 purple:text-white/40"
+                          className="p-2 -m-2 shrink-0 text-black/40 dark:text-white/40 purple:text-[#716C9E]"
                         >
                           <ChevronIcon open={isExpanded} />
                         </button>
@@ -580,14 +582,14 @@ export function MobileNav() {
                             above: that's what makes this card's rendered width equal the
                             image/title Link's width instead of the whole row's. */}
                         <div className="flex items-start gap-2 mb-3">
-                          <div className="flex-1 min-w-0 rounded-xl bg-[#EDE9F7] dark:bg-[#1c1c1c] purple:bg-[#3D2E5C] p-4">
-                            <p className="text-[10.5px] font-medium uppercase tracking-widest text-black/40 dark:text-white/45 purple:text-white/45">
+                          <div className="flex-1 min-w-0 rounded-xl bg-[#EDE9F7] dark:bg-[#1c1c1c] purple:bg-[#1C1A56] p-4">
+                            <p className="text-[10.5px] font-medium uppercase tracking-widest text-black/40 dark:text-white/45 purple:text-[#716C9E]">
                               Business Functions
                             </p>
                             <ul className="mt-2 flex flex-col gap-1.5">
                               {p.useCases?.map((uc) => (
-                                <li key={uc} className="flex items-center gap-2 text-[13px] font-medium text-[#333] dark:text-white/90 purple:text-white/90">
-                                  <span className="w-1 h-1 rounded-full bg-[#5D4387] dark:bg-white/60 purple:bg-[#5D4387] shrink-0" />
+                                <li key={uc} className="flex items-center gap-2 text-[13px] font-medium text-[#333] dark:text-white/90 purple:text-[#F6F4FF]">
+                                  <span className="w-1 h-1 rounded-full bg-[#5D4387] dark:bg-white/60 purple:bg-[#7C5CFF] shrink-0" />
                                   {uc}
                                 </li>
                               ))}
@@ -606,7 +608,7 @@ export function MobileNav() {
                 and now the same bordered-card treatment for its 2 items too. */}
             <button
               onClick={() => setBehindAccordionOpen((v) => !v)}
-              className={`flex items-center justify-between px-4 py-3 hover:bg-black/[0.03] dark:hover:bg-white/5 purple:hover:bg-white/8 rounded-xl ${NAV_ITEM}`}
+              className={`flex items-center justify-between px-4 py-3 hover:bg-black/[0.03] dark:hover:bg-white/5 purple:hover:bg-[#7C5CFF]/10 rounded-xl ${NAV_ITEM}`}
             >
               Behind the Angels
               <ChevronIcon open={behindAccordionOpen} />
@@ -621,9 +623,9 @@ export function MobileNav() {
                     key={item.href}
                     href={item.href}
                     onClick={close}
-                    className="flex items-center justify-between gap-2 rounded-xl border border-black/[0.08] p-3 hover:border-black/20 hover:bg-black/[0.03] dark:border-white/10 dark:hover:border-white/25 dark:hover:bg-white/5 purple:border-[#EDE9F7]/15 purple:hover:border-[#EDE9F7]/35 purple:hover:bg-white/8 transition-colors [font-family:system-ui,-apple-system,sans-serif]"
+                    className="flex items-center justify-between gap-2 rounded-xl border border-black/[0.08] p-3 hover:border-black/20 hover:bg-black/[0.03] dark:border-white/10 dark:hover:border-white/25 dark:hover:bg-white/5 purple:border-[#B79CFF]/15 purple:hover:border-[#7C5CFF]/40 purple:hover:bg-[#7C5CFF]/10 transition-colors [font-family:system-ui,-apple-system,sans-serif]"
                   >
-                    <p className="text-[13px] font-semibold text-[#111] dark:text-white purple:text-white">{item.title}</p>
+                    <p className="text-[13px] font-semibold text-[#111] dark:text-white purple:text-[#F6F4FF]">{item.title}</p>
                   </Link>
                 ))}
               </div>
@@ -631,7 +633,7 @@ export function MobileNav() {
             <Link
               href="/contact"
               onClick={close}
-              className={`px-4 py-3 hover:bg-black/[0.03] dark:hover:bg-white/5 purple:hover:bg-white/8 rounded-xl ${NAV_ITEM}`}
+              className={`px-4 py-3 hover:bg-black/[0.03] dark:hover:bg-white/5 purple:hover:bg-[#7C5CFF]/10 rounded-xl ${NAV_ITEM}`}
             >
               Contact
             </Link>

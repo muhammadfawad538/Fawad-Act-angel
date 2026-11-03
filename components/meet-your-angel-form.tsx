@@ -38,10 +38,10 @@ const CHANNELS: { id: Channel; icon: React.ReactNode }[] = [
 ]
 
 const inputClass =
-  "bg-white border border-black/10 rounded-xl px-4 py-1.5 text-sm text-[#111] placeholder:text-black/25 focus:outline-none focus:border-black/25 transition-colors w-full"
-const labelClass = "text-xs font-medium text-black/60"
+  "bg-white border border-black/10 rounded-xl px-4 py-1.5 text-sm text-[#111] placeholder:text-black/25 focus:outline-none focus:border-black/25 transition-colors w-full dark:bg-white/[0.06] dark:border-white/15 dark:text-white dark:placeholder:text-white/30 dark:focus:border-white/35 purple:bg-[#12103C]/50 purple:border-[#B79CFF]/20 purple:text-[#F6F4FF] purple:placeholder:text-[#ABA6D9]/50 purple:focus:border-[#7C5CFF]/60"
+const labelClass = "text-xs font-medium text-black/60 dark:text-white/60 purple:text-[#ABA6D9]"
 const primaryButtonClass =
-  "w-full px-6 py-2 bg-[#111] text-white text-sm rounded-xl hover:bg-[#333] transition-colors tracking-wide font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+  "w-full px-6 py-2 bg-[#111] text-white text-sm rounded-xl hover:bg-[#333] transition-colors tracking-wide font-medium disabled:opacity-50 disabled:cursor-not-allowed dark:bg-white dark:text-black dark:hover:bg-white/85 purple:bg-[#7C5CFF] purple:hover:bg-[#8F72FF]"
 
 export interface MeetYourAngelFormProps {
   /**
@@ -266,10 +266,10 @@ export function MeetYourAngelForm({ resetOn, onDone, source }: MeetYourAngelForm
     <>
       {step === "details" && (
         <div className="flex flex-col gap-1.5">
-          <p className="text-sm font-semibold text-[#333] leading-snug">
+          <p className="text-sm font-semibold text-[#333] dark:text-white purple:text-[#F6F4FF] leading-snug">
             Don&apos;t Take Our Word for It. Meet Your Angel.
           </p>
-          <p className="text-[13px] text-black/45 leading-snug">
+          <p className="text-[13px] text-black/45 dark:text-white/50 purple:text-[#ABA6D9] leading-snug">
             No presentation, no pressure — you choose the channel below.
           </p>
 
@@ -289,8 +289,8 @@ export function MeetYourAngelForm({ resetOn, onDone, source }: MeetYourAngelForm
                   title={c.id}
                   className={`flex-1 flex flex-col items-center justify-center gap-1 py-1.5 rounded-2xl border cursor-pointer transition-all duration-200 ${
                     active
-                      ? "bg-[#333] border-[#333] text-white"
-                      : "bg-transparent border-black/[0.12] text-black/55 hover:border-[#333] hover:text-[#333]"
+                      ? "bg-[#333] border-[#333] text-white dark:bg-white dark:border-white dark:text-black purple:bg-[#7C5CFF] purple:border-[#7C5CFF] purple:text-white"
+                      : "bg-transparent border-black/[0.12] text-black/55 hover:border-[#333] hover:text-[#333] dark:border-white/20 dark:text-white/55 dark:hover:border-white/50 dark:hover:text-white purple:border-[#B79CFF]/25 purple:text-[#ABA6D9] purple:hover:border-[#7C5CFF]/50 purple:hover:text-[#F6F4FF]"
                   }`}
                 >
                   <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -338,28 +338,28 @@ export function MeetYourAngelForm({ resetOn, onDone, source }: MeetYourAngelForm
               />
             </div>
 
-            <div className="text-[11px] text-black/35">
+            <div className="text-[11px] text-black/35 dark:text-white/40 purple:text-[#716C9E]">
               Include your country code — we&apos;ll text a verification code to your mobile and
               email.
             </div>
 
-            <p className="text-[10.5px] leading-tight text-black/40">
+            <p className="text-[10.5px] leading-tight text-black/40 dark:text-white/45 purple:text-[#716C9E]">
               By submitting this form, you agree to receive phone calls and recurring automated
               text messages from Act Angel AI about your enquiry, including a verification code,
               callback confirmations, and follow-ups. Consent is not a condition of purchase.
               Message and data rates may apply. Reply STOP to unsubscribe or HELP for help. See
               our{" "}
-              <a href="/privacy" target="_blank" className="underline hover:text-black/60">
+              <a href="/privacy" target="_blank" className="underline hover:text-black/60 dark:hover:text-white purple:hover:text-[#F6F4FF]">
                 Privacy Policy
               </a>{" "}
               and{" "}
-              <a href="/terms" target="_blank" className="underline hover:text-black/60">
+              <a href="/terms" target="_blank" className="underline hover:text-black/60 dark:hover:text-white purple:hover:text-[#F6F4FF]">
                 Terms of Service
               </a>
               .
             </p>
 
-            {error && <div className="text-xs text-red-600">{error}</div>}
+            {error && <div className="text-xs text-red-600 dark:text-red-400 purple:text-red-400">{error}</div>}
 
             <button type="submit" disabled={loading} className={primaryButtonClass}>
               {loading ? "Sending code…" : "Send me a code →"}
@@ -370,7 +370,7 @@ export function MeetYourAngelForm({ resetOn, onDone, source }: MeetYourAngelForm
 
       {step === "otp" && (
         <div className="flex flex-col gap-2.5">
-          <p className="text-sm text-black/55">
+          <p className="text-sm text-black/55 dark:text-white/65 purple:text-[#ABA6D9]">
             Your Angel is ready. Just verify your phone and email to get started.
           </p>
 
@@ -400,7 +400,7 @@ export function MeetYourAngelForm({ resetOn, onDone, source }: MeetYourAngelForm
               />
             </div>
 
-            {error && <div className="text-xs text-red-600">{error}</div>}
+            {error && <div className="text-xs text-red-600 dark:text-red-400 purple:text-red-400">{error}</div>}
 
             <button type="submit" disabled={loading} className={primaryButtonClass}>
               {loading ? "Verifying…" : "Verify & continue →"}
@@ -411,7 +411,7 @@ export function MeetYourAngelForm({ resetOn, onDone, source }: MeetYourAngelForm
             type="button"
             onClick={handleResend}
             disabled={resendCooldown > 0 || loading}
-            className="text-center text-xs text-black/45 hover:text-black/70 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+            className="text-center text-xs text-black/45 hover:text-black/70 dark:text-white/50 dark:hover:text-white/80 purple:text-[#ABA6D9] purple:hover:text-[#F6F4FF] transition-colors disabled:cursor-not-allowed disabled:opacity-50"
           >
             {resendCooldown > 0 ? `Resend codes in ${resendCooldown}s` : "Resend codes"}
           </button>
@@ -429,7 +429,7 @@ export function MeetYourAngelForm({ resetOn, onDone, source }: MeetYourAngelForm
               setEmailSid(undefined)
               if (cooldownTimer.current) clearInterval(cooldownTimer.current)
             }}
-            className="text-center text-xs text-black/45 hover:text-black/70 transition-colors"
+            className="text-center text-xs text-black/45 hover:text-black/70 dark:text-white/50 dark:hover:text-white/80 purple:text-[#ABA6D9] purple:hover:text-[#F6F4FF] transition-colors"
           >
             Use a different number or email
           </button>
@@ -438,19 +438,19 @@ export function MeetYourAngelForm({ resetOn, onDone, source }: MeetYourAngelForm
 
       {step === "success" && (
         <div className="flex flex-col items-center text-center gap-2.5 py-1">
-          <div className="w-12 h-12 rounded-full bg-emerald-50 border border-emerald-600/20 text-emerald-600 flex items-center justify-center text-xl">
+          <div className="w-12 h-12 rounded-full bg-emerald-50 border border-emerald-600/20 text-emerald-600 dark:bg-emerald-500/15 dark:border-emerald-500/30 dark:text-emerald-400 purple:bg-emerald-500/15 purple:border-emerald-500/30 purple:text-emerald-400 flex items-center justify-center text-xl">
             ✓
           </div>
           <h3 className="text-lg font-medium">You&apos;re all set!</h3>
           {channel === "Call" && (
-            <p className="text-sm text-black/55">
+            <p className="text-sm text-black/55 dark:text-white/65 purple:text-[#ABA6D9]">
               Your mobile and email are verified. Act Angel is calling you now — keep an eye on
               your phone.
             </p>
           )}
           {channel === "WhatsApp" && (
             <>
-              <p className="text-sm text-black/55">
+              <p className="text-sm text-black/55 dark:text-white/65 purple:text-[#ABA6D9]">
                 Your mobile and email are verified. WhatsApp should be opening now to start
                 chatting with your Angel.
               </p>
@@ -465,7 +465,7 @@ export function MeetYourAngelForm({ resetOn, onDone, source }: MeetYourAngelForm
             </>
           )}
           {channel === "Email" && (
-            <p className="text-sm text-black/55">
+            <p className="text-sm text-black/55 dark:text-white/65 purple:text-[#ABA6D9]">
               Your mobile and email are verified. Check your inbox — your Angel has just sent you
               a note to get the conversation started.
             </p>

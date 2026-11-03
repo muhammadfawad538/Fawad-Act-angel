@@ -46,7 +46,7 @@ const OFFSET_STEP  = 8    // px pushed down per card stacked on top
 
 function Tag({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] tracking-widest font-sans text-black/40 bg-black/[0.04] dark:text-white/50 dark:bg-white/[0.06] purple:text-[#EDE9F7]/70 purple:bg-white/[0.08]">
+    <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] tracking-widest font-sans text-black/40 bg-black/[0.04] dark:text-white/50 dark:bg-white/[0.06] purple:text-[#B79CFF] purple:bg-[#7C5CFF]/[0.12]">
       {children}
     </span>
   )
@@ -114,7 +114,7 @@ export function StackingAgentCards() {
               {/* bg-(--agent-card-bg): a CSS var (globals.css), not dark:/purple: classes —
                   the same color also drives the desktop image's fade gradient below, via the
                   same var, so the two can't end up mismatched. */}
-              <div className="group relative bg-(--agent-card-bg) rounded-2xl border border-black/[0.07] dark:border-white/10 purple:border-[#EDE9F7]/15 overflow-hidden cursor-pointer">
+              <div className="group relative bg-(--agent-card-bg) rounded-2xl border border-black/[0.07] dark:border-white/10 purple:border-[#B79CFF]/15 overflow-hidden cursor-pointer">
 
                 {/* ── MOBILE: image top, fades out at bottom ── */}
                 {agent.img && (
@@ -160,15 +160,15 @@ export function StackingAgentCards() {
                         <Tag>{agent.label}</Tag>
                       </div>
                     )}
-                    <h3 className={`text-xl font-light text-[#111] dark:text-white purple:text-white ${agent.stats ? "mb-3" : ""} ${!agent.label ? "mt-0" : ""}`}>{agent.title}</h3>
-                    <p className="text-sm text-black/45 dark:text-white/55 purple:text-white/55 leading-relaxed mb-8">{agent.desc}</p>
+                    <h3 className={`text-xl font-light text-[#111] dark:text-white purple:text-[#F6F4FF] ${agent.stats ? "mb-3" : ""} ${!agent.label ? "mt-0" : ""}`}>{agent.title}</h3>
+                    <p className="text-sm text-black/45 dark:text-white/55 purple:text-[#ABA6D9] leading-relaxed mb-8">{agent.desc}</p>
                   </div>
                   {agent.stats && agent.stats.length > 0 && (
-                    <div className="flex gap-8 pt-6 border-t border-black/[0.06] dark:border-white/10 purple:border-[#EDE9F7]/15">
+                    <div className="flex gap-8 pt-6 border-t border-black/[0.06] dark:border-white/10 purple:border-[#B79CFF]/15">
                       {agent.stats.map(s => (
                         <div key={s.l}>
-                          <div className="text-2xl font-light text-[#111] dark:text-white purple:text-white">{s.v}</div>
-                          <div className="text-[11px] text-black/35 dark:text-white/40 purple:text-white/40 tracking-widest mt-0.5">{s.l}</div>
+                          <div className="text-2xl font-light text-[#111] dark:text-white purple:text-[#F6F4FF]">{s.v}</div>
+                          <div className="text-[11px] text-black/35 dark:text-white/40 purple:text-[#716C9E] tracking-widest mt-0.5">{s.l}</div>
                         </div>
                       ))}
                     </div>

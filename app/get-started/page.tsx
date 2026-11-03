@@ -35,7 +35,7 @@ export default async function GetStartedPage({
   // pt-28 is a floor, not a centering input — justify-center can't push content above it, which
   // is what keeps the heading from sliding up under the fixed nav on short-content viewports.
   return (
-    <div className="bg-[#F5F4F0] text-[#111] min-h-screen flex flex-col font-sans antialiased">
+    <div className="bg-[#F5F4F0] text-[#111] dark:bg-[#0a0a0a] dark:text-white purple:bg-[#12103C] purple:text-[#F6F4FF] min-h-screen flex flex-col font-sans antialiased">
       <SiteHeader />
 
       <div className="flex-1 flex flex-col justify-center px-6 md:px-12 lg:px-20 pt-28 pb-12">
@@ -44,7 +44,7 @@ export default async function GetStartedPage({
             Meet Your Angel
           </h1>
 
-          <div className="mt-10 bg-white border border-black/[0.08] rounded-2xl p-6">
+          <div className="mt-10 bg-white border border-black/[0.08] dark:bg-white/[0.04] dark:border-white/10 purple:bg-[#1C1A56] purple:border-[#B79CFF]/15 rounded-2xl p-6">
             <MeetYourAngelForm source={source} />
           </div>
         </main>

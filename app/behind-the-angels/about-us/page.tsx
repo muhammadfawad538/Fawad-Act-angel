@@ -11,15 +11,15 @@ export const metadata: Metadata = {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="mt-12">
-      <h2 className="text-2xl md:text-3xl font-light tracking-tight leading-[1.15] text-[#111]">{title}</h2>
-      <div className="mt-4 flex flex-col gap-4 text-[15px] leading-relaxed text-black/60 text-justify">{children}</div>
+      <h2 className="text-2xl md:text-3xl font-light tracking-tight leading-[1.15] text-[#111] dark:text-white purple:text-[#F6F4FF]">{title}</h2>
+      <div className="mt-4 flex flex-col gap-4 text-[15px] leading-relaxed text-black/60 dark:text-white/70 purple:text-[#ABA6D9] text-justify">{children}</div>
     </section>
   )
 }
 
 export default function BehindTheAngelsPage() {
   return (
-    <div className="bg-[#F5F4F0] text-[#111] min-h-screen flex flex-col font-sans antialiased">
+    <div className="bg-[#F5F4F0] text-[#111] dark:bg-[#0a0a0a] dark:text-white purple:bg-[#12103C] purple:text-[#F6F4FF] min-h-screen flex flex-col font-sans antialiased">
       {/* Same nav + modals as the homepage (app/page.tsx) — not a stripped-down logo-only
           copy, so the dropdown and Get Started button work identically here. */}
       <SiteHeader />
@@ -31,37 +31,37 @@ export default function BehindTheAngelsPage() {
         <h1 className="text-3xl md:text-5xl font-light tracking-tight leading-[1.15] md:leading-[1.1] max-w-3xl mx-auto text-center">
           We Don&rsquo;t Build More Software.<br className="hidden md:block"/>We Build AI Specialists.
         </h1>
-        <p className="mt-4 text-lg md:text-xl text-black/55 text-center">
+        <p className="mt-4 text-lg md:text-xl text-black/55 dark:text-white/70 purple:text-[#ABA6D9] text-center">
           Scale your business — not your headcount.
         </p>
 
-        <p className="mt-8 text-[15px] leading-relaxed text-black/60 text-center max-w-3xl mx-auto">
-          Act Angel AI is a <strong className="font-medium text-[#111]">Boston-headquartered AI
+        <p className="mt-8 text-[15px] leading-relaxed text-black/60 dark:text-white/70 purple:text-[#ABA6D9] text-center max-w-3xl mx-auto">
+          Act Angel AI is a <strong className="font-medium text-[#111] dark:text-white purple:text-[#F6F4FF]">Boston-headquartered AI
           company</strong> bringing together industry veterans with three decades of enterprise technology, SaaS, and business process expertise and a new generation of{" "}
-          <strong className="font-medium text-[#111]">AI-native talent—fresh, fast, innovative, and agile.</strong>{" "}
+          <strong className="font-medium text-[#111] dark:text-white purple:text-[#F6F4FF]">AI-native talent—fresh, fast, innovative, and agile.</strong>{" "}
           Backed by seasoned investors who know how to build, scale, and win.
         </p>
 
         <Section title="Where we come from">
           <p>
             At the heart of an innovation ecosystem shaped by{" "}
-            <strong className="font-medium text-[#111]">MIT, Harvard, leading researchers,
+            <strong className="font-medium text-[#111] dark:text-white purple:text-[#F6F4FF]">MIT, Harvard, leading researchers,
             startups, and global enterprises</strong>, we unite deep business experience with
             next-generation AI thinking.
           </p>
         </Section>
 
         <Section title="Software isn't the point — action is">
-          <p>Businesses have enough software. <strong className="font-medium text-[#111]">What they need is action.</strong></p>
+          <p>Businesses have enough software. <strong className="font-medium text-[#111] dark:text-white purple:text-[#F6F4FF]">What they need is action.</strong></p>
           <p>
-            Our <strong className="font-medium text-[#111]">Virtual AI Specialists</strong> understand
+            Our <strong className="font-medium text-[#111] dark:text-white purple:text-[#F6F4FF]">Virtual AI Specialists</strong> understand
             context and take the right action at the right time — without reminders or chasing.
             They work across your existing systems, data, processes, and channels to{" "}
-            <strong className="font-medium text-[#111]">engage prospects, serve customers, follow
+            <strong className="font-medium text-[#111] dark:text-white purple:text-[#F6F4FF]">engage prospects, serve customers, follow
             up, and get things done.</strong>
           </p>
           <p>
-            Always on — <strong className="font-medium text-[#111]">24/7, across time zones, in
+            Always on — <strong className="font-medium text-[#111] dark:text-white purple:text-[#F6F4FF]">24/7, across time zones, in
             virtually any language</strong>, without shifts, fatigue, bad days, or personal
             downtime.
           </p>
@@ -69,18 +69,18 @@ export default function BehindTheAngelsPage() {
 
         <Section title="The result">
           <p>
-            <strong className="font-medium text-[#111]">More capacity, lower costs, and seamless
+            <strong className="font-medium text-[#111] dark:text-white purple:text-[#F6F4FF]">More capacity, lower costs, and seamless
             growth without proportional headcount.</strong> Your people focus on judgment,
             creativity, and relationships. Your AI workforce keeps business moving.
           </p>
           <p>
-            <strong className="font-medium text-[#111]">We work with the technology you already
+            <strong className="font-medium text-[#111] dark:text-white purple:text-[#F6F4FF]">We work with the technology you already
             have</strong> — turning your existing systems, data, and processes into autonomous
             action.
           </p>
         </Section>
 
-        <p className="mt-12 text-xl md:text-2xl font-light tracking-tight text-[#111] max-w-3xl">
+        <p className="mt-12 text-xl md:text-2xl font-light tracking-tight text-[#111] dark:text-white purple:text-[#F6F4FF] max-w-3xl">
           Perfect actions. Perfect timing. Lower cost. Limitless scale.
         </p>
       </main>

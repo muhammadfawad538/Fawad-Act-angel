@@ -26,14 +26,6 @@ export const metadata: Metadata = {
 //    further viewport-*height*-based rules (hiding the eyebrow on short screens, etc.) are not
 //    reproduced — nothing else on this site branches on viewport height, and this page still
 //    reads correctly without that extra layer.
-const PURPLE = "#5D4387";
-const INK = "#19171D";
-const MUTED = "#635D6B";
-const PAPER = "#F8F7F5";
-const LINE = "#DDD7E5";
-const WASH = "#EFEAF5";
-const VISION_TEXT = "#51465F";
-
 function Eyebrow({
   children,
   marginBottom,
@@ -58,13 +50,11 @@ function Eyebrow({
         }}
       >
         <span
-          className="inline-block rounded-full uppercase"
+          className="inline-block rounded-full uppercase text-[#5D4387] bg-[#EFEAF5] dark:text-white dark:bg-white/[0.06] purple:text-[#7C5CFF] purple:bg-[#7C5CFF]/10"
           style={{
             fontSize: 11,
             letterSpacing: 2,
             fontWeight: 650,
-            color: PURPLE,
-            background: WASH,
             padding: "7px 18px",
           }}
         >
@@ -76,12 +66,11 @@ function Eyebrow({
 
   return (
     <p
-      className={`flex items-center gap-3 uppercase ${center ? "justify-center" : ""}`}
+      className={`flex items-center gap-3 uppercase text-[#5D4387] dark:text-white purple:text-[#7C5CFF] ${center ? "justify-center" : ""}`}
       style={{
         fontSize: 11,
         letterSpacing: 2,
         fontWeight: 650,
-        color: PURPLE,
         margin: `0 0 ${marginBottom}px`,
       }}
     >
@@ -122,8 +111,7 @@ const COMMITMENTS = [
 export default function ProgressWithPurposePage() {
   return (
     <div
-      className="min-h-screen flex flex-col font-sans antialiased"
-      style={{ background: PAPER, color: INK }}
+      className="min-h-screen flex flex-col font-sans antialiased bg-[#F8F7F5] text-[#19171D] dark:bg-[#0a0a0a] dark:text-white purple:bg-[#12103C] purple:text-[#F6F4FF]"
     >
       {/* Same nav + modals as the rest of the site (per the integration brief) — the reference
           build's own minimal brand+back-link header is not reused; only the page content below
@@ -140,22 +128,22 @@ export default function ProgressWithPurposePage() {
               Our philanthropic commitment
             </Eyebrow>
             <h1
+              className="text-[#19171D] dark:text-white purple:text-[#F6F4FF]"
               style={{
                 fontSize: 48,
                 fontWeight: 300,
                 lineHeight: 1.1,
                 letterSpacing: "-1.6px",
                 margin: "0 0 9px",
-                color: INK,
               }}
             >
-              Progress with <span style={{ color: PURPLE }}>Purpose.</span>
+              Progress with <span className="text-[#5D4387] dark:text-white purple:text-[#7C5CFF]">Purpose.</span>
             </h1>
             <p
+              className="text-[#5D4387] dark:text-white purple:text-[#7C5CFF]"
               style={{
                 fontSize: 21,
                 lineHeight: 1.5,
-                color: PURPLE,
                 fontWeight: 400,
                 letterSpacing: "-0.4px",
                 margin: "0 0 12px",
@@ -164,11 +152,11 @@ export default function ProgressWithPurposePage() {
               We choose to measure success by the good we do with it.
             </p>
             <p
+              className="text-[#635D6B] dark:text-white/55 purple:text-[#ABA6D9]"
               style={{
                 maxWidth: 1050,
                 margin: "0 auto",
                 fontSize: 16,
-                color: MUTED,
                 lineHeight: 1.5,
               }}
             >
@@ -180,14 +168,13 @@ export default function ProgressWithPurposePage() {
 
           {/* Three Commitments */}
           <section
-            className="mt-6 pt-5"
-            style={{ borderTop: `1px solid ${LINE}` }}
+            className="mt-6 pt-5 border-t border-[#DDD7E5] dark:border-white/10 purple:border-[#B79CFF]/15"
           >
             <h2
+              className="text-[#635D6B] dark:text-white/55 purple:text-[#ABA6D9]"
               style={{
                 fontSize: 12,
                 fontWeight: 500,
-                color: MUTED,
                 margin: "0 0 12px",
               }}
             >
@@ -202,16 +189,16 @@ export default function ProgressWithPurposePage() {
                 <div
                   key={c.number}
                   tabIndex={0}
-                  className="rounded-2xl border-2 border-black/[0.08] bg-white px-6 py-6 transition-colors cursor-pointer hover:border-[#5D4387] focus:outline-none focus:border-[#5D4387] active:border-[#5D4387]"
+                  className="rounded-2xl border-2 border-black/[0.08] bg-white dark:bg-white/[0.04] dark:border-white/10 purple:bg-[#1C1A56] purple:border-[#B79CFF]/15 px-6 py-6 transition-colors cursor-pointer hover:border-[#5D4387] focus:outline-none focus:border-[#5D4387] active:border-[#5D4387] dark:hover:border-white/30 dark:focus:border-white/30 dark:active:border-white/30 purple:hover:border-[#7C5CFF] purple:focus:border-[#7C5CFF] purple:active:border-[#7C5CFF]"
                 >
                   <span
-                    className="inline-flex items-center justify-center w-[25px] h-[25px] rounded-md bg-[#EDE9F7]"
+                    className="inline-flex items-center justify-center w-[25px] h-[25px] rounded-md bg-[#EDE9F7] dark:bg-white/10 purple:bg-[#7C5CFF]/[0.15]"
                     aria-hidden="true"
                   >
-                    <span className="w-[40%] h-[40%] rounded-[3px] bg-[#5D4387]" />
+                    <span className="w-[40%] h-[40%] rounded-[3px] bg-[#5D4387] dark:bg-white/70 purple:bg-[#B79CFF]" />
                   </span>
-                  <p className="mt-4 font-semibold text-[#111]">{c.title}</p>
-                  <p className="mt-1.5 text-sm text-black/50 leading-relaxed">
+                  <p className="mt-4 font-semibold text-[#111] dark:text-white purple:text-[#F6F4FF]">{c.title}</p>
+                  <p className="mt-1.5 text-sm text-black/50 dark:text-white/55 purple:text-[#ABA6D9] leading-relaxed">
                     {c.body}
                   </p>
                 </div>
@@ -223,26 +210,26 @@ export default function ProgressWithPurposePage() {
               centered columns), not a tall two-column block; that's the base composition's
               shape, superseded by the compact pass same as everything else on this page. */}
           <section
-            className="mt-6 grid md:grid-cols-[0.6fr_1.8fr] gap-6 md:items-center"
-            style={{ background: WASH, borderRadius: 16, padding: "20px 26px" }}
+            className="mt-6 grid md:grid-cols-[0.6fr_1.8fr] gap-6 md:items-center bg-[#EFEAF5] dark:bg-white/[0.06] purple:bg-[#7C5CFF]/10"
+            style={{ borderRadius: 16, padding: "20px 26px" }}
           >
             <div>
               <Eyebrow marginBottom={7}>Our inspiration</Eyebrow>
               <h2
+                className="text-[#19171D] dark:text-white purple:text-[#F6F4FF]"
                 style={{
                   fontSize: 29,
                   lineHeight: 1.16,
                   letterSpacing: "-1px",
                   fontWeight: 300,
                   margin: 0,
-                  color: INK,
                 }}
               >
                 Sat Yug
                 <span
+                  className="text-[#5D4387] dark:text-white purple:text-[#7C5CFF]"
                   style={{
                     display: "block",
-                    color: PURPLE,
                     fontSize: 16,
                     letterSpacing: 0,
                     marginTop: 7,
@@ -254,9 +241,9 @@ export default function ProgressWithPurposePage() {
             </div>
             <div>
               <p
+                className="text-[#51465F] dark:text-white/70 purple:text-[#ABA6D9]"
                 style={{
                   margin: "0 0 7px",
-                  color: VISION_TEXT,
                   fontSize: 14,
                   lineHeight: 1.5,
                 }}
@@ -266,9 +253,9 @@ export default function ProgressWithPurposePage() {
                 it represents an ideal age guided by truth and virtue.
               </p>
               <p
+                className="text-[#51465F] dark:text-white/70 purple:text-[#ABA6D9]"
                 style={{
                   margin: "0 0 7px",
-                  color: VISION_TEXT,
                   fontSize: 14,
                   lineHeight: 1.5,
                 }}
@@ -278,9 +265,9 @@ export default function ProgressWithPurposePage() {
                 needs are met.
               </p>
               <p
+                className="text-[#51465F] dark:text-white/70 purple:text-[#ABA6D9]"
                 style={{
                   margin: 0,
-                  color: VISION_TEXT,
                   fontSize: 14,
                   lineHeight: 1.5,
                 }}

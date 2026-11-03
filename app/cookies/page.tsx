@@ -15,15 +15,15 @@ const LAST_UPDATED = "21 August 2026"
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="mt-12">
-      <h2 className="text-2xl md:text-3xl font-light tracking-tight leading-[1.15] text-[#111]">{title}</h2>
-      <div className="mt-4 flex flex-col gap-4 text-[15px] leading-relaxed text-black/60">{children}</div>
+      <h2 className="text-2xl md:text-3xl font-light tracking-tight leading-[1.15] text-[#111] dark:text-white purple:text-[#F6F4FF]">{title}</h2>
+      <div className="mt-4 flex flex-col gap-4 text-[15px] leading-relaxed text-black/60 dark:text-white/70 purple:text-[#ABA6D9]">{children}</div>
     </section>
   )
 }
 
 export default function CookiesPolicyPage() {
   return (
-    <div className="bg-[#F5F4F0] text-[#111] min-h-screen flex flex-col font-sans antialiased">
+    <div className="bg-[#F5F4F0] text-[#111] dark:bg-[#0a0a0a] dark:text-white purple:bg-[#12103C] purple:text-[#F6F4FF] min-h-screen flex flex-col font-sans antialiased">
       {/* Same nav + modals as the homepage, matching /privacy, /terms, and
           /behind-the-angels — not the stripped-down logo-only nav this used to have. */}
       <SiteHeader />
@@ -35,9 +35,9 @@ export default function CookiesPolicyPage() {
         <h1 className="text-4xl md:text-5xl font-light tracking-tight leading-[1.05]">
           Cookies Policy
         </h1>
-        <p className="mt-4 text-[13px] text-black/40">Last updated: {LAST_UPDATED}</p>
+        <p className="mt-4 text-[13px] text-black/40 dark:text-white/45 purple:text-[#716C9E]">Last updated: {LAST_UPDATED}</p>
 
-        <p className="mt-8 text-[15px] leading-relaxed text-black/60">
+        <p className="mt-8 text-[15px] leading-relaxed text-black/60 dark:text-white/70 purple:text-[#ABA6D9]">
           This policy explains how Act Angel AI uses cookies and similar technologies when you
           visit our website, what each category is for, and how you can change your mind at any
           time. It sits alongside — and should be read with — the way we handle any personal
@@ -65,14 +65,14 @@ export default function CookiesPolicyPage() {
           </p>
           <div className="mt-2 flex flex-col gap-3">
             {COOKIE_CATEGORIES.map(cat => (
-              <div key={cat.id} className="rounded-2xl border border-black/[0.08] bg-white/60 p-5">
+              <div key={cat.id} className="rounded-2xl border border-black/[0.08] bg-white/60 dark:bg-white/[0.04] dark:border-white/10 purple:bg-[#1C1A56] purple:border-[#B79CFF]/15 p-5">
                 <div className="flex items-baseline justify-between gap-4">
-                  <span className="text-[15px] font-medium text-[#111]">{cat.label}</span>
+                  <span className="text-[15px] font-medium text-[#111] dark:text-white purple:text-[#F6F4FF]">{cat.label}</span>
                   {cat.locked && (
-                    <span className="text-[12px] font-medium text-black/40 shrink-0">Always Active</span>
+                    <span className="text-[12px] font-medium text-black/40 dark:text-white/45 purple:text-[#716C9E] shrink-0">Always Active</span>
                   )}
                 </div>
-                <p className="mt-2 text-[14px] leading-relaxed text-black/55">{cat.description}</p>
+                <p className="mt-2 text-[14px] leading-relaxed text-black/55 dark:text-white/65 purple:text-[#ABA6D9]">{cat.description}</p>
               </div>
             ))}
           </div>
@@ -149,7 +149,7 @@ export default function CookiesPolicyPage() {
           <p>
             <a
               href="mailto:Hello@ActAngel.com"
-              className="text-[#111] underline underline-offset-2 hover:text-black/60 transition-colors"
+              className="text-[#111] underline underline-offset-2 hover:text-black/60 dark:text-white dark:hover:text-white/70 purple:text-[#F6F4FF] purple:hover:text-[#ABA6D9] transition-colors"
             >
               Hello@ActAngel.com
             </a>

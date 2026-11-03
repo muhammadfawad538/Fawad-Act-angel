@@ -13,8 +13,8 @@ const LAST_UPDATED = "20 August 2026"
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="mt-12">
-      <h2 className="text-2xl md:text-3xl font-light tracking-tight leading-[1.15] text-[#111]">{title}</h2>
-      <div className="mt-4 flex flex-col gap-4 text-[15px] leading-relaxed text-black/60">{children}</div>
+      <h2 className="text-2xl md:text-3xl font-light tracking-tight leading-[1.15] text-[#111] dark:text-white purple:text-[#F6F4FF]">{title}</h2>
+      <div className="mt-4 flex flex-col gap-4 text-[15px] leading-relaxed text-black/60 dark:text-white/70 purple:text-[#ABA6D9]">{children}</div>
     </section>
   )
 }
@@ -22,7 +22,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 // Content transcribed verbatim from https://act-angel-ai-form.vercel.app/privacy.
 export default function PrivacyPage() {
   return (
-    <div className="bg-[#F5F4F0] text-[#111] min-h-screen flex flex-col font-sans antialiased">
+    <div className="bg-[#F5F4F0] text-[#111] dark:bg-[#0a0a0a] dark:text-white purple:bg-[#12103C] purple:text-[#F6F4FF] min-h-screen flex flex-col font-sans antialiased">
       <SiteHeader />
 
       {/* flex-1: keeps the footer pinned to the bottom of the screen on short-content pages
@@ -32,7 +32,7 @@ export default function PrivacyPage() {
         <h1 className="text-4xl md:text-5xl font-light tracking-tight leading-[1.05]">
           Privacy Policy
         </h1>
-        <p className="mt-4 text-[13px] text-black/40">Last updated: {LAST_UPDATED}</p>
+        <p className="mt-4 text-[13px] text-black/40 dark:text-white/45 purple:text-[#716C9E]">Last updated: {LAST_UPDATED}</p>
 
         <Section title="Information we collect">
           <p>
@@ -99,7 +99,7 @@ export default function PrivacyPage() {
             For any privacy question or request, contact us at{" "}
             <a
               href="mailto:Hello@ActAngel.com"
-              className="text-[#111] underline underline-offset-2 hover:text-black/60 transition-colors"
+              className="text-[#111] underline underline-offset-2 hover:text-black/60 dark:text-white dark:hover:text-white/70 purple:text-[#F6F4FF] purple:hover:text-[#ABA6D9] transition-colors"
             >
               Hello@ActAngel.com
             </a>

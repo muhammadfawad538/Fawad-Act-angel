@@ -253,7 +253,7 @@ export default function AgenticPage() {
                 // width, so the flex row overflows and pushes the phone off the right edge of
                 // the screen. 67px (~30% below the 96px original) just in this range; back to
                 // md:text-8xl above 872px where there's room for both.
-                className="text-6xl sm:text-7xl md:text-8xl [@media(768px<=width<=872px)]:text-[67px] font-light text-[#111] dark:text-white purple:text-white leading-[1.0] tracking-tight mb-6"
+                className="text-6xl sm:text-7xl md:text-8xl [@media(768px<=width<=872px)]:text-[67px] font-light text-[#111] dark:text-white purple:text-[#F6F4FF] leading-[1.0] tracking-tight mb-6"
                 style={{
                   fontFamily: '"IBM Plex Sans", sans-serif',
                   opacity: heroReady ? 1 : 0,
@@ -269,7 +269,7 @@ export default function AgenticPage() {
               </h1>
 
               <p
-                className="text-base sm:text-lg font-medium text-[#111]/70 dark:text-white/75 purple:text-white/75 max-w-sm mb-8"
+                className="text-base sm:text-lg font-medium text-[#111]/70 dark:text-white/75 purple:text-[#F6F4FF]/75 max-w-sm mb-8"
                 style={{
                   fontFamily: '"IBM Plex Sans", sans-serif',
                   opacity: heroReady ? 1 : 0,
@@ -298,13 +298,13 @@ export default function AgenticPage() {
                   // dark:/purple: invert to a white pill/black text — bg-[#111] is already
                   // near-black, so on either dark theme it'd otherwise sit nearly invisible
                   // against the hero's own now-dark fade background.
-                  className="px-6 py-3 bg-[#111] text-white text-sm rounded-xl hover:bg-[#333] dark:bg-white dark:text-black dark:hover:bg-white/85 purple:bg-white purple:text-black purple:hover:bg-white/85 transition-colors tracking-wide font-medium"
+                  className="px-6 py-3 bg-[#111] text-white text-sm rounded-xl hover:bg-[#333] dark:bg-white dark:text-black dark:hover:bg-white/85 purple:bg-[#7C5CFF] purple:text-white purple:hover:bg-[#8F72FF] transition-colors tracking-wide font-medium"
                 >
                   GET STARTED
                 </Link>
                 <Link
                   href="/hire-an-angel/sales-angel"
-                  className="px-6 py-3 border border-black/15 bg-white/40 text-[#111] text-sm rounded-xl hover:border-black/30 hover:bg-white/70 dark:border-white/20 dark:bg-white/10 dark:text-white dark:hover:border-white/40 dark:hover:bg-white/20 purple:border-[#EDE9F7]/25 purple:bg-white/10 purple:text-[#EDE9F7] purple:hover:border-[#EDE9F7]/45 purple:hover:bg-white/20 transition-colors tracking-wide font-medium"
+                  className="px-6 py-3 border border-black/15 bg-white/40 text-[#111] text-sm rounded-xl hover:border-black/30 hover:bg-white/70 dark:border-white/20 dark:bg-white/10 dark:text-white dark:hover:border-white/40 dark:hover:bg-white/20 purple:border-[#B79CFF]/20 purple:bg-white/5 purple:text-[#F6F4FF] purple:hover:border-[#B79CFF]/40 purple:hover:bg-[#7C5CFF]/10 transition-colors tracking-wide font-medium"
                   style={{
                     backdropFilter: "blur(8px)",
                     WebkitBackdropFilter: "blur(8px)",
@@ -338,13 +338,13 @@ export default function AgenticPage() {
                     {/* [@media(768px<=width<=872px)]: same overflow issue/fix as the hero
                         heading above — 29px is ~20% below the 36px (sm:text-4xl) original. */}
                     <div
-                      className="text-3xl sm:text-4xl [@media(768px<=width<=872px)]:text-[23px] text-[#111] dark:text-white purple:text-white font-light tracking-tight"
+                      className="text-3xl sm:text-4xl [@media(768px<=width<=872px)]:text-[23px] text-[#111] dark:text-white purple:text-[#F6F4FF] font-light tracking-tight"
                       style={{ fontFamily: '"IBM Plex Sans", sans-serif' }}
                     >
                       {stat.value}
                     </div>
                     <div
-                      className="text-xs text-black/40 dark:text-white/45 purple:text-white/45 tracking-widest uppercase mt-1"
+                      className="text-xs text-black/40 dark:text-white/45 purple:text-[#716C9E] tracking-widest uppercase mt-1"
                       style={{ fontFamily: '"IBM Plex Sans", sans-serif' }}
                     >
                       {stat.label}
@@ -396,7 +396,7 @@ export default function AgenticPage() {
           the root wrapper itself isn't themed yet (see hero's own note on this). Same #0a0a0a /
           #1a1226 tones as the hero's fade target, so there's no visible seam between the two
           once both are themed, even though each sets its background independently. */}
-      <section id="channels" className="py-32 px-6 md:px-12 lg:px-20 dark:bg-[#0a0a0a] purple:bg-[#1a1226]">
+      <section id="channels" className="py-32 px-6 md:px-12 lg:px-20 dark:bg-[#0a0a0a] purple:bg-[#12103C]">
         <div className="max-w-6xl mx-auto">
           {/* Header mirrors the Tools section: logo instead of a PixelIcon eyebrow, centred. */}
           <div className="mb-16 flex flex-col items-center text-center">
@@ -405,10 +405,10 @@ export default function AgenticPage() {
               alt="Act Angel AI"
               className="w-[86px] h-[86px] object-contain"
             />
-            <RevealText className="mt-5 text-4xl md:text-5xl lg:text-6xl font-light tracking-tight leading-[1.05] text-[#111] dark:text-white purple:text-white">
+            <RevealText className="mt-5 text-4xl md:text-5xl lg:text-6xl font-light tracking-tight leading-[1.05] text-[#111] dark:text-white purple:text-[#F6F4FF]">
               Reachable everywhere
             </RevealText>
-            <p className="mt-4 max-w-lg text-sm font-medium leading-relaxed text-[#111]/70 dark:text-white/75 purple:text-white/75">
+            <p className="mt-4 max-w-lg text-sm font-medium leading-relaxed text-[#111]/70 dark:text-white/75 purple:text-[#ABA6D9]">
               One Angel. Every Touchpoint. Nothing Gets Lost.
             </p>
           </div>
@@ -529,7 +529,7 @@ export default function AgenticPage() {
           continuing down from "Reachable everywhere" above it. */}
       <section
         id="tools"
-        className="py-32 px-6 md:px-12 lg:px-20 border-t border-black/[0.06] dark:border-white/10 purple:border-[#EDE9F7]/15 dark:bg-[#0a0a0a] purple:bg-[#1a1226] overflow-hidden"
+        className="py-32 px-6 md:px-12 lg:px-20 border-t border-black/[0.06] dark:border-white/10 purple:border-[#B79CFF]/15 dark:bg-[#0a0a0a] purple:bg-[#12103C] overflow-hidden"
       >
         <div className="max-w-6xl mx-auto">
           <div className="mb-16 flex flex-col items-center text-center">
@@ -538,10 +538,10 @@ export default function AgenticPage() {
               alt="Act Angel AI"
               className="w-[86px] h-[86px] object-contain"
             />
-            <RevealText className="mt-5 text-4xl md:text-5xl font-light tracking-tight leading-[1.05] text-[#111] dark:text-white purple:text-white">
+            <RevealText className="mt-5 text-4xl md:text-5xl font-light tracking-tight leading-[1.05] text-[#111] dark:text-white purple:text-[#F6F4FF]">
               All Your Tools.
             </RevealText>
-            <p className="mt-4 text-md font-medium text-[#111]/70 dark:text-white/75 purple:text-white/75 leading-relaxed max-w-xlg">
+            <p className="mt-4 text-md font-medium text-[#111]/70 dark:text-white/75 purple:text-[#ABA6D9] leading-relaxed max-w-xlg">
               Act Angel AI works alongside the platforms your business already
               runs on.
             </p>
@@ -629,7 +629,7 @@ export default function AgenticPage() {
                   // classes, so a responsive width can't be expressed there. The icon
                   // img below is sized at 80% of this div, so shrinking this hub shrinks
                   // the background circle and the icon inside it together.
-                  className="hidden md:flex absolute rounded-full bg-[#EDECE9] dark:bg-white/[0.07] purple:bg-white/10 items-center justify-center z-10 w-[min(200px,26%)] [@media(768px<=width<=991px)]:w-[min(160px,20.8%)]"
+                  className="hidden md:flex absolute rounded-full bg-[#EDECE9] dark:bg-white/[0.07] purple:bg-[#7C5CFF]/15 items-center justify-center z-10 w-[min(200px,26%)] [@media(768px<=width<=991px)]:w-[min(160px,20.8%)]"
                   style={{
                     position: "absolute",
                     left: "50%",
@@ -766,7 +766,7 @@ export default function AgenticPage() {
           the root wrapper. */}
       <section
         id="agents"
-        className="py-32 px-6 md:px-12 lg:px-20 border-t border-black/[0.06] dark:border-white/10 purple:border-[#EDE9F7]/15 dark:bg-[#0a0a0a] purple:bg-[#1a1226]"
+        className="py-32 px-6 md:px-12 lg:px-20 border-t border-black/[0.06] dark:border-white/10 purple:border-[#B79CFF]/15 dark:bg-[#0a0a0a] purple:bg-[#12103C]"
       >
         <div className="max-w-6xl mx-auto">
           {/* Header mirrors Reachable-everywhere / Tools: logo instead of a PixelIcon eyebrow,
@@ -777,7 +777,7 @@ export default function AgenticPage() {
               alt="Act Angel AI"
               className="w-[86px] h-[86px] object-contain"
             />
-            <RevealText className="mt-5 text-4xl md:text-5xl font-light tracking-tight leading-[1.05] text-[#111] dark:text-white purple:text-white">
+            <RevealText className="mt-5 text-4xl md:text-5xl font-light tracking-tight leading-[1.05] text-[#111] dark:text-white purple:text-[#F6F4FF]">
               {"60% of a seller's time\nisn't spent selling."}
             </RevealText>
           </div>
@@ -794,7 +794,7 @@ export default function AgenticPage() {
           image/fade layers below don't fully cover (mainly the upper portion of the section). */}
       <section
         id="pilot"
-        className="relative py-32 px-6 md:px-12 lg:px-20 border-t border-black/[0.06] dark:border-white/10 purple:border-[#EDE9F7]/15 dark:bg-[#0a0a0a] purple:bg-[#1a1226] overflow-hidden"
+        className="relative py-32 px-6 md:px-12 lg:px-20 border-t border-black/[0.06] dark:border-white/10 purple:border-[#B79CFF]/15 dark:bg-[#0a0a0a] purple:bg-[#12103C] overflow-hidden"
       >
         {/* Glass panels image (light) vs. the crystal skyline (dark/purple) — swapped by theme
             rather than just faded, since footer.png's light lavender/white background fights a
@@ -830,7 +830,7 @@ export default function AgenticPage() {
           }}
         />
         <div className="relative z-10 max-w-2xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tight leading-[1.05] mb-10 text-[#111] dark:text-white purple:text-white">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tight leading-[1.05] mb-10 text-[#111] dark:text-white purple:text-[#F6F4FF]">
             Hire your first
             <br />
             AI specialist
@@ -838,7 +838,7 @@ export default function AgenticPage() {
           <Link
             href="/get-started"
             onClick={() => posthog.capture("cta_get_started_clicked", { location: "hero" })}
-            className="inline-block px-8 py-3 bg-[#111] text-white text-sm rounded-xl hover:bg-[#333] dark:bg-white dark:text-black dark:hover:bg-white/85 purple:bg-white purple:text-black purple:hover:bg-white/85 transition-colors tracking-wide font-medium"
+            className="inline-block px-8 py-3 bg-[#111] text-white text-sm rounded-xl hover:bg-[#333] dark:bg-white dark:text-black dark:hover:bg-white/85 purple:bg-[#7C5CFF] purple:text-white purple:hover:bg-[#8F72FF] transition-colors tracking-wide font-medium"
           >
             Get Started
           </Link>
@@ -849,7 +849,7 @@ export default function AgenticPage() {
       {/* Same dark:/purple: bg pattern as every section above. */}
       <footer
         id="contact"
-        className="py-10 px-6 md:px-12 lg:px-20 border-t border-black/[0.06] dark:border-white/10 purple:border-[#EDE9F7]/15 dark:bg-[#0a0a0a] purple:bg-[#1a1226]"
+        className="py-10 px-6 md:px-12 lg:px-20 border-t border-black/[0.06] dark:border-white/10 purple:border-[#B79CFF]/15 dark:bg-[#0a0a0a] purple:bg-[#12103C]"
       >
         <div className="max-w-6xl mx-auto flex flex-col gap-6">
           {/* Row 1: logo, address, email. Stacks on small screens, one row from md up. */}
@@ -868,39 +868,39 @@ export default function AgenticPage() {
                 className="h-10 w-auto dark:brightness-0 dark:invert purple:brightness-0 purple:invert"
               />
             </Link>
-            <a href="#m" className="text-sm text-black/55 hover:text-black/70 dark:text-white/55 dark:hover:text-white/75 purple:text-[#EDE9F7]/60 purple:hover:text-[#EDE9F7]/85 transition-colors tracking-widest">
+            <a href="#m" className="text-sm text-black/55 hover:text-black/70 dark:text-white/55 dark:hover:text-white/75 purple:text-[#ABA6D9] purple:hover:text-[#F6F4FF] transition-colors tracking-widest">
               One Boston Place, # 2600, Boston, MA, 02108
             </a>
             <a
               href="mailto:Hello@ActAngel.com"
-              className="text-sm text-[gray] font-medium underline underline-offset-2 hover:text-black/70 dark:text-white/60 dark:hover:text-white/80 purple:text-[#EDE9F7]/65 purple:hover:text-[#EDE9F7]/90 transition-colors tracking-widest"
+              className="text-sm text-[gray] font-medium underline underline-offset-2 hover:text-black/70 dark:text-white/60 dark:hover:text-white/80 purple:text-[#ABA6D9] purple:hover:text-[#F6F4FF] transition-colors tracking-widest"
             >
               Hello@ActAngel.com
             </a>
           </div>
 
         </div>
-        <div className="max-w-6xl mx-auto mt-8 pt-6 border-t border-black/[0.04] dark:border-white/10 purple:border-[#EDE9F7]/15 flex flex-col-reverse md:flex-row md:items-center md:justify-between gap-4">
-          <span className="text-sm text-black/55 dark:text-white/55 purple:text-[#EDE9F7]/60">© 2026 Act Angel AI, Inc.</span>
+        <div className="max-w-6xl mx-auto mt-8 pt-6 border-t border-black/[0.04] dark:border-white/10 purple:border-[#B79CFF]/15 flex flex-col-reverse md:flex-row md:items-center md:justify-between gap-4">
+          <span className="text-sm text-black/55 dark:text-white/55 purple:text-[#ABA6D9]">© 2026 Act Angel AI, Inc.</span>
           <div className="flex flex-wrap items-center justify-start md:justify-end gap-x-6 gap-y-2">
             <a
               href="/privacy"
               target="_blank"
-              className="text-sm text-black/55 hover:text-black/70 dark:text-white/55 dark:hover:text-white/75 purple:text-[#EDE9F7]/60 purple:hover:text-[#EDE9F7]/85 transition-colors tracking-widest"
+              className="text-sm text-black/55 hover:text-black/70 dark:text-white/55 dark:hover:text-white/75 purple:text-[#ABA6D9] purple:hover:text-[#F6F4FF] transition-colors tracking-widest"
             >
               Privacy Policy
             </a>
             <a
               href="/terms"
               target="_blank"
-              className="text-sm text-black/55 hover:text-black/70 dark:text-white/55 dark:hover:text-white/75 purple:text-[#EDE9F7]/60 purple:hover:text-[#EDE9F7]/85 transition-colors tracking-widest"
+              className="text-sm text-black/55 hover:text-black/70 dark:text-white/55 dark:hover:text-white/75 purple:text-[#ABA6D9] purple:hover:text-[#F6F4FF] transition-colors tracking-widest"
             >
               Terms &amp; Conditions
             </a>
             <a
               href="/cookies"
               target="_blank"
-              className="text-sm text-black/55 hover:text-black/70 dark:text-white/55 dark:hover:text-white/75 purple:text-[#EDE9F7]/60 purple:hover:text-[#EDE9F7]/85 transition-colors tracking-widest"
+              className="text-sm text-black/55 hover:text-black/70 dark:text-white/55 dark:hover:text-white/75 purple:text-[#ABA6D9] purple:hover:text-[#F6F4FF] transition-colors tracking-widest"
             >
               Cookies Policy
             </a>

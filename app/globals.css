@@ -47,10 +47,13 @@ html body[data-scroll-locked] {
   --nav-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.6);
 }
 .purple {
-  /* A dark, desaturated step down from the brand accent (#5D4387), not just a tinted black —
-     keeps the bar reading as "purple" rather than "black with a purple border". */
-  --nav-bg: rgba(35, 24, 54, 0.8);
-  --nav-dropdown-bg: rgba(35, 24, 54, 0.97);
+  /* Client reference palette (idyllic-axolotl-1e5743.netlify.app): page bg #12103C, card
+     surface #1C1A56 — the dropdown panel uses the card surface, near-opaque, same relationship
+     the old purple theme had between its bar and its panel. --nav-bg is solid, not translucent
+     — on the reference, <nav> itself has no fill at all; what reads as its "background" is
+     just the flat page bg (#12103C) showing straight through. */
+  --nav-bg: #12103C;
+  --nav-dropdown-bg: rgba(28, 26, 86, 0.97);
   --nav-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.6);
 }
 
@@ -88,13 +91,14 @@ html body[data-scroll-locked] {
   );
 }
 .purple {
+  /* #12103C — the client reference's page background. */
   --hero-fade-gradient: linear-gradient(
     to top,
-    #1a1226 0%,
-    #1a1226 18%,
-    rgba(26, 18, 38, 0.85) 35%,
-    rgba(26, 18, 38, 0.5) 55%,
-    rgba(26, 18, 38, 0.15) 75%,
+    #12103c 0%,
+    #12103c 18%,
+    rgba(18, 16, 60, 0.85) 35%,
+    rgba(18, 16, 60, 0.5) 55%,
+    rgba(18, 16, 60, 0.15) 75%,
     transparent 100%
   );
 }
@@ -123,11 +127,63 @@ html body[data-scroll-locked] {
 .purple {
   --cta-fade-gradient: linear-gradient(
     to top,
-    #1a1226 0%,
-    rgba(26, 18, 38, 0.92) 18%,
-    rgba(26, 18, 38, 0.55) 35%,
+    #12103c 0%,
+    rgba(18, 16, 60, 0.92) 18%,
+    rgba(18, 16, 60, 0.55) 35%,
     transparent 55%
   );
+}
+
+/* Hire-an-Angel persona pages' "Business outcome" banner (components/hire-an-angel-page-content.tsx)
+   — a full-bleed gradient panel, so it needs a CSS var rather than dark:/purple: classes the same
+   way the fade gradients above do. dark stays achromatic (this project's standing rule: black
+   theme never reaches for color, purple theme is where accent color lives) — a lighter charcoal
+   pair so the panel still reads as a raised block against the page's #0a0a0a, not vivid. purple
+   reuses the client reference's own gradient verbatim (idyllic-axolotl-1e5743.netlify.app's
+   "More momentum. Less chasing." card), the one place on the persona pages where this exact
+   reference gradient belongs rather than a solid color. */
+:root {
+  --outcome-banner-gradient: linear-gradient(135deg, #5d4387, #7168a0);
+}
+.dark {
+  --outcome-banner-gradient: linear-gradient(135deg, #1c1c1c, #2b2b2b);
+}
+.purple {
+  --outcome-banner-gradient: linear-gradient(120deg, #4b2fd1, #1c1a56 65%);
+}
+
+/* Cookie Preferences modal's category toggle switches (components/cookie-consent.tsx) — the
+   on/off track fill depends on component state (on), not just theme, same problem
+   devex-section.tsx's active/inactive cards had — but with only two flat colors (no gradient
+   shape, no active-state branching beyond on/off) a CSS var pair is simpler here than reading
+   the theme in JS. The knob itself stays a plain white bg-white in every theme; dark keeps the
+   "on" track achromatic (a lighter translucent white, not solid) specifically so a white knob
+   still reads against it — solid white would erase the knob entirely. */
+:root {
+  --toggle-on-bg: #111;
+  --toggle-off-bg: rgba(0, 0, 0, 0.15);
+}
+.dark {
+  --toggle-on-bg: rgba(255, 255, 255, 0.4);
+  --toggle-off-bg: rgba(255, 255, 255, 0.15);
+}
+.purple {
+  --toggle-on-bg: #7c5cff;
+  --toggle-off-bg: rgba(183, 156, 255, 0.2);
+}
+
+/* Cookie consent banner (components/cookie-consent.tsx) — same near-opaque glass treatment as
+   --nav-dropdown-bg (not fully solid like --nav-bg, which got that specific treatment after
+   explicit feedback about the nav bar only): this is a floating bar over scrolled page content,
+   same depth cue the mobile nav's own panels use. */
+:root {
+  --cookie-banner-bg: rgba(255, 255, 255, 0.92);
+}
+.dark {
+  --cookie-banner-bg: rgba(10, 10, 10, 0.92);
+}
+.purple {
+  --cookie-banner-bg: rgba(18, 16, 60, 0.92);
 }
 
 /* Agent cards (components/stacking-agent-cards.tsx) — a CSS var rather than dark:/purple:
@@ -142,7 +198,7 @@ html body[data-scroll-locked] {
   --agent-card-bg: #141414;
 }
 .purple {
-  --agent-card-bg: #241a35;
+  --agent-card-bg: #1c1a56;
 }
 
 :root {
@@ -565,7 +621,7 @@ body[data-scroll-locked] {
 }
 
 /* Edge-fade colors match this section's own dark:/purple: background (set directly on the
-   <section> in page.tsx, same #0a0a0a / #1a1226 tones as the hero's fade target) rather than
+   <section> in page.tsx, same #0a0a0a / #12103C tones as the hero's fade target) rather than
    the page's still-light root background — these are plain CSS classes, not Tailwind
    utilities, so the .dark/.purple classes next-themes toggles on <html> are targeted directly
    rather than through the dark:/purple: variant syntax used elsewhere. */
@@ -576,10 +632,10 @@ body[data-scroll-locked] {
   background: linear-gradient(to left, rgba(10, 10, 10, 0.75) 0%, rgba(10, 10, 10, 0.45) 45%, transparent 100%);
 }
 .purple .channel-ticker::before {
-  background: linear-gradient(to right, rgba(26, 18, 38, 0.75) 0%, rgba(26, 18, 38, 0.45) 45%, transparent 100%);
+  background: linear-gradient(to right, rgba(18, 16, 60, 0.75) 0%, rgba(18, 16, 60, 0.45) 45%, transparent 100%);
 }
 .purple .channel-ticker::after {
-  background: linear-gradient(to left, rgba(26, 18, 38, 0.75) 0%, rgba(26, 18, 38, 0.45) 45%, transparent 100%);
+  background: linear-gradient(to left, rgba(18, 16, 60, 0.75) 0%, rgba(18, 16, 60, 0.45) 45%, transparent 100%);
 }
 
 .channel-ticker-track {
@@ -615,8 +671,8 @@ body[data-scroll-locked] {
   box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.4);
 }
 .purple .channel-pill {
-  background: rgba(93, 67, 135, 0.25);
-  color: #ede9f7;
+  background: rgba(124, 92, 255, 0.18);
+  color: #f6f4ff;
   box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.4);
 }
 
