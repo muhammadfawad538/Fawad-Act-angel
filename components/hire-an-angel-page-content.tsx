@@ -87,8 +87,17 @@ function FaqAccordionItem({
   );
 }
 
-function pillClass(active: boolean) {
-  return `px-4 py-2 md:px-5 md:py-2.5 rounded-full text-[13px] font-medium border cursor-pointer transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 ${
+// compact: AAA-UI-DM-WEB-011 (phone) + tablet enhancement request — Scenario pills (unlike
+// Channel, which also uses this function) have long enough labels ("Ticket Triage &
+// Resolution", "Calendar Management", "Interview Scheduling", ...) that auto-width flex-wrap
+// packed them inconsistently (uneven multi-row wraps on phone, one-per-row on tablet despite
+// room for 2). Scenario's wrapper (below) uses a 2-column equal-width grid at every size
+// instead — per explicit follow-up request, the pills stay equal-width on desktop too, not
+// just phone/tablet, rather than reverting to flex's auto-width packing once there's room for
+// it. Text stays small (12px) only below 768px where cells are narrowest; from md: up it's the
+// normal 13px/px-5 py-2.5 pill size, just in equal-width cells instead of auto-width.
+function pillClass(active: boolean, compact = false) {
+  return `${compact ? "px-3 py-2.5 text-[12px] leading-snug text-center w-full md:px-5 md:py-2.5 md:text-[13px] md:leading-normal" : "px-4 py-2 text-[13px]"} lg:px-5 lg:py-2.5 lg:text-[13px] lg:leading-normal rounded-full font-medium border cursor-pointer transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 ${
     active
       ? "bg-[#EDE9F7] border-[#5D4387]/30 text-[#5D4387] dark:bg-white/15 dark:border-white/30 dark:text-white purple:bg-[#7C5CFF]/20 purple:border-[#7C5CFF]/40 purple:text-[#F6F4FF]"
       : "border-black/15 text-black/60 hover:border-[#5D4387]/30 hover:bg-[#5D4387]/[0.05] hover:text-[#5D4387] dark:border-white/15 dark:text-white/60 dark:hover:border-white/35 dark:hover:bg-white/5 dark:hover:text-white purple:border-[#B79CFF]/20 purple:text-[#ABA6D9] purple:hover:border-[#7C5CFF]/40 purple:hover:bg-[#7C5CFF]/[0.08] purple:hover:text-[#F6F4FF]"
@@ -251,13 +260,19 @@ function LiveDemoSection({ persona }: { persona: Persona }) {
               <p className="text-[11px] font-semibold uppercase tracking-widest text-black/40 dark:text-white/40 purple:text-[#716C9E]">
                 Scenario
               </p>
-              <div className="mt-3 flex flex-wrap gap-2">
+              {/* grid-cols-2: AAA-UI-DM-WEB-011 (phone) + tablet enhancement request — a 2x2
+                  grid of equal-width pills at every viewport size, instead of the one-per-row
+                  vertical stack / uneven wrap QA flagged on phone and tablet. Kept as grid (not
+                  reverting to flex/flex-wrap) at desktop too per explicit follow-up request, so
+                  the 4 pills stay equal-width everywhere rather than auto-sized to their own
+                  text once there's room for flex-wrap to pack them well on its own. */}
+              <div className="mt-3 grid grid-cols-2 gap-2">
                 {scenarios.map((uc, i) => (
                   <button
                     key={uc}
                     type="button"
                     onClick={() => setScenario(i)}
-                    className={pillClass(i === scenario)}
+                    className={pillClass(i === scenario, true)}
                   >
                     {uc}
                   </button>
@@ -414,7 +429,7 @@ export function HireAnAngelPageContent({
                   key={p.id}
                   href={`/hire-an-angel/${p.slug}`}
                   aria-current={active ? "page" : undefined}
-                  className={`shrink-0 whitespace-nowrap pb-3 text-[14px] font-medium border-b-2 -mb-px transition-colors duration-200 ${
+                  className={`shrink-0 whitespace-nowrap pb-3 text-[14px] font-medium border-b-2 -mb-px transition-colors duration-200 purple:font-[Inter,sans-serif] ${
                     active
                       ? "text-[#111] border-[#111] dark:text-white dark:border-white purple:text-[#F6F4FF] purple:border-[#7C5CFF]"
                       : "text-[#8A8A8A] border-transparent hover:text-[#111] dark:text-white/50 dark:hover:text-white purple:text-[#ABA6D9] purple:hover:text-[#F6F4FF]"
@@ -441,14 +456,25 @@ export function HireAnAngelPageContent({
                       {persona.eyebrow}
                     </span>
                   )}
-                  <h1 className="mt-5 text-4xl md:text-5xl font-bold tracking-tight leading-[1.08] dark:text-white purple:text-[#F6F4FF]">
+                  {/* text-4xl (36px) fixed was wrapping the longer headlines ("From Customer
+                      Request to Resolution.", "Hope Angel: More Good, Done Every Day.") to 3-4
+                      stacked lines on mid-size phones like Pixel 9 (412px) — UI enhancement
+                      request, generalized to the whole mobile range rather than just 412px.
+                      clamp(28px, 7.5vw, 36px) scales the heading down just enough that every
+                      persona's headline wraps to 2 balanced lines across ~360-430px (nearly all
+                      current phones); still 36px (unchanged) once md: takes over at 768px. */}
+                  <h1 className="mt-5 text-[clamp(28px,7.5vw,36px)] md:text-5xl font-bold tracking-tight leading-[1.08] dark:text-white purple:text-[#F6F4FF]">
                     {persona.heroHeadline}
                   </h1>
-                  <p className="mt-5 text-[15px] text-black/55 dark:text-white/70 purple:text-[#ABA6D9] leading-relaxed max-w-2xl">
+                  {/* AAA-UI-DM-WEB-007: approved #716C9E/contrast 3.72 against the page's
+                      #12103C bg, not the #ABA6D9/7.88 every other purple: secondary-text
+                      instance uses — scoped to this hero description only, not the shared
+                      muted-text color used elsewhere on the page. */}
+                  <p className="mt-5 text-[15px] text-black/55 dark:text-white/70 purple:text-[#716C9E] leading-relaxed max-w-2xl">
                     {persona.heroSubtext}
                   </p>
                   {persona.heroSubtext2 && (
-                    <p className="mt-3 text-[15px] text-black/55 dark:text-white/70 purple:text-[#ABA6D9] leading-relaxed max-w-2xl">
+                    <p className="mt-3 text-[15px] text-black/55 dark:text-white/70 purple:text-[#716C9E] leading-relaxed max-w-2xl">
                       {persona.heroSubtext2}
                     </p>
                   )}
@@ -566,15 +592,33 @@ export function HireAnAngelPageContent({
                   reference design. Personas with a faqs list (e.g. Hope Angel) render its first
                   entry the same way — big headline + paragraph — then the remaining entries as a
                   collapsed accordion, matching the reference; personas without a faqs list just
-                  get the single whatIsTitle/whatIsDescription paragraph. */}
-              <section className="mt-20 max-w-2xl">
-                <span className="inline-block px-4 py-1.5 rounded-full border border-black/10 text-[10px] font-semibold uppercase tracking-widest text-black/45 dark:border-white/15 dark:text-white/50 purple:border-[#B79CFF]/20 purple:text-[#716C9E]">
+                  get the single whatIsTitle/whatIsDescription paragraph.
+                  purple:bg-[#1C1A56] etc. — AAA-UI-DM-WEB-005: the approved design wraps this
+                  whole block in a card (that color, rounded, padded); the current implementation
+                  had no card at all, just plain text straight on the page background. Light
+                  theme card is bg-white/border-black-[0.08], the same white-card pattern already
+                  used elsewhere on this page (capability cards, the Live Preview card) rather
+                  than a reference value, since the client reference is purple/dark-only. dark:
+                  cancels the new light-only properties back to nothing — dark wasn't part of
+                  either this or the original ticket, stays card-less as before.
+                  Reference site measured directly (idyllic-axolotl…, .def-block): card width is
+                  1160px against a 1425px content column — essentially the full max-w-6xl column,
+                  not the old max-w-2xl here — so that's dropped for light/purple (dark:max-w-2xl
+                  keeps dark exactly as it was; dark wasn't part of this round). */}
+              <section className="mt-20 bg-white border border-black/[0.08] rounded-2xl p-8 dark:max-w-2xl dark:bg-transparent dark:border-0 dark:rounded-none dark:p-0 purple:bg-[#1C1A56] purple:border-0 purple:rounded-2xl purple:p-8">
+                {/* Reference measured directly (.def-tag): 10px/700/1px tracking (the 10px and
+                    tracking-widest's 0.1em already matched at this size; font-weight/padding
+                    didn't) — px-4/py-1.5/font-semibold restored for dark via dark: overrides,
+                    unchanged there. purple: gets the reference's exact accent trio: #B79CFF
+                    text/border-at-16%, #7C5CFF-at-12% background (this span had no background
+                    at all before). */}
+                <span className="inline-block px-[12px] py-[5px] rounded-full border border-black/10 text-[10px] font-bold uppercase tracking-widest text-black/45 dark:px-4 dark:py-1.5 dark:font-semibold dark:border-white/15 dark:text-white/50 purple:border-[#B79CFF]/16 purple:bg-[#7C5CFF]/[0.12] purple:text-[#B79CFF]">
                   {persona.faqEyebrow ??
                     "Structured for Answer Engines · FAQPage Schema"}
                 </span>
                 {persona.faqs ? (
                   <>
-                    <h2 className="mt-5 text-2xl md:text-3xl font-light tracking-tight">
+                    <h2 className="mt-5 text-lg font-bold tracking-tight dark:text-2xl dark:md:text-3xl dark:font-light">
                       {persona.faqs[0].question}
                     </h2>
                     <p className="mt-4 text-sm text-black/55 dark:text-white/70 purple:text-[#ABA6D9] leading-relaxed">
@@ -592,7 +636,7 @@ export function HireAnAngelPageContent({
                   </>
                 ) : (
                   <>
-                    <h2 className="mt-5 text-2xl md:text-3xl font-light tracking-tight">
+                    <h2 className="mt-5 text-lg font-bold tracking-tight dark:text-2xl dark:md:text-3xl dark:font-light">
                       {persona.whatIsTitle}
                     </h2>
                     <p className="mt-4 text-sm text-black/55 dark:text-white/70 purple:text-[#ABA6D9] leading-relaxed">

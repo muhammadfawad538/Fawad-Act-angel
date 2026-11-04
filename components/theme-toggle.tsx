@@ -28,7 +28,7 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
   useEffect(() => setMounted(true), []);
 
   if (!mounted) {
-    return <div className={`h-[46px] w-[46px] shrink-0 ${className}`} aria-hidden="true" />;
+    return <div className={`h-[38px] w-[38px] dark:h-[46px] dark:w-[46px] shrink-0 ${className}`} aria-hidden="true" />;
   }
 
   // Falls back to "light" for anything not in THEME_ORDER — not just undefined, but also a
@@ -46,7 +46,7 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
       type="button"
       onClick={() => setTheme(next)}
       aria-label={THEME_LABEL[current]}
-      className={`inline-flex items-center justify-center h-[46px] w-[46px] shrink-0 rounded-full border border-[#DADADA] hover:border-[#b8b8b8] text-[#111] cursor-pointer transition-colors duration-200 dark:border-white/20 dark:text-white dark:hover:border-white/40 purple:border-[#B79CFF]/25 purple:text-[#F6F4FF] purple:hover:border-[#B79CFF]/50 ${className}`}
+      className={`inline-flex items-center justify-center h-[38px] w-[38px] shrink-0 rounded-full border border-[#DADADA] hover:border-[#b8b8b8] text-[#111] cursor-pointer transition-colors duration-200 dark:h-[46px] dark:w-[46px] dark:border-white/20 dark:text-white dark:hover:border-white/40 purple:h-[38px] purple:w-[38px] purple:border-[#B79CFF]/25 purple:text-[#F6F4FF] purple:hover:border-[#B79CFF]/50 ${className}`}
     >
       <Icon size={18} />
     </button>

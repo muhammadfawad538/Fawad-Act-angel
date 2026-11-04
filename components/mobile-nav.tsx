@@ -82,8 +82,19 @@ const NAV_ITEM =
 // siblings (the mobile menu's standalone "Get Started" link, in particular) — inline-flex keeps
 // it sized to its own content in both contexts. shrink-0/whitespace-nowrap stop the label from
 // wrapping or the pill from getting squeezed when the desktop row is short on space.
+// AAA-UI-DM-WEB-001's approved values (Inter font, 9px/18px padding, #ABA6D9 text) applied to
+// the navbar pills too, per follow-up request — h-auto on the base/purple pair overrides the
+// old shared h-[46px] since 9px vertical padding + this text's line-height comes out shorter
+// than that fixed height; py-[9px] replaces it instead of stacking on top of it. Extended to
+// light theme too (explicit request) — dark: gets its own h-[46px]/px-6/font-sans overrides
+// to stay exactly as it was, since black theme isn't part of this round of changes.
+// #ABA6D9 text against the card-surface color (#1C1A56) computes to exactly the approved 6.9
+// contrast (it was 7.89 against the old #12103C bar — see git history). No explicit pill
+// background needed for that any more: AAA-UI-DM-WEB-002 moved --nav-bg itself to #1C1A56, so
+// a transparent pill already inherits the right effective background from the bar behind it.
+// Not extended to light theme — its near-black text already has very high contrast regardless.
 const NAV_PILL =
-  "inline-flex items-center justify-center gap-[6px] h-[46px] px-6 rounded-full border border-[#DADADA] hover:border-[#b8b8b8] text-[12px] font-medium uppercase tracking-[0.08em] text-[#111] whitespace-nowrap shrink-0 transition-colors duration-200 dark:border-white/15 dark:hover:border-white/35 dark:text-white purple:border-[#B79CFF]/25 purple:hover:border-[#B79CFF]/50 purple:text-[#ABA6D9] purple:hover:text-[#F6F4FF]";
+  "inline-flex items-center justify-center gap-[6px] h-auto py-[9px] px-[18px] rounded-full border border-[#DADADA] hover:border-[#b8b8b8] text-[12px] font-medium uppercase tracking-[0.08em] text-[#111] whitespace-nowrap shrink-0 transition-colors duration-200 font-[Inter,sans-serif] dark:h-[46px] dark:py-0 dark:px-6 dark:font-sans dark:border-white/15 dark:hover:border-white/35 dark:text-white purple:h-auto purple:py-[9px] purple:px-[18px] purple:font-[Inter,sans-serif] purple:border-[#B79CFF]/25 purple:hover:border-[#B79CFF]/50 purple:text-[#ABA6D9] purple:hover:text-[#F6F4FF]";
 
 // Get Started is filled — #5D4387 is a mid-tone step sampled from the logo icon's own gradient,
 // lightening to #7168A0 on hover (both from the reference screenshot).
@@ -92,8 +103,12 @@ const NAV_PILL =
 // white button pops the way the purple one does against the light bar.
 // purple: overrides the light-theme fill with the client reference palette's own accent
 // (#7C5CFF, the solid color its "Hire a Sales Angel" buttons and active nav pill use).
+// h-auto + the same py-[9px]/px-[18px]/Inter as NAV_PILL above — matches Get Started's size to
+// the other 3 nav pills (was the fixed h-[46px]/px-[26px] every other theme still uses).
+// Extended to light theme (explicit request); dark: gets h-[46px]/px-[26px]/font-sans back to
+// stay exactly as it was.
 const NAV_CTA =
-  "inline-flex items-center justify-center h-[46px] px-[26px] rounded-full bg-[#5D4387] hover:bg-[#7168A0] text-[12px] font-medium uppercase tracking-[0.08em] text-white whitespace-nowrap shrink-0 transition-colors duration-200 dark:bg-white dark:text-black dark:hover:bg-white/85 purple:bg-[#7C5CFF] purple:hover:bg-[#8F72FF]";
+  "inline-flex items-center justify-center h-auto py-[9px] px-[18px] rounded-full bg-[#5D4387] hover:bg-[#7168A0] text-[12px] font-medium uppercase tracking-[0.08em] text-white whitespace-nowrap shrink-0 transition-colors duration-200 font-[Inter,sans-serif] dark:h-[46px] dark:py-0 dark:px-[26px] dark:font-sans dark:bg-white dark:text-black dark:hover:bg-white/85 purple:h-auto purple:py-[9px] purple:px-[18px] purple:font-[Inter,sans-serif] purple:bg-[#7C5CFF] purple:hover:bg-[#8F72FF]";
 
 // No props: every item here is now a real link (persona pages, /get-started, /contact)
 // rather than something that opens a modal, so the nav no longer needs callbacks from its
@@ -376,9 +391,18 @@ export function MobileNav() {
                           onPointerLeave={(e) => { if (e.pointerType === "mouse") setTooltip(null); }}
                           className="group relative flex flex-col border-b border-black/[0.06] dark:border-white/10 purple:border-[#B79CFF]/15 last:border-b-0 px-3 transition-colors duration-200 hover:bg-[#EDE9F7]/70 dark:hover:bg-white/5 purple:hover:bg-[#7C5CFF]/10 [font-family:system-ui,-apple-system,sans-serif]"
                         >
+                          {/* AAA-UI-DM-WEB-003: purple:bg-[#272269] is a solid color, not the
+                              translucent rgba(124,92,255,0.12) this used to be — that alpha-
+                              blended over whatever sat behind the dropdown, so the title text's
+                              actual contrast drifted with scroll position/backdrop, and the
+                              0.12→0.20 hover jump alone dropped it from ~12.7 to ~11.5. #272269
+                              is solved to land title text (#F6F4FF) at exactly the approved
+                              12.71 contrast deterministically, same value on hover since hover
+                              no longer changes this background at all (the existing pl-3→18px
+                              padding shift still gives hover feedback). */}
                           <div
                             ref={(el) => { pillRefs.current[p.id] = el; }}
-                            className="my-4 flex items-center gap-3 rounded-lg bg-[#5D4387]/10 pl-3 pr-3 py-2.5 transition-[background-color,padding] duration-200 group-hover:bg-[#5D4387]/30 group-hover:pl-[18px] dark:bg-white/[0.06] dark:group-hover:bg-white/[0.12] purple:bg-[#7C5CFF]/[0.12] purple:group-hover:bg-[#7C5CFF]/20"
+                            className="my-4 flex items-center gap-3 rounded-lg bg-[#5D4387]/10 pl-3 pr-3 py-2.5 transition-[background-color,padding] duration-200 group-hover:bg-[#5D4387]/30 group-hover:pl-[18px] dark:bg-white/[0.06] dark:group-hover:bg-white/[0.12] purple:bg-[#272269] purple:group-hover:bg-[#272269]"
                           >
                             <img
                               src={p.avatar}
@@ -551,7 +575,7 @@ export function MobileNav() {
                         <Link
                           href={`/hire-an-angel/${p.slug}`}
                           onClick={close}
-                          className="flex flex-1 min-w-0 items-center gap-3 rounded-lg bg-[#5D4387]/10 dark:bg-white/[0.06] purple:bg-[#7C5CFF]/[0.12] pl-3 pr-3 py-2.5 [font-family:system-ui,-apple-system,sans-serif]"
+                          className="flex flex-1 min-w-0 items-center gap-3 rounded-lg bg-[#5D4387]/10 dark:bg-white/[0.06] purple:bg-[#272269] pl-3 pr-3 py-2.5 [font-family:system-ui,-apple-system,sans-serif]"
                         >
                           <img
                             src={p.avatar}

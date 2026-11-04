@@ -118,11 +118,12 @@ export default function AgenticPage() {
   // Hero phone demo's width is a JS prop (PersonaPhoneDemo derives its own height from it), not
   // a CSS size — a media query can't touch it directly, and a CSS transform:scale wouldn't
   // actually shrink the layout box it reserves (which is the overflow problem in the first
-  // place), so this tracks the same 768-872px range in JS and passes a smaller width through
-  // instead. 306 is 10% below the normal 340.
+  // place), so this tracks the same row-squeeze condition in JS (portrait, >=768px wide — see
+  // the heading's own comment above for why this isn't a literal width band, AAA-UI-DM-WEB-010)
+  // and passes a smaller width through instead. 306 is 10% below the normal 340.
   const [heroPhoneWidth, setHeroPhoneWidth] = useState(340);
   useEffect(() => {
-    const mq = window.matchMedia("(min-width: 768px) and (max-width: 872px)");
+    const mq = window.matchMedia("(min-width: 768px) and (orientation: portrait)");
     setHeroPhoneWidth(mq.matches ? 306 : 340);
     const onChange = (e: MediaQueryListEvent) => setHeroPhoneWidth(e.matches ? 306 : 340);
     mq.addEventListener("change", onChange);
@@ -231,7 +232,18 @@ export default function AgenticPage() {
         {/* px-6 md:px-12 only — no lg:px-20 step. The theme's hero wrapper stops at md:px-12
             even though every other section in it goes on to lg:px-20; matched here so large
             screens don't get extra hero padding the theme itself doesn't have. */}
-        <div className="relative z-30 mt-auto px-6 md:px-12 pb-12">
+        {/* AAA-UI-DM-WEB-010: mt-auto bottom-anchors this block against min-h-screen (the
+            <section> above) — on a normal-aspect (landscape) viewport the two roughly agree,
+            but on any tall/narrow portrait one — iPad Mini (768x1024), iPad Air (820x1180),
+            iPad Pro 11" (834x1194), iPad Pro 12.9" (1024x1366), etc. — mt-auto scales with
+            viewport height and reads as a large gap between the nav and the heading (the
+            taller the device, the worse it gets). Capped to a fixed 144px for any portrait
+            viewport >=768px wide — not a literal width band, since QA found this on multiple
+            tablet sizes, not just one. 144px is close to iPad Mini's own natural ~160px (so
+            it's not a big jump there) and was tested down to ~110px before the hero video's
+            background glow started showing through the KPI row text, so this stops short of
+            that rather than chasing the smallest possible gap. */}
+        <div className="relative z-30 mt-auto [@media(min-width:768px)_and_(orientation:portrait)]:mt-36 px-6 md:px-12 pb-12">
           {/* No max-w-6xl/mx-auto here — the theme (act_angel_frontend_backup) deliberately
               doesn't width-match its hero to the max-w-6xl mx-auto column every other section
               uses; its hero content is left-anchored to the page padding instead. This carries
@@ -247,13 +259,22 @@ export default function AgenticPage() {
             {/* Text */}
             <div className="max-w-xl">
               <h1
-                // [@media(768px<=width<=872px)]: md:text-8xl (96px) is too wide here — the
-                // phone demo beside it is a fixed 340px, and at this narrow a viewport the
-                // heading's own content (e.g. "specialist") can't shrink below its intrinsic
-                // width, so the flex row overflows and pushes the phone off the right edge of
-                // the screen. 67px (~30% below the 96px original) just in this range; back to
-                // md:text-8xl above 872px where there's room for both.
-                className="text-6xl sm:text-7xl md:text-8xl [@media(768px<=width<=872px)]:text-[67px] font-light text-[#111] dark:text-white purple:text-[#F6F4FF] leading-[1.0] tracking-tight mb-6"
+                // md:text-8xl (96px) is too wide once the row layout kicks in on a narrow/
+                // portrait viewport — the phone demo beside it is a fixed (or 768-872px-range,
+                // 306px-reduced) width, and at these widths the heading's own content (e.g.
+                // "specialist") can't shrink below its intrinsic width, so the flex row
+                // overflows and pushes the phone off the right edge of the screen. Originally
+                // scoped to a literal 768-872px width band, but AAA-UI-DM-WEB-010 QA found the
+                // same wrap on other portrait tablets outside that band (iPad Air 820, iPad Pro
+                // 11" 834, iPad Pro 12.9" 1024-wide) — the real condition is "row layout +
+                // portrait", not a specific width, so this now targets any >=768px-wide portrait
+                // viewport instead of just that one range. 67px (~30% below the 96px original,
+                // the first fix for this) still wrapped the 2nd line ("AI Specialist") a 3rd
+                // time at iPad Mini's 768px width, the narrowest/tightest case — bisected down
+                // to 56px there (fits up to and including 60px, so 56 keeps a few px of margin)
+                // and that same value comfortably fits the wider portrait tablets too. Back to
+                // md:text-8xl in landscape/desktop where there's room for both.
+                className="text-6xl sm:text-7xl md:text-8xl [@media(min-width:768px)_and_(orientation:portrait)]:text-[56px] font-light text-[#111] dark:text-white purple:text-[#F6F4FF] leading-[1.0] tracking-tight mb-6"
                 style={{
                   fontFamily: '"IBM Plex Sans", sans-serif',
                   opacity: heroReady ? 1 : 0,
@@ -318,7 +339,15 @@ export default function AgenticPage() {
                   from the backup template's own metrics block (which the migration dropped):
                   IBM Plex Sans, large light value over a small uppercase letterspaced label,
                   staggered in after the buttons. */}
-              <div className="flex gap-8 sm:gap-12 mt-10">
+              {/* AAA-UI-DM-WEB-009: gap-8 (32px) left only 233px for the 3 values on a 360px
+                  viewport (Galaxy A55) — "< 10 sec" needs ~108px single-line and was wrapping
+                  to "< 10"/"sec", taller than the other two KPIs. Smaller mobile value size
+                  (text-2xl vs sm:text-4xl) plus whitespace-nowrap fixes the wrap; w-full
+                  justify-between (mobile only) spreads the 3 columns across the full text
+                  column so there's still a clear gap between each instead of them bunching up
+                  on the left — sm:w-auto/justify-start/gap-12 restores the original fixed-gap,
+                  left-anchored desktop layout untouched. */}
+              <div className="flex w-full justify-between sm:w-auto sm:justify-start sm:gap-12 mt-10">
                 {[
                   { value: "< 10 sec", label: "Response Time" },
                   { value: "99.9%", label: "Uptime" },
@@ -335,10 +364,11 @@ export default function AgenticPage() {
                       transition: `opacity 0.8s cubic-bezier(0.16,1,0.3,1) ${280 + i * 80}ms, filter 0.8s cubic-bezier(0.16,1,0.3,1) ${280 + i * 80}ms, transform 0.8s cubic-bezier(0.16,1,0.3,1) ${280 + i * 80}ms`,
                     }}
                   >
-                    {/* [@media(768px<=width<=872px)]: same overflow issue/fix as the hero
-                        heading above — 29px is ~20% below the 36px (sm:text-4xl) original. */}
+                    {/* Same row-squeeze fix/condition as the hero heading above (portrait,
+                        >=768px wide, not a literal width band — AAA-UI-DM-WEB-010) — 23px is
+                        ~20% below the 36px (sm:text-4xl) original. */}
                     <div
-                      className="text-3xl sm:text-4xl [@media(768px<=width<=872px)]:text-[23px] text-[#111] dark:text-white purple:text-[#F6F4FF] font-light tracking-tight"
+                      className="text-2xl sm:text-4xl [@media(min-width:768px)_and_(orientation:portrait)]:text-[23px] text-[#111] dark:text-white purple:text-[#F6F4FF] font-light tracking-tight whitespace-nowrap"
                       style={{ fontFamily: '"IBM Plex Sans", sans-serif' }}
                     >
                       {stat.value}

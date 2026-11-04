@@ -48,12 +48,16 @@ html body[data-scroll-locked] {
 }
 .purple {
   /* Client reference palette (idyllic-axolotl-1e5743.netlify.app): page bg #12103C, card
-     surface #1C1A56 — the dropdown panel uses the card surface, near-opaque, same relationship
-     the old purple theme had between its bar and its panel. --nav-bg is solid, not translucent
-     — on the reference, <nav> itself has no fill at all; what reads as its "background" is
-     just the flat page bg (#12103C) showing straight through. */
-  --nav-bg: #12103C;
-  --nav-dropdown-bg: rgba(28, 26, 86, 0.97);
+     surface #1C1A56. --nav-bg was previously the flat page bg (matching the reference's own
+     <nav>, which has no fill of its own — see git history) but QA ticket AAA-UI-DM-WEB-002
+     calls for the card surface color here instead, confirmed explicitly over that earlier
+     fix — now solid #1C1A56, same tone --nav-dropdown-bg already used.
+     --nav-dropdown-bg: AAA-UI-DM-WEB-004 — ticket gives approved #1C1A56F vs. current
+     #1C1A56F7 (this was rgba(28,26,86,0.97) = #1C1A56F7 exactly); read as the approved value's
+     alpha digit being shorthand for FF (fully opaque), i.e. solid #1C1A56 with no transparency,
+     not 97%. */
+  --nav-bg: #1C1A56;
+  --nav-dropdown-bg: #1C1A56;
   --nav-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.6);
 }
 
@@ -172,10 +176,10 @@ html body[data-scroll-locked] {
   --toggle-off-bg: rgba(183, 156, 255, 0.2);
 }
 
-/* Cookie consent banner (components/cookie-consent.tsx) — same near-opaque glass treatment as
-   --nav-dropdown-bg (not fully solid like --nav-bg, which got that specific treatment after
-   explicit feedback about the nav bar only): this is a floating bar over scrolled page content,
-   same depth cue the mobile nav's own panels use. */
+/* Cookie consent banner (components/cookie-consent.tsx) — a near-opaque glass treatment (not
+   fully solid, unlike --nav-bg/--nav-dropdown-bg above, both since made solid per explicit
+   feedback): this is a floating bar over scrolled page content, the same depth cue the mobile
+   nav's own panels used before they went solid too. */
 :root {
   --cookie-banner-bg: rgba(255, 255, 255, 0.92);
 }

@@ -32,7 +32,7 @@ export default function BehindTheAngelsPage() {
           We Don&rsquo;t Build More Software.<br className="hidden md:block"/>We Build AI Specialists.
         </h1>
         <p className="mt-4 text-lg md:text-xl text-black/55 dark:text-white/70 purple:text-[#ABA6D9] text-center">
-          Scale your business — not your headcount.
+          AI That Acts. Work Gets Done—with What You Already Have.
         </p>
 
         <p className="mt-8 text-[15px] leading-relaxed text-black/60 dark:text-white/70 purple:text-[#ABA6D9] text-center max-w-3xl mx-auto">
