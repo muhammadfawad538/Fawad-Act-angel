@@ -309,7 +309,7 @@ export function MobileNav() {
               src="/images/logo.png"
               alt=""
               aria-hidden="true"
-              className="h-10 w-auto dark:brightness-0 dark:invert purple:brightness-0 purple:invert"
+              className="h-12 w-auto dark:brightness-0 dark:invert purple:brightness-0 purple:invert"
             />
           </Link>
 

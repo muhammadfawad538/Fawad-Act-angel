@@ -2,15 +2,18 @@
 
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import { Sun, Sparkles } from "lucide-react";
+import { Sun, Moon } from "lucide-react";
 
 // Cycles light → purple → light. Black theme is deliberately not in this list any more (client
 // is only being shown light/purple for now) — its CSS/dark: classes are all still fully intact
 // site-wide, just not reachable from this toggle. ThemeProvider (app/layout.tsx) still lists
 // "dark" as a valid theme, so it can still be set programmatically (e.g. localStorage.theme =
 // "dark") if it's ever needed again.
+// Icons follow the conventional sun/moon pairing (client feedback: the button needs "the
+// correct dark icon") — moon on light (click to go dark/purple), sun on purple (click back to
+// light) — rather than the sparkle glyph used right after the 3-way toggle was cut down to 2.
 const THEME_ORDER = ["light", "purple"] as const;
-const THEME_ICON = { light: Sparkles, purple: Sun } as const;
+const THEME_ICON = { light: Moon, purple: Sun } as const;
 const THEME_LABEL = {
   light: "Switch to purple theme",
   purple: "Switch to light theme",
