@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { useTheme } from "next-themes"
 
 interface AgentCard {
   label?: string
@@ -8,25 +9,33 @@ interface AgentCard {
   desc: string
   stats?: { v: string; l: string }[]
   img?: string
+  darkImg?: string
 }
 
 // Act Angel's 3 traits (Always On / Consistently Great / Provably Honest) — heading +
-// description only, no label tag or stats row (see the conditional rendering below).
+// description only, no label tag or stats row (see the conditional rendering below). darkImg
+// (dark_images/) replaces img for both the dark and purple themes — same crystal image for
+// both. Assignment per explicit user request (rotated from an earlier by-theme pairing, not
+// derived from the trait copy): Always On → magnifier, Consistently Great → hourglass,
+// Provably Honest → cascade funnel (the 4th image, the skyline, went to the CTA section).
 const AGENTS: AgentCard[] = [
   {
     title: "Always On",
     desc: "No sick days, no shift changes",
     img: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/researcher-CvhqOuV6irGwBOnJoTGFlXdbyYBRjb.png",
+    darkImg: "/dark_images/Prismatic_Magnifier_and_Crystal_Still_Life.png",
   },
   {
     title: "Consistently Great",
     desc: "Same quality, every conversation",
     img: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/coder-9bItvCegU6TXUqbX3tUXGBAtvkBkXp.png",
+    darkImg: "/dark_images/Iridescent_Crystal_Hourglass_in_Prism_Light.png",
   },
   {
     title: "Provably Honest",
     desc: "Every outcome verified, not claimed",
     img: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/analyst-Ysxnqg7Fpy2cfA56PiIttv1KximMhT.png",
+    darkImg: "/dark_images/Iridescent_Crystal_Cascade_Funnel.png",
   },
 ]
 
@@ -37,7 +46,7 @@ const OFFSET_STEP  = 8    // px pushed down per card stacked on top
 
 function Tag({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] tracking-widest font-sans text-black/40 bg-black/[0.04]">
+    <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] tracking-widest font-sans text-black/40 bg-black/[0.04] dark:text-white/50 dark:bg-white/[0.06] purple:text-[#B79CFF] purple:bg-[#7C5CFF]/[0.12]">
       {children}
     </span>
   )
@@ -47,6 +56,15 @@ export function StackingAgentCards() {
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
   // depth[i] = 0..N how many cards are currently stacked on top of card i
   const [depth, setDepth] = useState<number[]>(AGENTS.map(() => 0))
+
+  // Gates which image variant actually mounts per card (not just a dark:/purple: class toggle)
+  // so the page isn't fetching all 6 images — 3 original photos plus 3 ~2MB crystal renders —
+  // on every load regardless of theme. Same mounted-guard pattern as ThemeToggle/DevExSection.
+  const { resolvedTheme } = useTheme()
+  const [themeMounted, setThemeMounted] = useState(false)
+  useEffect(() => setThemeMounted(true), [])
+  const isDarkOrPurple =
+    themeMounted && (resolvedTheme === "dark" || resolvedTheme === "purple")
 
   useEffect(() => {
     function onScroll() {
@@ -93,13 +111,16 @@ export function StackingAgentCards() {
                 willChange:     "transform",
               }}
             >
-              <div className="group relative bg-[#faf9f7] rounded-2xl border border-black/[0.07] overflow-hidden cursor-pointer">
+              {/* bg-(--agent-card-bg): a CSS var (globals.css), not dark:/purple: classes —
+                  the same color also drives the desktop image's fade gradient below, via the
+                  same var, so the two can't end up mismatched. */}
+              <div className="group relative bg-(--agent-card-bg) rounded-2xl border border-black/[0.07] dark:border-white/10 purple:border-[#B79CFF]/15 overflow-hidden cursor-pointer">
 
                 {/* ── MOBILE: image top, fades out at bottom ── */}
                 {agent.img && (
                   <div className="relative w-full h-52 pointer-events-none md:hidden">
                     <img
-                      src={agent.img}
+                      src={isDarkOrPurple && agent.darkImg ? agent.darkImg : agent.img}
                       alt={agent.title}
                       className="absolute inset-0 w-full h-full object-cover object-center"
                       style={{
@@ -114,14 +135,14 @@ export function StackingAgentCards() {
                 {agent.img && (
                   <div className="hidden md:block absolute inset-y-0 right-0 w-1/2 pointer-events-none">
                     <img
-                      src={agent.img}
+                      src={isDarkOrPurple && agent.darkImg ? agent.darkImg : agent.img}
                       alt={agent.title}
                       className="w-full h-full object-cover object-center"
                     />
                     <div
                       className="absolute inset-0"
                       style={{
-                        background: "linear-gradient(to right, #faf9f7 0%, transparent 55%)",
+                        background: "linear-gradient(to right, var(--agent-card-bg) 0%, transparent 55%)",
                       }}
                     />
                   </div>
@@ -139,15 +160,15 @@ export function StackingAgentCards() {
                         <Tag>{agent.label}</Tag>
                       </div>
                     )}
-                    <h3 className={`text-xl font-light ${agent.stats ? "mb-3" : ""} ${!agent.label ? "mt-0" : ""}`}>{agent.title}</h3>
-                    <p className="text-sm text-black/45 leading-relaxed mb-8">{agent.desc}</p>
+                    <h3 className={`text-xl font-light text-[#111] dark:text-white purple:text-[#F6F4FF] ${agent.stats ? "mb-3" : ""} ${!agent.label ? "mt-0" : ""}`}>{agent.title}</h3>
+                    <p className="text-sm text-black/45 dark:text-white/55 purple:text-[#ABA6D9] leading-relaxed mb-8">{agent.desc}</p>
                   </div>
                   {agent.stats && agent.stats.length > 0 && (
-                    <div className="flex gap-8 pt-6 border-t border-black/[0.06]">
+                    <div className="flex gap-8 pt-6 border-t border-black/[0.06] dark:border-white/10 purple:border-[#B79CFF]/15">
                       {agent.stats.map(s => (
                         <div key={s.l}>
-                          <div className="text-2xl font-light">{s.v}</div>
-                          <div className="text-[11px] text-black/35 tracking-widest mt-0.5">{s.l}</div>
+                          <div className="text-2xl font-light text-[#111] dark:text-white purple:text-[#F6F4FF]">{s.v}</div>
+                          <div className="text-[11px] text-black/35 dark:text-white/40 purple:text-[#716C9E] tracking-widest mt-0.5">{s.l}</div>
                         </div>
                       ))}
                     </div>

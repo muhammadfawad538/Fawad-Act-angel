@@ -1,15 +1,21 @@
 import React from "react"
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono, IBM_Plex_Sans } from 'next/font/google'
+import { Geist, Geist_Mono, IBM_Plex_Sans, Inter } from 'next/font/google'
 import { Courier_Prime } from 'next/font/google'
 import { AnalyticsGate } from '@/components/analytics-gate'
 import { CookieConsent } from '@/components/cookie-consent'
+import { ThemeProvider } from '@/components/theme-provider'
 import './globals.css'
 
 const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 const _courierPrime = Courier_Prime({ weight: ["400", "700"], subsets: ["latin"] });
 const _ibmPlexSans = IBM_Plex_Sans({ weight: ["300", "400", "500", "600"], subsets: ["latin"] });
+// AAA-UI-DM-WEB-001: the approved persona-page tab design specifies Inter, not Geist —
+// registered the same way as the fonts above (no .variable/.className applied here; next/font
+// still makes the family available by name globally, same as how IBM Plex Sans is referenced
+// elsewhere via a plain fontFamily string).
+const _inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   // Without this, Next.js can't resolve relative image paths (openGraph.images /
@@ -57,13 +63,24 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`font-sans antialiased`}>
-        {children}
-        <CookieConsent />
-        {/* Was an unconditional <Analytics />, which loaded before the visitor was asked.
-            The gate mounts it only once analytics consent is actually granted. */}
-        <AnalyticsGate />
+        {/* attribute="class" toggles the matching class (.dark / .purple) on <html> — the
+            mechanism globals.css's @custom-variant dark/purple (&:is(.x *)) already expect, so
+            dark:/purple: utilities just work once added. Three themes, not the usual two: light
+            plus two distinct dark variants (a conventional black one and a brand-purple one)
+            for the client to choose between. enableSystem is off: this is a demo toggle, not a
+            real OS-preference-following feature yet, so it should start deterministically on
+            light rather than silently differing by visitor. suppressHydrationWarning above is
+            required by next-themes — it sets the class via an inline script before React
+            hydrates, which would otherwise be flagged as a mismatch. */}
+        <ThemeProvider attribute="class" themes={["light", "dark", "purple"]} defaultTheme="light" enableSystem={false}>
+          {children}
+          <CookieConsent />
+          {/* Was an unconditional <Analytics />, which loaded before the visitor was asked.
+              The gate mounts it only once analytics consent is actually granted. */}
+          <AnalyticsGate />
+        </ThemeProvider>
       </body>
     </html>
   )

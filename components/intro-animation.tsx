@@ -23,7 +23,9 @@ type Phase = "idle" | "in" | "out" | "done"
 
 // Every value below is read directly off the reference build's live DOM/stylesheet
 // (https://aiactangel.netlify.app/) rather than inferred from screenshots — bubble sizes,
-// both waypoints, icon glyph sizes and the timing are all verbatim.
+// both waypoints, icon glyph sizes and the timing are all verbatim. Not rendered any more (the
+// icon-cluster phase was replaced by the closing line below) and no longer feeds any timing
+// calculation — kept only as reference measurements in case that phase is ever revived.
 //
 // Two things earlier guesses got wrong: the stagger IS perfectly uniform (172.5ms), and the
 // scattered look comes entirely from the varied bubble SIZES and the irregular waypoint
@@ -56,27 +58,30 @@ const BUBBLES: Bubble[] = [
     icon: <polyline points="20 6 9 17 4 12" strokeWidth="2" /> }, // check
 ]
 
-// Hub orb timing, also verbatim from the reference.
+// Hub orb timing, also verbatim from the reference. Not rendered any more (the icon-cluster
+// phase was replaced by the closing line below) and no longer feeds any timing calculation —
+// kept only as reference measurements in case that phase is ever revived.
 const ORB_SIZE        = 101
 const ORB_IN_DUR      = 575
 const ORB_MORPH_DELAY = 3507.5
 const ORB_MORPH_DUR   = 690
 
-// Closing line. Its fade-in deliberately overlaps the orb's morph (3507.5-4197.5ms) so the
-// orb collapsing and the text arriving read as one handoff rather than two separate beats.
-// TEXT_HOLD is measured from the reference: it sits fully visible ~1.6s before the intro ends.
-const TEXT_DELAY = 3852.5
-const TEXT_DUR   = 690
-const TEXT_HOLD  = 1600
+// Closing line. TEXT_DELAY is pinned to ICONS_START (the moment the wordmark finishes fading
+// out) plus a near-zero gap, so the handoff between the two animations reads as continuous
+// rather than a dead pause. TEXT_DUR + TEXT_HOLD is the headline's total on-screen time
+// (fade-in, then holding fully visible) — 1500ms total, by explicit request.
+const TEXT_DELAY = ICONS_START + 10
+const TEXT_DUR   = 300
+const TEXT_HOLD  = 1200
 
-// Phase ends when the last thing on screen is done — now the closing line, not the orb.
-const ICONS_TOTAL = Math.max(
-  BUBBLE_DELAY0 + BUBBLE_STAGGER * (BUBBLES.length - 1) + BUBBLE_DUR,
-  ORB_MORPH_DELAY + ORB_MORPH_DUR,
-  TEXT_DELAY + TEXT_DUR + TEXT_HOLD,
-)
+// When setPhase("in") actually fires (see the effect below). CURTAIN_DELAY needs this because
+// TEXT_DELAY above is itself counted from that same moment — it's a CSS animation-delay on an
+// element that first mounts the instant phase leaves "idle", not from component mount.
+const PHASE_IN_START = 80
 
-const CURTAIN_DELAY      = ICONS_START + ICONS_TOTAL + 100
+// Curtain starts lifting once the headline has finished its whole on-screen run (fade-in +
+// hold) — BUBBLE_*/ORB_* above no longer factor in here since nothing renders them.
+const CURTAIN_DELAY      = PHASE_IN_START + TEXT_DELAY + TEXT_DUR + TEXT_HOLD + 100
 const CURTAIN_DURATION   = 1300  // matches the CSS transition on the curtain div
 const ANIM_TOTAL         = CURTAIN_DELAY + CURTAIN_DURATION + 400
 
@@ -137,7 +142,7 @@ export function IntroAnimation({ onDone }: { onDone: () => void }) {
     // Tiny delay so the browser has painted before we start transitioning.
     // The second icon-cluster phase is removed completely, so the final headline starts
     // immediately after the wordmark exits and there is no blank gap in the middle.
-    const t0 = setTimeout(() => setPhase("in"), 80)
+    const t0 = setTimeout(() => setPhase("in"), PHASE_IN_START)
     const t1 = setTimeout(() => setPhase("out"), LETTERS_IN_TOTAL)
     const t3 = setTimeout(() => setCurtainUp(true), CURTAIN_DELAY)
     const t4 = setTimeout(() => onDone(), HERO_REVEAL_MS)
@@ -161,17 +166,17 @@ export function IntroAnimation({ onDone }: { onDone: () => void }) {
   return (
     <div className="fixed inset-0 z-[100] pointer-events-none" aria-hidden="true">
 
-      {/* Gradient curtain — retracts upward, revealing mountains from bottom */}
+      {/* Gradient curtain — retracts upward, revealing mountains from bottom. Background is a
+          className, not the inline style below, so dark:/purple: can reach it — matches
+          whichever page background it's about to reveal (next-themes sets .dark/.purple on
+          <html> synchronously before hydration, so this is correct from the very first paint,
+          no flash of the wrong colour). White on light: the reference's intro backdrop was
+          pure white, kept as the light-theme default. */}
       <div
-        className="absolute inset-x-0 top-0"
+        className="absolute inset-x-0 top-0 bg-white dark:bg-[#0a0a0a] purple:bg-[#12103C]"
         style={{
           bottom: curtainUp ? "100%" : "0%",
           transition: curtainUp ? "bottom 1.3s cubic-bezier(0.76, 0, 0.24, 1)" : "none",
-          // White, not the page's #F5F4F0 — the reference's intro backdrop is pure white, and
-          // it has to be: the orb is #F4F4F4, so on an off-white curtain it's the same colour
-          // as its own background and simply doesn't read. The semi-transparent bubbles also
-          // composite to the reference's exact greys only over white.
-          background: "#FFFFFF",
         }}
       />
 
@@ -216,7 +221,7 @@ export function IntroAnimation({ onDone }: { onDone: () => void }) {
                 return (
                   <span
                     key={li}
-                    className="font-sans font-bold text-[#111] leading-none select-none uppercase"
+                    className="font-sans font-bold text-[#111] dark:text-white purple:text-[#F6F4FF] leading-none select-none uppercase"
                     style={{
                       fontSize: `calc((100vw - 64px) / ${REAL_LETTERS})`,
                       letterSpacing: "0.05em",
@@ -246,7 +251,7 @@ export function IntroAnimation({ onDone }: { onDone: () => void }) {
           HERO_REVEAL_MS, so this always clears the text before the homepage is visible. */}
       {phase !== "idle" && !curtainUp && (
         <h1
-          className="absolute left-1/2 font-sans text-[#111] text-center m-0 flex flex-col items-center"
+          className="absolute left-1/2 font-sans text-[#111] dark:text-white purple:text-[#F6F4FF] text-center m-0 flex flex-col items-center"
           style={{
             top: "50%",
             width: 780,

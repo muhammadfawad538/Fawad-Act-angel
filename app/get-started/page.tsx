@@ -12,11 +12,12 @@ export const metadata: Metadata = {
 // The same lead-capture flow that used to live only in a popup (components/meet-your-angel-popup.tsx,
 // still intact for later reactivation) — every "Get Started" CTA on the site now links here
 // instead of opening that modal.
-// ?source=<tag> (currently only "hope-angel", set by the Hope Angel page's CTA) is threaded
-// through to the intake webhook, so the outbound call/WhatsApp opens in the right voice from
-// the first word instead of the model having to infer it mid-conversation. Any other/missing
-// value is dropped rather than forwarded, so this can't be used to inject arbitrary text.
-const KNOWN_SOURCES = ["hope-angel"]
+// ?source=<tag>, set by each of the 5 Hire-an-Angel persona pages' own CTA buttons
+// (lib/personas.ts's ctaHref/closingCtaHref), is threaded through to the intake webhook, so the
+// outbound call/WhatsApp opens in the right voice from the first word instead of the model
+// having to infer it mid-conversation. Any other/missing value is dropped rather than forwarded,
+// so this can't be used to inject arbitrary text.
+const KNOWN_SOURCES = ["sales", "service", "hr", "assistance", "hope-angel"]
 
 export default async function GetStartedPage({
   searchParams,
@@ -34,7 +35,7 @@ export default async function GetStartedPage({
   // pt-28 is a floor, not a centering input — justify-center can't push content above it, which
   // is what keeps the heading from sliding up under the fixed nav on short-content viewports.
   return (
-    <div className="bg-[#F5F4F0] text-[#111] min-h-screen flex flex-col font-sans antialiased">
+    <div className="bg-[#F5F4F0] text-[#111] dark:bg-[#0a0a0a] dark:text-white purple:bg-[#12103C] purple:text-[#F6F4FF] min-h-screen flex flex-col font-sans antialiased">
       <SiteHeader />
 
       <div className="flex-1 flex flex-col justify-center px-6 md:px-12 lg:px-20 pt-28 pb-12">
@@ -43,7 +44,7 @@ export default async function GetStartedPage({
             Meet Your Angel
           </h1>
 
-          <div className="mt-10 bg-white border border-black/[0.08] rounded-2xl p-6">
+          <div className="mt-10 bg-white border border-black/[0.08] dark:bg-white/[0.04] dark:border-white/10 purple:bg-[#1C1A56] purple:border-[#B79CFF]/15 rounded-2xl p-6">
             <MeetYourAngelForm source={source} />
           </div>
         </main>

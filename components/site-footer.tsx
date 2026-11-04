@@ -9,7 +9,7 @@ export function SiteFooter() {
   return (
     <footer
       id="contact"
-      className="py-10 px-6 md:px-12 lg:px-20 border-t border-black/[0.06]"
+      className="py-10 px-6 md:px-12 lg:px-20 border-t border-black/[0.06] dark:border-white/10 purple:border-[#B79CFF]/15 dark:bg-[#0a0a0a] purple:bg-[#12103C]"
     >
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-8">
         <Link
@@ -21,15 +21,15 @@ export function SiteFooter() {
             src="/images/logo.png"
             alt=""
             aria-hidden="true"
-            className="h-10 w-auto"
+            className="h-10 w-auto dark:brightness-0 dark:invert purple:brightness-0 purple:invert"
           />
         </Link>
-        <a href="#m" className="text-sm text-black/55 hover:text-black/70 transition-colors tracking-widest">
+        <a href="#m" className="text-sm text-black/55 hover:text-black/70 dark:text-white/55 dark:hover:text-white/75 purple:text-[#ABA6D9] purple:hover:text-[#F6F4FF] transition-colors tracking-widest">
           One Boston Place, # 2600, Boston, MA, 02108
         </a>
         <a
           href="mailto:Hello@ActAngel.com"
-          className="text-sm text-[gray] font-medium underline underline-offset-2 hover:text-black/70 transition-colors tracking-widest"
+          className="text-sm text-[gray] font-medium underline underline-offset-2 hover:text-black/70 dark:text-white/60 dark:hover:text-white/80 purple:text-[#ABA6D9] purple:hover:text-[#F6F4FF] transition-colors tracking-widest"
         >
           Hello@ActAngel.com
         </a>
@@ -40,27 +40,27 @@ export function SiteFooter() {
           stacked on small screens — column-reverse renders the last DOM child (the links)
           first, while md:flex-row switches back to plain left-to-right, so the copyright
           (first in DOM) stays below the links. Same trick, no JS. */}
-      <div className="max-w-6xl mx-auto mt-8 pt-6 border-t border-black/[0.04] flex flex-col-reverse md:flex-row md:items-center md:justify-between gap-4">
-        <span className="text-sm text-black/55">© 2026 Act Angel AI, Inc.</span>
+      <div className="max-w-6xl mx-auto mt-8 pt-6 border-t border-black/[0.04] dark:border-white/10 purple:border-[#B79CFF]/15 flex flex-col-reverse md:flex-row md:items-center md:justify-between gap-4">
+        <span className="text-sm text-black/55 dark:text-white/55 purple:text-[#ABA6D9]">© 2026 Act Angel AI, Inc.</span>
         <div className="flex flex-wrap items-center justify-start md:justify-end gap-x-6 gap-y-2">
           <a
             href="/privacy"
             target="_blank"
-            className="text-sm text-black/55 hover:text-black/70 transition-colors tracking-widest"
+            className="text-sm text-black/55 hover:text-black/70 dark:text-white/55 dark:hover:text-white/75 purple:text-[#ABA6D9] purple:hover:text-[#F6F4FF] transition-colors tracking-widest"
           >
             Privacy Policy
           </a>
           <a
             href="/terms"
             target="_blank"
-            className="text-sm text-black/55 hover:text-black/70 transition-colors tracking-widest"
+            className="text-sm text-black/55 hover:text-black/70 dark:text-white/55 dark:hover:text-white/75 purple:text-[#ABA6D9] purple:hover:text-[#F6F4FF] transition-colors tracking-widest"
           >
             Terms &amp; Conditions
           </a>
           <a
             href="/cookies"
             target="_blank"
-            className="text-sm text-black/55 hover:text-black/70 transition-colors tracking-widest"
+            className="text-sm text-black/55 hover:text-black/70 dark:text-white/55 dark:hover:text-white/75 purple:text-[#ABA6D9] purple:hover:text-[#F6F4FF] transition-colors tracking-widest"
           >
             Cookies Policy
           </a>

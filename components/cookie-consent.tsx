@@ -65,9 +65,9 @@ export function CookieConsent() {
           // z-40 deliberately: Radix dialogs (overlay and content alike) sit at z-50, so a
           // higher value here would paint the banner over the preferences modal. 40 still
           // clears all page content, which tops out at z-30.
-          className="fixed inset-x-0 bottom-0 z-40 border-t border-black/[0.08]"
+          className="fixed inset-x-0 bottom-0 z-40 border-t border-black/[0.08] dark:border-white/10 purple:border-[#B79CFF]/15"
           style={{
-            background: "rgba(255,255,255,0.92)",
+            background: "var(--cookie-banner-bg)",
             backdropFilter: "blur(16px)",
             WebkitBackdropFilter: "blur(16px)",
             boxShadow: "0 -10px 30px -12px rgba(0,0,0,0.12)",
@@ -75,13 +75,13 @@ export function CookieConsent() {
         >
           <div className="max-w-6xl mx-auto px-6 md:px-12 py-6 flex flex-col lg:flex-row lg:items-center gap-5 lg:gap-10">
             <div className="flex-1">
-              <p className="text-[15px] font-medium text-[#111]">We value your privacy</p>
-              <p className="mt-2 text-[13px] leading-relaxed text-black/55">
+              <p className="text-[15px] font-medium text-[#111] dark:text-white purple:text-[#F6F4FF]">We value your privacy</p>
+              <p className="mt-2 text-[13px] leading-relaxed text-black/55 dark:text-white/65 purple:text-[#ABA6D9]">
                 We use cookies to give you the best experience on our site — to remember your
                 preferences, understand how the site is used, and improve it. Click
                 &ldquo;Accept All&rdquo; to agree to all cookies, or &ldquo;Customize&rdquo; to
                 choose which categories you allow. For more detail, see our{" "}
-                <a href="/cookies" target="_blank" className="underline underline-offset-2 hover:text-[#111] transition-colors">
+                <a href="/cookies" target="_blank" className="underline underline-offset-2 hover:text-[#111] dark:hover:text-white purple:hover:text-[#F6F4FF] transition-colors">
                   Cookies Policy
                 </a>
                 .
@@ -91,19 +91,19 @@ export function CookieConsent() {
             <div className="flex flex-wrap items-center gap-2 shrink-0">
               <button
                 onClick={() => setShowPrefs(true)}
-                className="px-5 py-2.5 text-[13px] font-medium rounded-full border border-black/15 text-[#111] hover:border-black/30 hover:bg-black/[0.03] transition-colors cursor-pointer"
+                className="px-5 py-2.5 text-[13px] font-medium rounded-full border border-black/15 text-[#111] hover:border-black/30 hover:bg-black/[0.03] dark:border-white/20 dark:text-white dark:hover:border-white/40 dark:hover:bg-white/10 purple:border-[#B79CFF]/25 purple:text-[#F6F4FF] purple:hover:border-[#B79CFF]/50 purple:hover:bg-[#7C5CFF]/10 transition-colors cursor-pointer"
               >
                 Customize
               </button>
               <button
                 onClick={() => { rejectAll(); close() }}
-                className="px-5 py-2.5 text-[13px] font-medium rounded-full border border-black/15 text-[#111] hover:border-black/30 hover:bg-black/[0.03] transition-colors cursor-pointer"
+                className="px-5 py-2.5 text-[13px] font-medium rounded-full border border-black/15 text-[#111] hover:border-black/30 hover:bg-black/[0.03] dark:border-white/20 dark:text-white dark:hover:border-white/40 dark:hover:bg-white/10 purple:border-[#B79CFF]/25 purple:text-[#F6F4FF] purple:hover:border-[#B79CFF]/50 purple:hover:bg-[#7C5CFF]/10 transition-colors cursor-pointer"
               >
                 Reject All
               </button>
               <button
                 onClick={() => { acceptAll(); close() }}
-                className="px-5 py-2.5 text-[13px] font-medium rounded-full bg-[#111] text-white hover:bg-[#333] transition-colors cursor-pointer"
+                className="px-5 py-2.5 text-[13px] font-medium rounded-full bg-[#111] text-white hover:bg-[#333] dark:bg-white dark:text-black dark:hover:bg-white/85 purple:bg-[#7C5CFF] purple:hover:bg-[#8F72FF] transition-colors cursor-pointer"
               >
                 Accept All
               </button>
@@ -114,12 +114,12 @@ export function CookieConsent() {
 
       <Dialog open={showPrefs} onOpenChange={setShowPrefs}>
         <DialogContent
-          className="bg-white border-none p-8 gap-0 overflow-y-auto themed-scrollbar"
+          className="bg-white border-none p-8 gap-0 overflow-y-auto themed-scrollbar dark:bg-[#0a0a0a] dark:border dark:border-white/10 purple:bg-[#1C1A56] purple:border purple:border-[#B79CFF]/15"
           style={{ width: 524, maxWidth: "100%", borderRadius: 20, maxHeight: "90vh" }}
         >
           <DialogHeader className="p-0 space-y-0">
             <DialogTitle
-              className="text-[20px] font-medium tracking-tight text-[#111] text-left"
+              className="text-[20px] font-medium tracking-tight text-[#111] dark:text-white purple:text-[#F6F4FF] text-left"
               style={{ lineHeight: "27px" }}
             >
               Cookie Preferences
@@ -129,7 +129,7 @@ export function CookieConsent() {
             </DialogDescription>
           </DialogHeader>
 
-          <p className="mt-3 text-[13px] leading-relaxed text-black/55">
+          <p className="mt-3 text-[13px] leading-relaxed text-black/55 dark:text-white/65 purple:text-[#ABA6D9]">
             Necessary cookies are always on because the site cannot work without them.
             Everything else is off unless you turn it on.
           </p>
@@ -139,12 +139,12 @@ export function CookieConsent() {
               const locked = !!cat.locked
               const on = locked || choice[cat.id as OptionalCategory]
               return (
-                <div key={cat.id} className="rounded-2xl border border-black/[0.08] p-4">
+                <div key={cat.id} className="rounded-2xl border border-black/[0.08] dark:border-white/10 purple:border-[#B79CFF]/15 p-4">
                   <div className="flex items-start justify-between gap-4">
-                    <span className="text-[14px] font-medium text-[#111]">{cat.label}</span>
+                    <span className="text-[14px] font-medium text-[#111] dark:text-white purple:text-[#F6F4FF]">{cat.label}</span>
 
                     {locked ? (
-                      <span className="text-[12px] font-medium text-black/40 shrink-0 pt-1">
+                      <span className="text-[12px] font-medium text-black/40 dark:text-white/45 purple:text-[#716C9E] shrink-0 pt-1">
                         Always Active
                       </span>
                     ) : (
@@ -157,7 +157,7 @@ export function CookieConsent() {
                           setChoice(c => ({ ...c, [cat.id as OptionalCategory]: !c[cat.id as OptionalCategory] }))
                         }
                         className="relative shrink-0 rounded-full transition-colors duration-200 cursor-pointer"
-                        style={{ width: 40, height: 24, background: on ? "#111" : "rgba(0,0,0,0.15)" }}
+                        style={{ width: 40, height: 24, background: on ? "var(--toggle-on-bg)" : "var(--toggle-off-bg)" }}
                       >
                         <span
                           className="absolute top-[3px] bg-white rounded-full transition-all duration-200"
@@ -166,7 +166,7 @@ export function CookieConsent() {
                       </button>
                     )}
                   </div>
-                  <p className="mt-2 text-[12px] leading-relaxed text-black/50">{cat.description}</p>
+                  <p className="mt-2 text-[12px] leading-relaxed text-black/50 dark:text-white/55 purple:text-[#ABA6D9]">{cat.description}</p>
                 </div>
               )
             })}
@@ -178,13 +178,13 @@ export function CookieConsent() {
           <div className="mt-6 flex flex-wrap gap-2">
             <button
               onClick={() => { setChoice(ALL_OFF); rejectAll(); close() }}
-              className="flex-1 min-w-[120px] px-4 py-2 text-[12px] font-medium whitespace-nowrap rounded-full border border-black/15 text-[#111] hover:border-black/30 hover:bg-black/[0.03] transition-colors cursor-pointer"
+              className="flex-1 min-w-[120px] px-4 py-2 text-[12px] font-medium whitespace-nowrap rounded-full border border-black/15 text-[#111] hover:border-black/30 hover:bg-black/[0.03] dark:border-white/20 dark:text-white dark:hover:border-white/40 dark:hover:bg-white/10 purple:border-[#B79CFF]/25 purple:text-[#F6F4FF] purple:hover:border-[#B79CFF]/50 purple:hover:bg-[#7C5CFF]/10 transition-colors cursor-pointer"
             >
               Reject All
             </button>
             <button
               onClick={() => { saveConsent(choice); close() }}
-              className="flex-1 min-w-[120px] px-4 py-2 text-[12px] font-medium whitespace-nowrap rounded-full border border-black/15 text-[#111] hover:border-black/30 hover:bg-black/[0.03] transition-colors cursor-pointer"
+              className="flex-1 min-w-[120px] px-4 py-2 text-[12px] font-medium whitespace-nowrap rounded-full border border-black/15 text-[#111] hover:border-black/30 hover:bg-black/[0.03] dark:border-white/20 dark:text-white dark:hover:border-white/40 dark:hover:bg-white/10 purple:border-[#B79CFF]/25 purple:text-[#F6F4FF] purple:hover:border-[#B79CFF]/50 purple:hover:bg-[#7C5CFF]/10 transition-colors cursor-pointer"
             >
               Save Preferences
             </button>
@@ -194,7 +194,7 @@ export function CookieConsent() {
                 acceptAll()
                 close()
               }}
-              className="flex-1 min-w-[120px] px-4 py-2 text-[12px] font-medium whitespace-nowrap rounded-full bg-[#111] text-white hover:bg-[#333] transition-colors cursor-pointer"
+              className="flex-1 min-w-[120px] px-4 py-2 text-[12px] font-medium whitespace-nowrap rounded-full bg-[#111] text-white hover:bg-[#333] dark:bg-white dark:text-black dark:hover:bg-white/85 purple:bg-[#7C5CFF] purple:hover:bg-[#8F72FF] transition-colors cursor-pointer"
             >
               Accept All
             </button>

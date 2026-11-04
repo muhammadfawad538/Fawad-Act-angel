@@ -33,19 +33,19 @@ const FALLBACK_PRIORITIES = [
 ];
 
 const baseFieldClass =
-  "bg-white border rounded-xl px-4 py-3 text-sm text-[#111] placeholder:text-black/25 focus:outline-none focus:ring-2 transition-colors w-full";
+  "bg-white border rounded-xl px-4 py-3 text-sm text-[#111] placeholder:text-black/25 focus:outline-none focus:ring-2 transition-colors w-full dark:bg-white/[0.06] dark:text-white dark:placeholder:text-white/30 purple:bg-[#12103C]/50 purple:text-[#F6F4FF] purple:placeholder:text-[#ABA6D9]/50";
 const okBorder =
-  "border-black/10 focus:border-[#5D4387] focus:ring-[#5D4387]/20";
+  "border-black/10 focus:border-[#5D4387] focus:ring-[#5D4387]/20 dark:border-white/15 dark:focus:border-white/40 dark:focus:ring-white/20 purple:border-[#B79CFF]/20 purple:focus:border-[#7C5CFF]/60 purple:focus:ring-[#7C5CFF]/20";
 const errorBorder = "border-red-400 focus:border-red-500 focus:ring-red-500/20";
 function fieldClass(hasError: boolean) {
   return `${baseFieldClass} ${hasError ? errorBorder : okBorder}`;
 }
 const requiredLabelClass =
-  "text-sm font-semibold text-[#111] after:content-['_*'] after:text-red-500 after:font-normal";
+  "text-sm font-semibold text-[#111] after:content-['_*'] after:text-red-500 after:font-normal dark:text-white purple:text-[#F6F4FF]";
 const optionalLabelClass =
-  "text-sm font-semibold text-[#111] after:content-['_optional'] after:text-black/35 after:font-normal after:text-xs";
+  "text-sm font-semibold text-[#111] after:content-['_optional'] after:text-black/35 after:font-normal after:text-xs dark:text-white dark:after:text-white/45 purple:text-[#F6F4FF] purple:after:text-[#716C9E]";
 const primaryButtonClass =
-  "w-full px-6 py-3 bg-[#5D4387] text-white text-[12px] font-semibold uppercase rounded-full hover:bg-[#7168A0] transition-colors tracking-wide disabled:opacity-50 disabled:cursor-not-allowed";
+  "w-full px-6 py-3 bg-[#5D4387] text-white text-[12px] font-semibold uppercase rounded-full hover:bg-[#7168A0] transition-colors tracking-wide disabled:opacity-50 disabled:cursor-not-allowed dark:bg-white dark:text-black dark:hover:bg-white/85 purple:bg-[#7C5CFF] purple:hover:bg-[#8F72FF]";
 
 const MISSION_EMAIL = "Hello@ActAngel.com";
 
@@ -147,7 +147,7 @@ function TruncatedOptionText({ text }: { text: string }) {
 
 function FieldError({ message }: { message?: string }) {
   if (!message) return null;
-  return <p className="mt-1.5 text-xs text-red-600">{message}</p>;
+  return <p className="mt-1.5 text-xs text-red-600 dark:text-red-400 purple:text-red-400">{message}</p>;
 }
 
 // AAA-HA-002: the form kept all entered values in plain component state only, so navigating
@@ -422,20 +422,20 @@ export function ShareYourMissionForm() {
   if (ready) {
     return (
       <div className="flex flex-col items-center text-center gap-3 py-2">
-        <div className="w-12 h-12 rounded-full bg-emerald-50 border border-emerald-600/20 text-emerald-600 flex items-center justify-center text-xl">
+        <div className="w-12 h-12 rounded-full bg-emerald-50 border border-emerald-600/20 text-emerald-600 dark:bg-emerald-500/15 dark:border-emerald-500/30 dark:text-emerald-400 purple:bg-emerald-500/15 purple:border-emerald-500/30 purple:text-emerald-400 flex items-center justify-center text-xl">
           ✓
         </div>
         <h3 className="text-lg font-medium">Your brief is ready to send.</h3>
-        <p className="text-sm text-black/55 max-w-sm">
+        <p className="text-sm text-black/55 dark:text-white/65 purple:text-[#ABA6D9] max-w-sm">
           Please send the prepared email to{" "}
           <a
             href={`mailto:${MISSION_EMAIL}`}
-            className="underline hover:text-black/70"
+            className="underline hover:text-black/70 dark:hover:text-white purple:hover:text-[#F6F4FF]"
           >
             {MISSION_EMAIL}
           </a>
           . Once sent, you may meet an Angel through our{" "}
-          <Link href="/get-started" className="underline hover:text-black/70">
+          <Link href="/get-started" className="underline hover:text-black/70 dark:hover:text-white purple:hover:text-[#F6F4FF]">
             Get Started
           </Link>{" "}
           page. Our team will review your organization before offering Hope
@@ -454,7 +454,7 @@ export function ShareYourMissionForm() {
   return (
     <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-8">
       <div>
-        <h2 className="text-base font-semibold text-[#111]">
+        <h2 className="text-base font-semibold text-[#111] dark:text-white purple:text-[#F6F4FF]">
           Your organization
         </h2>
         <div className="mt-5 grid [@media(min-width:1180px)]:grid-cols-2 gap-x-4 gap-y-4">
@@ -590,7 +590,7 @@ export function ShareYourMissionForm() {
       </div>
 
       <div>
-        <h2 className="text-base font-semibold text-[#111]">
+        <h2 className="text-base font-semibold text-[#111] dark:text-white purple:text-[#F6F4FF]">
           How Hope Angel could help
         </h2>
         <div className="mt-5 grid [@media(min-width:1180px)]:grid-cols-2 gap-x-4 gap-y-4">
@@ -628,7 +628,7 @@ export function ShareYourMissionForm() {
                     other styling. */}
                 <SelectTrigger
                   onBlur={() => handleBlur("priority")}
-                  className={`${fieldClass(!!fieldErrors.priority)} h-auto data-[size=default]:h-auto font-normal overflow-hidden whitespace-normal *:data-[slot=select-value]:min-w-0 *:data-[slot=select-value]:max-w-full focus-visible:border-[#5D4387] focus-visible:ring-[#5D4387]/20`}
+                  className={`${fieldClass(!!fieldErrors.priority)} h-auto data-[size=default]:h-auto font-normal overflow-hidden whitespace-normal *:data-[slot=select-value]:min-w-0 *:data-[slot=select-value]:max-w-full focus-visible:border-[#5D4387] focus-visible:ring-[#5D4387]/20 dark:focus-visible:border-white/40 dark:focus-visible:ring-white/20 purple:focus-visible:border-[#7C5CFF]/60 purple:focus-visible:ring-[#7C5CFF]/20`}
                 >
                   <SelectValue placeholder="Select one" />
                 </SelectTrigger>
@@ -637,13 +637,13 @@ export function ShareYourMissionForm() {
                 side="bottom"
                 avoidCollisions={false}
                 style={priorityTriggerWidth ? { width: priorityTriggerWidth } : undefined}
-                className="rounded-xl border-black/10 shadow-lg"
+                className="rounded-xl border-black/10 shadow-lg dark:bg-[#0a0a0a] dark:border-white/10 dark:text-white purple:bg-[#1C1A56] purple:border-[#B79CFF]/15 purple:text-[#F6F4FF]"
               >
                 {priorityOptions.map((p) => (
                   <SelectItem
                     key={p}
                     value={p}
-                    className="cursor-pointer rounded-lg text-sm focus:bg-[#5D4387]/10 focus:text-[#5D4387] data-[state=checked]:font-medium data-[state=checked]:text-[#5D4387] [&_svg:not([class*='text-'])]:text-[#5D4387]"
+                    className="cursor-pointer rounded-lg text-sm focus:bg-[#5D4387]/10 focus:text-[#5D4387] data-[state=checked]:font-medium data-[state=checked]:text-[#5D4387] [&_svg:not([class*='text-'])]:text-[#5D4387] dark:focus:bg-white/10 dark:focus:text-white dark:data-[state=checked]:text-white dark:[&_svg:not([class*='text-'])]:text-white purple:focus:bg-[#7C5CFF]/15 purple:focus:text-[#B79CFF] purple:data-[state=checked]:text-[#B79CFF] purple:[&_svg:not([class*='text-'])]:text-[#B79CFF]"
                   >
                     <TruncatedOptionText text={p} />
                   </SelectItem>
@@ -699,7 +699,7 @@ export function ShareYourMissionForm() {
       </div>
 
       <div>
-        <h2 className="text-base font-semibold text-[#111]">
+        <h2 className="text-base font-semibold text-[#111] dark:text-white purple:text-[#F6F4FF]">
           Who we can contact
         </h2>
         <div className="mt-5 grid [@media(min-width:1180px)]:grid-cols-2 gap-x-4 gap-y-4">
@@ -755,7 +755,7 @@ export function ShareYourMissionForm() {
         </div>
       </div>
       <div className="flex flex-col gap-4">
-        <label className="flex items-start gap-2 text-[14px] text-black/55 leading-snug">
+        <label className="flex items-start gap-2 text-[14px] text-black/55 dark:text-white/65 purple:text-[#ABA6D9] leading-snug">
           <input
             type="checkbox"
             checked={authorized}
@@ -768,16 +768,16 @@ export function ShareYourMissionForm() {
           eligibility, authenticity, and ethical review.
         </label>
 
-        {error && <div className="text-xs text-red-600">{error}</div>}
+        {error && <div className="text-xs text-red-600 dark:text-red-400 purple:text-red-400">{error}</div>}
 
-        <p className="text-[10.5px] leading-tight text-black/60">
+        <p className="text-[10.5px] leading-tight text-black/60 dark:text-white/45 purple:text-[#716C9E]">
           We use these details to review your enquiry and contact you. Please do
           not include personal information about beneficiaries or confidential
           financial records. See our{" "}
           <Link
             href="/privacy"
             target="_blank"
-            className="underline hover:text-black/60"
+            className="underline hover:text-black/60 dark:hover:text-white purple:hover:text-[#F6F4FF]"
           >
             Privacy Policy
           </Link>
@@ -791,7 +791,7 @@ export function ShareYourMissionForm() {
           Prepare My Mission Brief
         </button>
 
-        <p className="text-[10.5px] leading-tight text-black/60 text-center">
+        <p className="text-[10.5px] leading-tight text-black/60 dark:text-white/45 purple:text-[#716C9E] text-center">
           Your email app will open with this brief addressed to Act Angel AI.
           Send the email to complete your enquiry.
         </p>
