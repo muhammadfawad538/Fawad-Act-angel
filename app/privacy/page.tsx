@@ -121,7 +121,7 @@ export default function PrivacyPage() {
               </li>
               <li>Create or update calendar events when authorized.</li>
               <li>Operate, maintain, and secure our services.</li>
-              <li>Meet applicable legal and regulatory obligations.1</li>
+              <li>Meet applicable legal and regulatory obligations.</li>
             </ul>
           </Section>
 
