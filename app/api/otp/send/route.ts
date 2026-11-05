@@ -5,8 +5,15 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // Abuse protection added after the 5 Nov 2026 incident, when a script called
 // this route directly and sent 1,638 SMS codes to Uzbek and Belarusian numbers.
-// Only the countries we serve can get a code: US/Canada, India, Pakistan.
-const ALLOWED_COUNTRY_PREFIXES = ["+1", "+91", "+92"];
+// Only the countries we serve can get a code (Dhiraj's list, 5 Nov 2026):
+// US/Canada, India, Pakistan, UAE, Singapore, Thailand, UK, Germany, France,
+// Australia, Philippines, Malaysia, Saudi Arabia, Qatar, Jordan, Austria,
+// Lebanon, Egypt. Twilio's geo permissions are set to the same list, which
+// also blocks the non US/Canada countries that share the +1 code.
+const ALLOWED_COUNTRY_PREFIXES = [
+  "+1", "+91", "+92", "+971", "+65", "+66", "+44", "+49", "+33",
+  "+61", "+63", "+60", "+966", "+974", "+962", "+43", "+961", "+20",
+];
 
 function allowedCountry(phone: string): boolean {
   return ALLOWED_COUNTRY_PREFIXES.some((prefix) => phone.startsWith(prefix));
@@ -118,7 +125,7 @@ export async function POST(request: NextRequest) {
   }
   if (!allowedCountry(phone)) {
     return NextResponse.json(
-      { error: "We can only send codes to US, Canada, India and Pakistan numbers right now." },
+      { error: "Sorry, we're not providing our services in your country yet." },
       { status: 400 }
     );
   }
