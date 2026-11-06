@@ -3,6 +3,33 @@ import { normalizePhone } from "@/lib/phone";
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// Abuse protection added after the 5 Nov 2026 incident, when a script called
+// this route directly and sent 1,638 SMS codes to Uzbek and Belarusian numbers.
+// Only the countries we serve can get a code (Dhiraj's list, 5 Nov 2026):
+// US/Canada, India, Pakistan, UAE, Singapore, Thailand, UK, Germany, France,
+// Australia, Philippines, Malaysia, Saudi Arabia, Qatar, Jordan, Austria,
+// Lebanon, Egypt. Twilio's geo permissions are set to the same list, which
+// also blocks the non US/Canada countries that share the +1 code.
+const ALLOWED_COUNTRY_PREFIXES = [
+  "+1", "+91", "+92", "+971", "+65", "+66", "+44", "+49", "+33",
+  "+61", "+63", "+60", "+966", "+974", "+962", "+43", "+961", "+20",
+];
+
+function allowedCountry(phone: string): boolean {
+  return ALLOWED_COUNTRY_PREFIXES.some((prefix) => phone.startsWith(prefix));
+}
+
+// Vercel puts the real visitor IP first in x-forwarded-for.
+function clientIp(request: NextRequest): string {
+  const forwarded = request.headers.get("x-forwarded-for");
+  return forwarded?.split(",")[0]?.trim() || request.headers.get("x-real-ip") || "unknown";
+}
+
+// Thrown when Twilio Verify's Service Rate Limits (phone_number and
+// end_user_ip, configured on the Verify service in the Twilio console)
+// reject a send.
+class RateLimitedError extends Error {}
+
 // Not a true secret - this endpoint is called directly from a browser, so
 // whatever key is sent here is visible in that page's own network requests.
 // This only filters out generic internet noise; the real gate against abuse
@@ -29,7 +56,8 @@ async function startVerification(
   verifyServiceSid: string,
   to: string,
   channel: "sms" | "email",
-  previousSid?: string
+  previousSid?: string,
+  rateLimits?: Record<string, string>
 ): Promise<{ status: string; sid: string }> {
   const auth = Buffer.from(`${accountSid}:${authToken}`).toString("base64");
 
@@ -51,6 +79,7 @@ async function startVerification(
   }
 
   const params = new URLSearchParams({ To: to, Channel: channel });
+  if (rateLimits) params.set("RateLimits", JSON.stringify(rateLimits));
   const res = await fetch(
     `https://verify.twilio.com/v2/Services/${verifyServiceSid}/Verifications`,
     {
@@ -65,6 +94,9 @@ async function startVerification(
 
   const data = await res.json();
   if (!res.ok) {
+    if (res.status === 429) {
+      throw new RateLimitedError("Too many code requests. Please wait a while and try again.");
+    }
     const label = channel === "sms" ? "SMS" : "email";
     throw new Error(data.message ?? `Failed to send the ${label} verification code`);
   }
@@ -91,6 +123,12 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     );
   }
+  if (!allowedCountry(phone)) {
+    return NextResponse.json(
+      { error: "Sorry, we're not providing our services in your country yet." },
+      { status: 400 }
+    );
+  }
   if (!email || !EMAIL.test(email)) {
     return NextResponse.json({ error: "Please enter a valid email address" }, { status: 400 });
   }
@@ -106,10 +144,15 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const [phoneResult, emailResult] = await Promise.all([
-      startVerification(accountSid, authToken, verifyServiceSid, phone, "sms", body.previousPhoneSid),
-      startVerification(accountSid, authToken, verifyServiceSid, email, "email", body.previousEmailSid),
-    ]);
+    // SMS first, with the rate limit keys. The email code is only sent if
+    // the SMS was allowed, so a blocked request costs nothing on either channel.
+    const phoneResult = await startVerification(
+      accountSid, authToken, verifyServiceSid, phone, "sms", body.previousPhoneSid,
+      { phone_number: phone, end_user_ip: clientIp(request) }
+    );
+    const emailResult = await startVerification(
+      accountSid, authToken, verifyServiceSid, email, "email", body.previousEmailSid
+    );
     return NextResponse.json({
       phoneStatus: phoneResult.status,
       emailStatus: emailResult.status,
@@ -117,6 +160,9 @@ export async function POST(request: NextRequest) {
       emailSid: emailResult.sid,
     });
   } catch (err) {
+    if (err instanceof RateLimitedError) {
+      return NextResponse.json({ error: err.message }, { status: 429 });
+    }
     return NextResponse.json(
       { error: err instanceof Error ? err.message : "Failed to send verification codes" },
       { status: 502 }
