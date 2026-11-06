@@ -71,8 +71,16 @@ const NAV_DROPDOWN_STYLE = {
 // act_angel_frontend_backup's own nav, which sets this same system-ui stack on its links
 // rather than using the site's Geist font — applied as a class here (not inherited from a
 // wrapper) so it still reaches the dropdown popover, which portals outside the nav in the DOM.
+// purple: text pinned to plain white (text-white), matching NAV_CTA (Get Started)'s own
+// purple-mode text exactly — Get Started never changes its text color between rest and hover
+// (only its background does), so this sets the same white for both purple:text-white and
+// purple:hover:text-white rather than leaving hover unscoped, which would otherwise fall back
+// to the bare hover:text-[#111] above (that rule has no theme of its own, so it still applies
+// in purple mode) and shift the color on hover instead of keeping it constant as requested.
+// Shape/background intentionally untouched — these stay plain text links, not filled pills
+// like Get Started.
 const NAV_ITEM =
-  "text-[14px] font-medium text-[#4A4A4A] hover:text-[#111] transition-colors duration-200 [font-family:system-ui,-apple-system,sans-serif] dark:text-white/60 dark:hover:text-white purple:text-[#ABA6D9] purple:hover:text-[#F6F4FF]";
+  "text-[14px] font-medium text-[#4A4A4A] hover:text-[#111] transition-colors duration-200 [font-family:system-ui,-apple-system,sans-serif] dark:text-white/60 dark:hover:text-white purple:text-white purple:hover:text-white";
 
 // Nav pill buttons (requirements/Buttons_update_header.png): "Hire an Angel", "Behind the
 // Angels" and "Contact" are now outlined pills the same size as Get Started (46px tall, 12px
@@ -93,8 +101,11 @@ const NAV_ITEM =
 // background needed for that any more: AAA-UI-DM-WEB-002 moved --nav-bg itself to #1C1A56, so
 // a transparent pill already inherits the right effective background from the bar behind it.
 // Not extended to light theme — its near-black text already has very high contrast regardless.
+// purple: text pinned to plain white, matching NAV_CTA (Get Started)'s own purple-mode text
+// exactly (same color at rest and on hover — only background/border still change on hover).
+// Border/padding/shape left as-is: stays an outlined pill, not filled like Get Started.
 const NAV_PILL =
-  "inline-flex items-center justify-center gap-[6px] h-auto py-[9px] px-[18px] rounded-full border border-[#DADADA] hover:border-[#b8b8b8] text-[12px] font-medium uppercase tracking-[0.08em] text-[#111] whitespace-nowrap shrink-0 transition-colors duration-200 font-[Inter,sans-serif] dark:h-[46px] dark:py-0 dark:px-6 dark:font-sans dark:border-white/15 dark:hover:border-white/35 dark:text-white purple:h-auto purple:py-[9px] purple:px-[18px] purple:font-[Inter,sans-serif] purple:border-[#B79CFF]/25 purple:hover:border-[#B79CFF]/50 purple:text-[#ABA6D9] purple:hover:text-[#F6F4FF]";
+  "inline-flex items-center justify-center gap-[6px] h-auto py-[9px] px-[18px] rounded-full border border-[#DADADA] hover:border-[#b8b8b8] text-[12px] font-medium uppercase tracking-[0.08em] text-[#111] whitespace-nowrap shrink-0 transition-colors duration-200 font-[Inter,sans-serif] dark:h-[46px] dark:py-0 dark:px-6 dark:font-sans dark:border-white/15 dark:hover:border-white/35 dark:text-white purple:h-auto purple:py-[9px] purple:px-[18px] purple:font-[Inter,sans-serif] purple:border-[#B79CFF]/25 purple:hover:border-[#B79CFF]/50 purple:text-white purple:hover:text-white";
 
 // Get Started is filled — #5D4387 is a mid-tone step sampled from the logo icon's own gradient,
 // lightening to #7168A0 on hover (both from the reference screenshot).
