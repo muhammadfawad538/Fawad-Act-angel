@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { Sun, Moon } from "lucide-react";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
 // Cycles light → purple → light. Black theme is deliberately not in this list any more (client
 // is only being shown light/purple for now) — its CSS/dark: classes are all still fully intact
@@ -17,6 +18,13 @@ const THEME_ICON = { light: Moon, purple: Sun } as const;
 const THEME_LABEL = {
   light: "Switch to purple theme",
   purple: "Switch to light theme",
+} as const;
+// Visible tooltip text — the client calls the purple theme "Dark Theme", so this names the
+// theme a click switches TO (same destination the icon/aria-label above already describe),
+// just in the client's own short wording rather than the fuller "Switch to X theme" phrasing.
+const THEME_TOOLTIP = {
+  light: "Dark Theme",
+  purple: "Light Theme",
 } as const;
 
 export function ThemeToggle({ className = "" }: { className?: string }) {
@@ -42,13 +50,18 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
   const Icon = THEME_ICON[current];
 
   return (
-    <button
-      type="button"
-      onClick={() => setTheme(next)}
-      aria-label={THEME_LABEL[current]}
-      className={`inline-flex items-center justify-center h-[38px] w-[38px] shrink-0 rounded-full border border-[#DADADA] hover:border-[#b8b8b8] text-[#111] cursor-pointer transition-colors duration-200 dark:h-[46px] dark:w-[46px] dark:border-white/20 dark:text-white dark:hover:border-white/40 purple:h-[38px] purple:w-[38px] purple:border-[#B79CFF]/25 purple:text-[#F6F4FF] purple:hover:border-[#B79CFF]/50 ${className}`}
-    >
-      <Icon size={18} />
-    </button>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <button
+          type="button"
+          onClick={() => setTheme(next)}
+          aria-label={THEME_LABEL[current]}
+          className={`inline-flex items-center justify-center h-[38px] w-[38px] shrink-0 rounded-full border border-[#DADADA] hover:border-[#b8b8b8] text-[#111] cursor-pointer transition-colors duration-200 dark:h-[46px] dark:w-[46px] dark:border-white/20 dark:text-white dark:hover:border-white/40 purple:h-[38px] purple:w-[38px] purple:border-[#B79CFF]/25 purple:text-[#F6F4FF] purple:hover:border-[#B79CFF]/50 ${className}`}
+        >
+          <Icon size={18} />
+        </button>
+      </TooltipTrigger>
+      <TooltipContent>{THEME_TOOLTIP[current]}</TooltipContent>
+    </Tooltip>
   );
 }

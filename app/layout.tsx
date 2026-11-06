@@ -5,6 +5,7 @@ import { Courier_Prime } from 'next/font/google'
 import { AnalyticsGate } from '@/components/analytics-gate'
 import { CookieConsent } from '@/components/cookie-consent'
 import { ThemeProvider } from '@/components/theme-provider'
+import { ThemeFromQuery } from '@/components/theme-from-query'
 import './globals.css'
 
 const _geist = Geist({ subsets: ["latin"] });
@@ -75,6 +76,9 @@ export default function RootLayout({
             required by next-themes — it sets the class via an inline script before React
             hydrates, which would otherwise be flagged as a mismatch. */}
         <ThemeProvider attribute="class" themes={["light", "dark", "purple"]} defaultTheme="light" enableSystem={false}>
+          {/* Reads ?theme=purple (etc.) from the URL and applies it on load — lets the client
+              share a link that opens the site already in a specific theme. */}
+          <ThemeFromQuery />
           {children}
           <CookieConsent />
           {/* Was an unconditional <Analytics />, which loaded before the visitor was asked.
